@@ -39,7 +39,6 @@ class SliderGUI;
 #include "RTT/PickRTT.h"
 #include "../GUI/Rect.h"
 #include "../GUI/GUIUtils/SliderGUI.h"
-#include "../controllerEGL/ContextControllerEGL.h"
 
 #include <string>
 #include <vector>

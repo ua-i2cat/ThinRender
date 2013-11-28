@@ -22,7 +22,6 @@
 
 #include "Mesh.h"
 #include "../../utils/Timer.h"
-#include "../../controllerEGL/ContextControllerEGL.h"
 #include "../../shader/lightning/DirectionalLightNormalMapShader.h"
 #include "../../shader/lightning/DirectionalLightNormalMapShadowMapShader.h"
 #include "../../shader/lightning/EdgelShader.h"

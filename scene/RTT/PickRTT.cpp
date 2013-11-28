@@ -21,7 +21,6 @@
  */
 
 #include "PickRTT.h"
-#include "../../controllerEGL/ContextControllerEGL.h"
 #include "../../globalData/GlobalData.h"
 
 PickRTT::PickRTT(){

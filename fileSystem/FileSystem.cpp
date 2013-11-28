@@ -21,7 +21,9 @@
  */
 
 #include "FileSystem.h"
+#ifdef ANDROID_PLATFORM
 #include "AndroidFileSystem.h"
+#endif
 #include "IOSFileSystem.h"
 
 FileSystem* FileSystem::fileSystemInstance = 0;

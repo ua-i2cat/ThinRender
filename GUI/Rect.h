@@ -31,7 +31,6 @@
 #include "../sceneObjects/mesh/Mesh.h"
 #include "../sceneObjects/mesh/MeshManager.h"
 #include "../globalData/GlobalData.h"
-#include "../controllerEGL/ContextControllerEGL.h"
 #include "../log/Log.h"
 #include "Text.h"
 #include <string>

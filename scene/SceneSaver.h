@@ -35,7 +35,6 @@
 #include "../fileSystem/FileSystem.h"
 #include "../utils/fast_atof.h"
 #include "../utils/Maths.h"
-#include "../controllerEGL/ContextControllerEGL.h"
 #include "../fileSystem/FileSystem.h"
 
 #include <string>
