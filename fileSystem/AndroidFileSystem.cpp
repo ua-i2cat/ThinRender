@@ -69,9 +69,6 @@ int AndroidFileSystem::writeFile(string filePath, const char* content){
 void AndroidFileSystem::init(){
 }
 
-void AndroidFileSystem::release(){
-}
-
 void AndroidFileSystem::setAssetManager(ANativeActivity* nativeActivity){
 	this->assetManager = nativeActivity->assetManager;
 	dataPath = "/sdcard/renderScenes/";

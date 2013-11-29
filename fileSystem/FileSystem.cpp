@@ -98,5 +98,9 @@ void FileSystem::init(){
 }
 
 void FileSystem::release(){
+	for(map<string, FileStruct*>::iterator it = fileMap.begin(); it != fileMap.end(); ++it) {
+		delete (it->second);
+		(it->second) = 0;
+	}
 	fileMap.clear();
 }

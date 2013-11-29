@@ -57,7 +57,6 @@ public:
 protected:
 	std::string dataPath;
 	virtual void init();
-	virtual void release();
 };
 #endif
 #endif

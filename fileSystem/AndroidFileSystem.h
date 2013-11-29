@@ -63,6 +63,5 @@ protected:
 	std::string dataPath;
 	AAssetManager* assetManager;
 	virtual void init();
-	virtual void release();
 };
 #endif

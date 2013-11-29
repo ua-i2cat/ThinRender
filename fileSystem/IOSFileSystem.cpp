@@ -81,7 +81,4 @@ int IOSFileSystem::writeFile(string filePath, const char* content){
 void IOSFileSystem::init(){
 }
 
-void IOSFileSystem::release(){
-}
-
 #endif
