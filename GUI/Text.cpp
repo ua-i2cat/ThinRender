@@ -50,7 +50,7 @@ void printShaderLog(GLuint object){
 
 Text::Text(Text* text) {
 	maxHeight = text->maxHeight;
-    c = new glyphData[128];
+    c = new glyphData[256];
 	vbo = 0;
 	color = glm::vec4(0.0f,0.0f,0.0f,1.0f);
 	programText = text->programText;
@@ -61,12 +61,12 @@ Text::Text(Text* text) {
 	tex = text->tex;
 	w = text->w;
 	h = text->h;
-	memcpy(c, text->c, sizeof(glyphData)*128);
+	memcpy(c, text->c, sizeof(glyphData)*256);
 	atlasWidth = w;
 	atlasHeight = h;
 }
 Text::Text(FT_Face face, int height) {
-    c = new glyphData[128];
+    c = new glyphData[256];
 	color = glm::vec4(0.0f,0.0f,0.0f,1.0f);
 	cIndex = 0;
 	GLuint vs, fs;
@@ -166,10 +166,10 @@ Text::Text(FT_Face face, int height) {
 	int rowh = 0;
 	w = 0;
 	h = 0;
-	memset(c, 0, sizeof(glyphData) * 128);
+	memset(c, 0, sizeof(glyphData) * 256);
 
 	/* Find minimum size for a texture holding all visible ASCII characters */
-	for (int i = 32; i < 128; i++) {
+	for (int i = 32; i < 256; i++) {
 		if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
 			logErr("Loading character %c failed!\n", i);
 			continue;
@@ -210,7 +210,7 @@ Text::Text(FT_Face face, int height) {
 	int oy = 0;
 	rowh = 0;
 
-	for (int i = 32; i < 128; i++) {
+	for (int i = 32; i < 256; i++) {
 		if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
 			logErr("Loading character %c failed!\n", i);
 			continue;
