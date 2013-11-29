@@ -25,8 +25,8 @@
 
 #include <string>
 #include <map>
-#include "../platform.h"
-#include "../log/log.h"
+#include "../Platform.h"
+#include "../log/Log.h"
 
 using namespace std;
 
