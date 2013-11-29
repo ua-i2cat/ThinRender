@@ -219,13 +219,13 @@ void RectGUI::setText(std::string message, std::string typographyFile, int fontS
 	text = TextManager::getInstance()->getText(typographyFile, fontSize);
 	float widthMessage = text->getWidthOfMessage(textMessage.c_str());
 	float heightMessage = text->getHeightOfMessage(textMessage.c_str());
-	text->setText(textMessage.c_str(), width/2.0f - widthMessage/2.0f, GlobalData::getInstance()->screenHeight-height/2.0f-heightMessage/2.0f);
+	text->setText(textMessage, width/2.0f - widthMessage/2.0f, GlobalData::getInstance()->screenHeight-height/2.0f-heightMessage/2.0f);
 }
 
 void RectGUI::setBlockText(std::string message, std::string typographyFile, int fontSize, int align){
 	textMessage = message;
 	text = TextManager::getInstance()->getText(typographyFile, fontSize);
-	text->setBlockText(textMessage.c_str(), width, align);
+	text->setBlockText(textMessage, width, align);
 }
 
 void RectGUI::setProjectionMatrix(){
