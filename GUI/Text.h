@@ -25,6 +25,7 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include <string>
 
 #include "../OpenGLPlatform.h"
 #include "../log/Log.h"
@@ -95,9 +96,9 @@ public:
      * @param float sx multiplier x
      * @param float sy multiplier y
      */
-	void setText(const char *text, float x, float y);
+	void setText(std::string text, float x, float y);
 	/** IN PROGRESS */
-	void setBlockText(const char *text, float width, int align = 0);
+	void setBlockText(std::string text, float width, int align = 0);
 	uint8_t* calculatePointerEndLine(const char *text, float width);
 	float calculateLength(const char *start, const char *end);
 	int calculateNumWhiteSpaces(const char *start, const char *end);
@@ -125,8 +126,8 @@ public:
 	int cIndex;
 	glm::vec4 color;
 private:
-
 	int atlasWidth, atlasHeight;
+    std::string parseAndReplaceAccents(std::string text);
 };
 
 #endif

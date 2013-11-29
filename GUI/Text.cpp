@@ -21,6 +21,7 @@
  */
 
 #include <algorithm>
+#include <map>
 #include "Text.h"
 #include "../fileSystem/FileSystem.h"
 #include "../globalData/GlobalData.h"
@@ -286,7 +287,7 @@ uint8_t* Text::calculatePointerEndLine(const char *text, float width){
 }
 //first only left alignment
 //align 0 left, 1 center, 2 justified
-void Text::setBlockText(const char *text, float width, int align){
+void Text::setBlockText(std::string text, float width, int align){
 	logInf("setBlockText width: %f", width);
 	float x = 0.0;
 	float y = GlobalData::getInstance()->screenHeight - maxHeight;
@@ -299,16 +300,16 @@ void Text::setBlockText(const char *text, float width, int align){
 
 	uint8_t *lineEnding;
 	//logWar("Text::setText message: %s x: %f y: %f sx: %f sy: %f", text, x, y, sx, sy);
-
-	point coords[6 * strlen(text)];
+    text = parseAndReplaceAccents(text);
+	point coords[6 * strlen(text.c_str())];
 	cIndex = 0;
 	float line = 0.0f;
-	lineEnding = calculatePointerEndLine(text, width);
+	lineEnding = calculatePointerEndLine(text.c_str(), width);
 	/* Loop through all characters */
 	float whiteSpaceModificator = 1.0f;
 	if(align == 2){//justificat
-		float messageLength = calculateLength(text,(const char *)lineEnding);
-		float numWhiteSpaces = calculateNumWhiteSpaces(text,(const char *)lineEnding);
+		float messageLength = calculateLength(text.c_str(),(const char *)lineEnding);
+		float numWhiteSpaces = calculateNumWhiteSpaces(text.c_str(),(const char *)lineEnding);
 		float advanceWhiteSpace = c[' '].ax;
 
 		whiteSpaceModificator = (width - messageLength + numWhiteSpaces*advanceWhiteSpace)/(numWhiteSpaces*advanceWhiteSpace);
@@ -316,7 +317,7 @@ void Text::setBlockText(const char *text, float width, int align){
 			whiteSpaceModificator = 1.0f;
 		}
 	}
-	for (p = (const uint8_t *)text; *p; p++) {
+	for (p = (const uint8_t *)text.c_str(); *p; p++) {
 		if(p == lineEnding){
 			line--;
 			if(*p == '\\') p++;
@@ -365,18 +366,18 @@ void Text::setBlockText(const char *text, float width, int align){
 	}
 	glBufferData(GL_ARRAY_BUFFER, sizeof(coords), coords, GL_STATIC_DRAW);
 }
-void Text::setText(const char *text, float x, float y){
+void Text::setText(std::string text, float x, float y){
 	if(vbo != 0) glDeleteBuffers(1, &vbo);
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	const uint8_t *p;
 	//logWar("Text::setText message: %s x: %f y: %f sx: %f sy: %f", text, x, y, sx, sy);
-
-	point coords[6 * strlen(text)];
+    text = parseAndReplaceAccents(text);
+	point coords[6 * strlen(text.c_str())];
 	cIndex = 0;
 	/* Loop through all characters */
-	for (p = (const uint8_t *)text; *p; p++) {
+	for (p = (const uint8_t *)text.c_str(); *p; p++) {
 		/* Calculate the vertex and texture coordinates */
 		float x2 = x + c[*p].bl;//bl bitmap left
 		float y2 = -y - c[*p].bt;//bt bitmap top
@@ -460,4 +461,80 @@ float Text::getHeightOfMessage(const char* message){
 		if(auxiliarY > y) y = auxiliarY;
 	}
 	return y;
+}
+
+std::string Text::parseAndReplaceAccents(std::string text) {
+
+	std::map<std::string, int> replacements;
+
+	replacements["À"] = 192;
+	replacements["Á"] = 193;
+	replacements["Â"] = 194;
+	replacements["Ä"] = 196;
+
+	replacements["È"] = 200;
+	replacements["É"] = 201;
+	replacements["Ê"] = 202;
+	replacements["Ë"] = 203;
+
+	replacements["Ì"] = 204;
+	replacements["Í"] = 205;
+	replacements["Î"] = 206;
+	replacements["Ï"] = 207;
+
+	replacements["Ò"] = 210;
+	replacements["Ó"] = 211;
+	replacements["Ô"] = 212;
+	replacements["Ö"] = 214;
+
+	replacements["Ù"] = 217;
+	replacements["Ú"] = 218;
+	replacements["Û"] = 219;
+	replacements["Ü"] = 220;
+
+	replacements["à"] = 224;
+	replacements["á"] = 225;
+	replacements["â"] = 226;
+	replacements["ä"] = 228;
+
+	replacements["è"] = 232;
+	replacements["é"] = 233;
+	replacements["ê"] = 234;
+	replacements["ë"] = 235;
+
+	replacements["ì"] = 236;
+	replacements["í"] = 237;
+	replacements["î"] = 238;
+	replacements["ï"] = 239;
+
+	replacements["ò"] = 242;
+	replacements["ó"] = 243;
+	replacements["ô"] = 244;
+	replacements["ö"] = 246;
+
+	replacements["ù"] = 249;
+	replacements["ú"] = 250;
+	replacements["û"] = 251;
+	replacements["ü"] = 252;
+
+	replacements["Ç"] = 199;
+	replacements["ç"] = 231;
+	replacements["Ñ"] = 209;
+	replacements["ñ"] = 241;
+	replacements["·"] = 183;
+	replacements["'"] = 180;
+	replacements["¡"] = 161;
+	replacements["¿"] = 191;
+
+	for(map<std::string, int>::iterator it = replacements.begin(); it != replacements.end(); ++it) {
+
+		size_t pos = text.find(it->first);
+		while (pos != std::string::npos) {
+			char sub[2] = {(char) it->second, '\0'};
+			text.replace(pos, it->first.length(), std::string(sub));
+			pos = text.find(it->first, pos + 1);
+		}
+	}
+
+	return text;
 }
