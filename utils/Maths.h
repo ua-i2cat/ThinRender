@@ -48,6 +48,9 @@ namespace Maths
 	static inline float sqrtf(float x){
 		return sqrt(x);
 	}
+    static inline float signf(float x){
+        return x < 0 ? -1.0f : 1.0f;
+    }
 };
 
 #endif
