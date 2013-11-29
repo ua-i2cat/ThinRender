@@ -24,6 +24,9 @@
 #include "../fileSystem/FileSystem.h"
 #include "../Platform.h"
 #include "../log/Log.h"
+extern "C" {
+    #include "../utils/JPEG.h"
+}
 
 TextureManager* TextureManager::instance = 0;
 
@@ -52,8 +55,8 @@ TextureManager::~TextureManager(){
 	textureMap.clear();
 }
 
-Texture* TextureManager::getTexture(string name){
-	std::map<string, Texture*>::iterator it;
+Texture* TextureManager::getTexture(std::string name){
+	std::map<std::string, Texture*>::iterator it;
 	it = textureMap.find(name);
 	if(it != textureMap.end()){//textura previament carregada
 		return (it->second);
@@ -61,7 +64,22 @@ Texture* TextureManager::getTexture(string name){
 	if(FileSystem::getInstance()->openFile(name) == -1){
 		logErr("Error TextureManager::getTexture opening %s: ", name.c_str());
 	}
-	Image* image = loadImageMemory((const void *)FileSystem::getInstance()->getFileData(name), FileSystem::getInstance()->getFileSize(name));
+
+	bool foundPNG = (name.find(".png") != std::string::npos);
+	bool foundBMP = (name.find(".bmp") != std::string::npos);
+	bool foundJPEG = (name.find(".jpg") != std::string::npos) || (name.find(".jpeg") != std::string::npos);
+
+	Image* image = 0;
+	if (foundPNG) {
+		image = loadImageMemoryPNG((const void *)FileSystem::getInstance()->getFileData(name), FileSystem::getInstance()->getFileSize(name));
+	} else if (foundBMP) {
+		image = loadImageMemoryBMP((const void *)FileSystem::getInstance()->getFileData(name), FileSystem::getInstance()->getFileSize(name));
+	} else if (foundJPEG) {
+		image = loadImageMemoryJPEG((const void *)FileSystem::getInstance()->getFileData(name), FileSystem::getInstance()->getFileSize(name));
+	}
+
+	// TODO: Error handling?
+
 	textureMap[name] = new Texture(image);
 	delete image;
 	FileSystem::getInstance()->destroyFileData(name);
@@ -78,7 +96,57 @@ void TextureManager::read_data_memory(png_structp png_ptr, png_bytep data, png_u
    f->current_pos += length;
 }
 
-Image* TextureManager::loadImageMemory(const void *buffer, int bufsize)
+Image* TextureManager::loadImageMemoryBMP(const void *buffer, int bufsize)
+{
+	logInf("TextureManager::loadImageMemoryBMP: start processing");
+	unsigned char *inputBuffer = (unsigned char *) buffer;
+
+	unsigned int pixelInputOffset = (unsigned int) (*(inputBuffer + 0x0A));
+
+	unsigned int widthInPixels = (unsigned int) (*(inputBuffer + 0x12));
+	unsigned int heightInPixels = (unsigned int) (*(inputBuffer + 0x16));
+
+	unsigned int size = widthInPixels * heightInPixels * 3;
+
+	logInf("BMP data: pixel_data offset: %d - width: %d - height: %d - size %d", pixelInputOffset, widthInPixels, heightInPixels, size);
+
+	logInf("Creating a new Image");
+	Image* image = new Image(widthInPixels, heightInPixels, 3, size);
+
+	// TODO: check bufsize
+
+	logInf("About to memcpy!");
+
+	for (int i = 0; i < size; i += 3) {
+		unsigned char b = (inputBuffer + pixelInputOffset + i)[0];
+		unsigned char r = (inputBuffer + pixelInputOffset + i)[2];
+		(inputBuffer + pixelInputOffset + i)[0] = r;
+		(inputBuffer + pixelInputOffset + i)[2] = b;
+	}
+
+	memcpy(image->pixel_data, inputBuffer + pixelInputOffset, size);
+
+	return image;
+}
+
+Image* TextureManager::loadImageMemoryJPEG(const void *buffer, int bufsize)
+{
+    int size, w, h;
+    parseJPEG((const char *)buffer, bufsize, &size, &w, &h);
+    Image* image = new Image(w, h, 2, size);
+
+    int ret = decompressJPEG((char const *)buffer, bufsize, (char *)image->pixel_data);
+    logInf("TextureManager::loadImageMemoryJPEG: processed size %d, expected size %d", ret, size);
+
+    if (ret == 0) {
+    	logErr("TextureManager::loadImageMemoryJPEG: processed size is 0");
+    	return 0;
+    }
+
+    return image;
+}
+
+Image* TextureManager::loadImageMemoryPNG(const void *buffer, int bufsize)
 {
 	png_structp png_ptr;
 	png_infop info_ptr;

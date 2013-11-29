@@ -61,7 +61,9 @@ private:
 	TextureManager();
 	~TextureManager();
 
-	Image* loadImageMemory(const void *buffer, int bufsize);
+	Image* loadImageMemoryBMP(const void *buffer, int bufsize);
+	Image* loadImageMemoryJPEG(const void *buffer, int bufsize);
+	Image* loadImageMemoryPNG(const void *buffer, int bufsize);
 
 	static TextureManager* instance;
 };
