@@ -5,29 +5,39 @@
 
 JavaVM* javaVM = NULL;
 jclass activityClass;
+JNIEnv *env;
 jobject activityObj;
 static ANativeWindow* _theNativeWindow;
-
+jmethodID methodUpdate;
 namespace TextureWindow {
-
+	static void close(){
+		logInf("TextureWindow::getANativeWindow B!");
+		javaVM->DetachCurrentThread();
+	}
+	static void updateTexture(){
+		env->CallVoidMethod(activityObj, methodUpdate);
+	}
 	static ANativeWindow* getANativeWindow(int texture) {
 		logInf("TextureWindow::getANativeWindow START!");
 		if (javaVM == NULL) {
 			logErr("TextureSurface::setTextureSurface Error: javaVM is NULL");
 			return 0;
 		}
-		JNIEnv *env;
+
 		javaVM->AttachCurrentThread(&env, NULL);
 		jmethodID method = env->GetMethodID(activityClass, "initSurfaceTexture", "(I)V");
 		if (method == NULL) {
 			logErr("TextureSurface::setTextureSurface Error: could not find createSurfaceFromTexture method");
 			return 0;
 		}
+		methodUpdate = env->GetMethodID(activityClass, "updateTexture", "()V");
+		if (methodUpdate == NULL) {
+			logErr("TextureSurface::setTextureSurface Error: could not find createSurfaceFromTexture method");
+			return 0;
+		}
 		logInf("TextureWindow::getANativeWindow A!");
 		env->CallVoidMethod(activityObj, method, texture);
-		logInf("TextureWindow::getANativeWindow B!");
-		javaVM->DetachCurrentThread();
-		logInf("TextureWindow::getANativeWindow C!");
+
 		return _theNativeWindow;
 	}
 
