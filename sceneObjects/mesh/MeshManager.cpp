@@ -421,7 +421,8 @@ Mesh* MeshManager::parseOBJ(string filename, char* buffer, int lenght){
 //	logInf("parse OBJ file with name %s lenght %i", filename.c_str(),lenght);
     //logInf("buffer:\n%s",buffer);
     resultMesh = new Mesh(filename, getNewId());
-	SubMesh* auxSubMesh = new SubMesh(0);
+    int idSubMesh = 0;
+	SubMesh* auxSubMesh = new SubMesh(idSubMesh);
 	int i = 0;
 	while (buffer[i] != '\0')
 	{
