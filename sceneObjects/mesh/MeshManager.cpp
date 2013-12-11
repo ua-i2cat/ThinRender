@@ -420,6 +420,7 @@ void MeshManager::prepareSubMeshNormals(Mesh* mesh, SubMesh* subMesh){
 Mesh* MeshManager::parseOBJ(string filename, char* buffer, int lenght){
 //	logInf("parse OBJ file with name %s lenght %i", filename.c_str(),lenght);
     //logInf("buffer:\n%s",buffer);
+	elementOffsetOBJ = 0;
     resultMesh = new Mesh(filename, getNewId());
     int idSubMesh = 0;
 	SubMesh* auxSubMesh = new SubMesh(idSubMesh);
@@ -471,6 +472,12 @@ Mesh* MeshManager::parseOBJ(string filename, char* buffer, int lenght){
 		break;
 	case 'o': // Parse object name
 		//getObjectName();
+		if (idSubMesh != 0) {
+			elementOffsetOBJ += auxSubMesh->vertices.size();
+			resultMesh->subMeshes.push_back(auxSubMesh);
+		}
+		idSubMesh++;
+	    auxSubMesh = new SubMesh(idSubMesh);
 		skipLine(buffer, &i);
 		break;
 	default:
@@ -478,45 +485,50 @@ Mesh* MeshManager::parseOBJ(string filename, char* buffer, int lenght){
 		break;
 	}
 	}
-    
-//    logInf("calculating normals auxSubMesh->vertices.size() %lu", auxSubMesh->vertices.size());
-//    logInf("calculating normals auxSubMesh->elements.size() %lu", auxSubMesh->elements.size());
-
-	int ia, ib, ic;
-	glm::vec3 normal;
-	auxSubMesh->normals.resize(auxSubMesh->vertices.size(), glm::vec3(0.0, 0.0, 0.0));
-	vector<int> nb_seen;
-	nb_seen.resize(auxSubMesh->vertices.size(), 0);
-	int current;
-	int v[3];
-	for (int i = 0; i < auxSubMesh->elements.size(); i++) {
-		ia = auxSubMesh->elements.at(i).x;
-		ib = auxSubMesh->elements.at(i).y;
-		ic = auxSubMesh->elements.at(i).z;
-        //logInf("a %i, b %i, c %i",ia,ib,ic);
-		normal = glm::normalize(glm::cross(
-				auxSubMesh->vertices.at(ib) - auxSubMesh->vertices.at(ia),
-				auxSubMesh->vertices.at(ic) - auxSubMesh->vertices.at(ia)));
-		v[0] = ia;
-		v[1] = ib;
-		v[2] = ic;
-		for (int j = 0; j < 3; j++) {
-			current = v[j];
-            //logInf("current %i", current);
-			nb_seen[current]++;
-			if(nb_seen[current] == 1){
-				auxSubMesh->normals[current] = normal;
-			}else{
-				auxSubMesh->normals[current].x = auxSubMesh->normals[current].x * (1.0 - 1.0/nb_seen[current]) + normal.x * 1.0/nb_seen[current];
-				auxSubMesh->normals[current].y = auxSubMesh->normals[current].y * (1.0 - 1.0/nb_seen[current]) + normal.y * 1.0/nb_seen[current];
-				auxSubMesh->normals[current].z = auxSubMesh->normals[current].z * (1.0 - 1.0/nb_seen[current]) + normal.z * 1.0/nb_seen[current];
-				auxSubMesh->normals[current] = glm::normalize(auxSubMesh->normals[current]);
-			}
-		}
-	}
-    logInf("push back sub mesh");
 	resultMesh->subMeshes.push_back(auxSubMesh);
-    logInf("return");
+
+
+
+    for (int t = 0; t < idSubMesh; t++) {
+        auxSubMesh = resultMesh->subMeshes.at(t);
+
+        //logInf("calculating normals auxSubMesh->vertices.size() %lu", auxSubMesh->vertices.size());
+		//logInf("calculating normals auxSubMesh->elements.size() %lu", auxSubMesh->elements.size());
+
+        auxSubMesh->normals.resize(auxSubMesh->vertices.size(), glm::vec3(0.0, 0.0, 0.0));
+        vector<int> nb_seen;
+        nb_seen.clear();
+        nb_seen.resize(auxSubMesh->vertices.size(), 0);
+        for (int i = 0; i < auxSubMesh->elements.size(); i++) {
+        	int ia, ib, ic;
+        	glm::vec3 normal;
+        	int current;
+        	int v[3];
+            ia = auxSubMesh->elements.at(i).x;
+            ib = auxSubMesh->elements.at(i).y;
+            ic = auxSubMesh->elements.at(i).z;
+            //logInf("a %i, b %i, c %i",ia,ib,ic);
+            normal = glm::normalize(glm::cross(
+                        auxSubMesh->vertices.at(ib) - auxSubMesh->vertices.at(ia),
+                        auxSubMesh->vertices.at(ic) - auxSubMesh->vertices.at(ia)));
+            v[0] = ia;
+            v[1] = ib;
+            v[2] = ic;
+            for (int j = 0; j < 3; j++) {
+                current = v[j];
+                //logInf("current %i", current);
+                nb_seen[current]++;
+                if(nb_seen[current] == 1){
+                    auxSubMesh->normals[current] = normal;
+                }else{
+                    auxSubMesh->normals[current].x = auxSubMesh->normals[current].x * (1.0 - 1.0/nb_seen[current]) + normal.x * 1.0/nb_seen[current];
+                    auxSubMesh->normals[current].y = auxSubMesh->normals[current].y * (1.0 - 1.0/nb_seen[current]) + normal.y * 1.0/nb_seen[current];
+                    auxSubMesh->normals[current].z = auxSubMesh->normals[current].z * (1.0 - 1.0/nb_seen[current]) + normal.z * 1.0/nb_seen[current];
+                    auxSubMesh->normals[current] = glm::normalize(auxSubMesh->normals[current]);
+                }
+            }
+        }
+    }
 	return resultMesh;
 }
 void MeshManager::getNextWord(char* buffer, int* i){
@@ -542,13 +554,13 @@ void MeshManager::getFace(std::vector<glm::i32vec3>* vertices, char* buffer, int
 	getNextWord(buffer, i);
 	int x, y, z;
 	copyNextWord(tempBuffer, BUFFERSIZE, buffer, i);
-	x = (int) atoi(tempBuffer) - 1;
+	x = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
 
 	copyNextWord(tempBuffer, BUFFERSIZE, buffer, i);
-	y = (int) atoi(tempBuffer) - 1;
+	y = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
 
 	copyNextWord(tempBuffer, BUFFERSIZE, buffer, i);
-	z = (int) atoi(tempBuffer) - 1;
+	z = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
 
 	vertices->push_back(glm::i32vec3(x, y, z));
 

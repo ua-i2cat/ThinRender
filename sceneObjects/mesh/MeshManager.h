@@ -86,6 +86,7 @@ private:
 	void computeQuaternionW(glm::quat* quat);
 
 	void printMeshData(Mesh* mesh);
+	int elementOffsetOBJ;
 };
 
 #endif
