@@ -249,20 +249,12 @@ bool audioSelectClip(int which, int count)
 {
     switch (which) {
     case 0:     // CLIP_NONE
-        nextBuffer = (short *) NULL;
-        nextSize = 0;
         break;
     case 1:     // CLIP_HELLO
-        nextBuffer = (short *) hello;
-        nextSize = sizeof(hello);
         break;
     case 2:     // CLIP_ANDROID
-        nextBuffer = (short *) android;
-        nextSize = sizeof(android);
         break;
     case 3:     // CLIP_SAWTOOTH
-        nextBuffer = sawtoothBuffer;
-        nextSize = sizeof(sawtoothBuffer);
         break;
     case 4:     // CLIP_PLAYBACK
         // we recorded at 16 kHz, but are playing buffers at 8 Khz, so do a primitive down-sample

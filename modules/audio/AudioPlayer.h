@@ -25,20 +25,22 @@
 
 #include <sys/types.h>
 #include <android/asset_manager.h>
+#include <string>
 
 class AudioPlayer {
 
 public:
-    AudioPlayer();
+    AudioPlayer(AAssetManager* aAssetManager);
     ~AudioPlayer();
 
-	void setSource(std::string fileName);
-	void play();
-	void pause();
-	void stop();
+	bool setSource(std::string fileName);
+	bool play();
+	bool pause();
+	bool stop();
 
 private:
     AAssetManager* assetManager;
+    bool engineCreated;
 };
 
 #endif
