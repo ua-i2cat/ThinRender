@@ -23,6 +23,9 @@
 #ifndef AUDIO_PLAYER_H
 #define AUDIO_PLAYER_H
 
+#include <sys/types.h>
+#include <android/asset_manager.h>
+
 class AudioPlayer {
 
 public:
@@ -35,7 +38,7 @@ public:
 	void stop();
 
 private:
-
+    AAssetManager* assetManager;
 };
 
 #endif

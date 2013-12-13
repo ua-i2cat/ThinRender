@@ -22,27 +22,42 @@
 
 #include "AudioPlayer.h"
 #include <pthread>
-
-AudioPlayer::AudioPlayer() {
-
+extern "C" {
+    #include "audio.h"
 }
+
+#include <SLES/OpenSLES.h>
+#include <SLES/OpenSLES_Android.h>
+
+AudioPlayer::AudioPlayer(AAssetManager* aAssetManager) {
+    assetManager = aAssetManager;
+    audioCreateEngine();
+    audioCreateBufferQueueAudioPlayer();
+    engineCreated = true;
+}
+    
 
 AudioPlayer::~AudioPlayer() {
-
+    if (engineCreated) {
+        audioShutdown();
+    }
 }
 
-bool AudioPlayer::setSource() {
-
+bool AudioPlayer::setSource(std::string filename) {
+    audioCreateAssetAudioPlayer(assetManager, filename.c_str());
 }
 
 bool AudioPlayer::play() {
-
+    audioSetPlayingAssetAudioPlayer(true);
 }
 
 bool AudioPlayer::pause() {
+    audioSetPlayingAssetAudioPlayer(false);
 
 }
 
 bool AudioPlayer::stop() {
-
+    audioSetPlayingAssetAudioPlayer(false);
+    audioShutdown();
+    engineCreated = false;
 }
