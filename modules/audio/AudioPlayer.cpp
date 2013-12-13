@@ -21,7 +21,6 @@
  */
 
 #include "AudioPlayer.h"
-#include <pthread>
 extern "C" {
     #include "audio.h"
 }
