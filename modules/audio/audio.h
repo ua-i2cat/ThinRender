@@ -17,6 +17,7 @@
  */
 
 #include <assert.h>
+#include <android/log.h>
 
 // for native audio
 #include <SLES/OpenSLES.h>
@@ -244,50 +245,6 @@ bool audioEnableReverb(bool enabled)
     return true;
 }
 
-// select the desired clip and play count, and enqueue the first buffer if idle
-bool audioSelectClip(int which, int count)
-{
-    switch (which) {
-    case 0:     // CLIP_NONE
-        break;
-    case 1:     // CLIP_HELLO
-        break;
-    case 2:     // CLIP_ANDROID
-        break;
-    case 3:     // CLIP_SAWTOOTH
-        break;
-    case 4:     // CLIP_PLAYBACK
-        // we recorded at 16 kHz, but are playing buffers at 8 Khz, so do a primitive down-sample
-        if (recorderSR == SL_SAMPLINGRATE_16) {
-            unsigned i;
-            for (i = 0; i < recorderSize; i += 2 * sizeof(short)) {
-                recorderBuffer[i >> 2] = recorderBuffer[i >> 1];
-            }
-            recorderSR = SL_SAMPLINGRATE_8;
-            recorderSize >>= 1;
-        }
-        nextBuffer = recorderBuffer;
-        nextSize = recorderSize;
-        break;
-    default:
-        nextBuffer = NULL;
-        nextSize = 0;
-        break;
-    }
-    nextCount = count;
-    if (nextSize > 0) {
-        // here we only enqueue one buffer because it is a long clip,
-        // but for streaming playback we would typically enqueue at least 2 buffers to start
-        SLresult result;
-        result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer, nextSize);
-        if (SL_RESULT_SUCCESS != result) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 // create asset audio player
 bool audioCreateAssetAudioPlayer(AAssetManager* assetManager, const char* filename)
 {
@@ -377,6 +334,7 @@ void audioSetPlayingAssetAudioPlayer(bool isPlaying)
 void audioShutdown()
 {
 
+    __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying bqPlayer");
     // destroy buffer queue audio player object, and invalidate all associated interfaces
     if (bqPlayerObject != NULL) {
         (*bqPlayerObject)->Destroy(bqPlayerObject);
@@ -388,6 +346,7 @@ void audioShutdown()
         bqPlayerVolume = NULL;
     }
 
+    __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying fdPlayerObject");
     // destroy file descriptor audio player object, and invalidate all associated interfaces
     if (fdPlayerObject != NULL) {
         (*fdPlayerObject)->Destroy(fdPlayerObject);
@@ -398,6 +357,7 @@ void audioShutdown()
         fdPlayerVolume = NULL;
     }
 
+    __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying outputMixObject");
     // destroy output mix object, and invalidate all associated interfaces
     if (outputMixObject != NULL) {
         (*outputMixObject)->Destroy(outputMixObject);
@@ -405,10 +365,12 @@ void audioShutdown()
         outputMixEnvironmentalReverb = NULL;
     }
 
+    __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying engineObject");
     // destroy engine object, and invalidate all associated interfaces
     if (engineObject != NULL) {
         (*engineObject)->Destroy(engineObject);
         engineObject = NULL;
         engineEngine = NULL;
     }
+    __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying engineObject done!");
 }
