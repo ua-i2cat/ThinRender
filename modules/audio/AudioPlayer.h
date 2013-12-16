@@ -40,7 +40,6 @@ public:
 
 private:
     AAssetManager* assetManager;
-    bool engineCreated;
 };
 
 #endif

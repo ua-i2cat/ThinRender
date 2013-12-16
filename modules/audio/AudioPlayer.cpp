@@ -32,14 +32,12 @@ AudioPlayer::AudioPlayer(AAssetManager* aAssetManager) {
     assetManager = aAssetManager;
     audioCreateEngine();
     audioCreateBufferQueueAudioPlayer();
-    engineCreated = true;
 }
     
 
 AudioPlayer::~AudioPlayer() {
-    if (engineCreated) {
-        audioShutdown();
-    }
+    stop();
+    audioShutdown();
 }
 
 bool AudioPlayer::setSource(std::string filename) {
@@ -57,6 +55,4 @@ bool AudioPlayer::pause() {
 
 bool AudioPlayer::stop() {
     audioSetPlayingAssetAudioPlayer(false);
-    audioShutdown();
-    engineCreated = false;
 }
