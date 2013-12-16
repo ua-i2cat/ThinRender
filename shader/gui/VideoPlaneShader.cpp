@@ -79,9 +79,14 @@ void VideoPlaneShader::setVars(glm::mat4 projView, glm::mat4 model, glm::mat4 vi
 
 	error = glGetError();
 	if(error != GL_NO_ERROR)logErr("2");
+
 	glActiveTexture(GL_TEXTURE0);
+#ifdef ANDROID_PLATFORM
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture->getTextureId());
-	glUniform1i(uniformTexture, 0);
+#else
+    glBindTexture(GL_TEXTURE, texture->getTextureId());
+#endif
+    glUniform1i(uniformTexture, 0);
 
 	error = glGetError();
 	if(error != GL_NO_ERROR)logErr("3");

@@ -24,9 +24,9 @@
 #include "../fileSystem/FileSystem.h"
 #include "../Platform.h"
 #include "../log/Log.h"
-extern "C" {
+//extern "C" {
     #include "../utils/JPEG.h"
-}
+//}
 
 TextureManager* TextureManager::instance = 0;
 

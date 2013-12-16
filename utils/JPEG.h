@@ -5,7 +5,8 @@
  * picture from memory instead of using a FILE pointer.
  * 
  */
-
+#ifndef JPEG_WRAPPER_H
+#define JPEG_WRAPPER_H
 #include "../libs/libjpeg/jpeglib.h"
 #include "../libs/libjpeg/jerror.h"
 
@@ -110,3 +111,6 @@ int decompressJPEG(const char* data, size_t len, char* out) {
     jpeg_destroy_decompress(&cinfo);
     return size;
 }
+
+
+#endif
