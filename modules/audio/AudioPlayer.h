@@ -24,22 +24,19 @@
 #define AUDIO_PLAYER_H
 
 #include <sys/types.h>
-#include <android/asset_manager.h>
 #include <string>
 
 class AudioPlayer {
 
 public:
-    AudioPlayer(AAssetManager* aAssetManager);
+    AudioPlayer(std::string filename);
     ~AudioPlayer();
 
-	bool setSource(std::string fileName);
 	bool play();
 	bool pause();
 	bool stop();
 
 private:
-    AAssetManager* assetManager;
 };
 
 #endif
