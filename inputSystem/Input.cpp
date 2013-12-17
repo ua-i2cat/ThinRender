@@ -138,7 +138,12 @@ std::vector<event> Input::getEventsNotLooked(){
     for(std::vector<event>::iterator it = eventVector.begin(); it < eventVector.end(); it++){
         if((*it).visited == false && !(*it).flushed){
             eV.push_back((*it));
-            (*it).visited = true;//not necessary
+            // Android only gives the difference between inputs and we're expected to
+            // mantain the static events (i.e. two-finger zoom: we should preserve the
+            // both fingers events even if one of them is not moving)
+            if ((*it).state == Input::BEGIN_INPUT) {
+                (*it).visited = true;
+            }
         }
         if(!(*it).active){
         	eventVector.erase(it);
