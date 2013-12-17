@@ -138,7 +138,7 @@ std::vector<event> Input::getEventsNotLooked(){
     for(std::vector<event>::iterator it = eventVector.begin(); it < eventVector.end(); it++){
         if((*it).visited == false && !(*it).flushed){
             eV.push_back((*it));
-            //(*it).visited = true;//not necessary
+            (*it).visited = true;//not necessary
         }
         if(!(*it).active){
         	eventVector.erase(it);
