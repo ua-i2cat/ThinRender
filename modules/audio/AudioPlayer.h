@@ -29,9 +29,10 @@
 class AudioPlayer {
 
 public:
-    AudioPlayer(std::string filename);
+    AudioPlayer(std::string filePath);
     ~AudioPlayer();
 
+    bool changeSource(std::string filePath);
 	bool play();
 	bool pause();
 	bool stop();

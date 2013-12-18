@@ -28,21 +28,27 @@
 #include <SLES/OpenSLES_Android.h>
 #include "audio.h"
 
-AudioPlayer::AudioPlayer(std::string filename) {
+AudioPlayer::AudioPlayer(std::string filePath) {
     audioCreateEngine();
     audioCreateBufferQueueAudioPlayer();
     
     AAssetManager *assetManager = GlobalData::getInstance()->app->activity->assetManager;
     long start;
     long length;
-    int fileDescriptor = FileSystem::getInstance()->getFileDescriptor(filename, &start, &length);
+    int fileDescriptor = FileSystem::getInstance()->getFileDescriptor(filePath, &start, &length);
     audioCreateAssetAudioPlayer(fileDescriptor, start, length);
 }
-    
 
 AudioPlayer::~AudioPlayer() {
     stop();
     audioShutdown();
+}
+
+bool AudioPlayer::changeSource(std::string filePath) {
+    long start;
+    long length;
+    int fileDescriptor = FileSystem::getInstance()->getFileDescriptor(filePath, &start, &length);
+    audioChangeAssetAudioPlayer(fileDescriptor, start, length);
 }
 
 bool AudioPlayer::play() {
