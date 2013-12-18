@@ -16,6 +16,10 @@
  * 
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <assert.h>
 #include <android/log.h>
 
@@ -246,26 +250,26 @@ bool audioEnableReverb(bool enabled)
 }
 
 // create asset audio player
-bool audioCreateAssetAudioPlayer(AAssetManager* assetManager, const char* filename)
+bool audioCreateAssetAudioPlayer(int fileDescriptor, unsigned long start, unsigned long length)
 {
     SLresult result;
 
     // TODO: use render fileSystem
-    AAsset* asset = AAssetManager_open(assetManager, filename, AASSET_MODE_UNKNOWN);
+    // AAsset* asset = AAssetManager_open(assetManager, filename, AASSET_MODE_UNKNOWN);
 
     // the asset might not be found
-    if (NULL == asset) {
-        return false;
-    }
+    // if (NULL == asset) {
+    //    return false;
+    //}
 
     // open asset as file descriptor
-    off_t start, length;
-    int fd = AAsset_openFileDescriptor(asset, &start, &length);
-    assert(0 <= fd);
-    AAsset_close(asset);
+    //off_t start, length;
+    //int fd = AAsset_openFileDescriptor(asset, &start, &length);
+    //assert(0 <= fd);
+    //AAsset_close(asset);
 
     // configure audio source
-    SLDataLocator_AndroidFD loc_fd = {SL_DATALOCATOR_ANDROIDFD, fd, start, length};
+    SLDataLocator_AndroidFD loc_fd = {SL_DATALOCATOR_ANDROIDFD, fileDescriptor, start, length};
     SLDataFormat_MIME format_mime = {SL_DATAFORMAT_MIME, NULL, SL_CONTAINERTYPE_UNSPECIFIED};
     SLDataSource audioSrc = {&loc_fd, &format_mime};
 
@@ -374,3 +378,7 @@ void audioShutdown()
     }
     __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying engineObject done!");
 }
+
+#ifdef __cplusplus
+}
+#endif

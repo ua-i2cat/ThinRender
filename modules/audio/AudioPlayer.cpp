@@ -24,18 +24,19 @@
 #include "../../globalData/GlobalData.h"
 #include <android/asset_manager.h>
 #include <android_native_app_glue.h>
-extern "C" {
-    #include "audio.h"
-}
-
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
+#include "audio.h"
 
 AudioPlayer::AudioPlayer(std::string filename) {
     audioCreateEngine();
     audioCreateBufferQueueAudioPlayer();
+    
     AAssetManager *assetManager = GlobalData::getInstance()->app->activity->assetManager;
-    audioCreateAssetAudioPlayer(assetManager, filename.c_str());
+    long start;
+    long length;
+    int fileDescriptor = FileSystem::getInstance()->getFileDescriptor(filename, &start, &length);
+    audioCreateAssetAudioPlayer(fileDescriptor, start, length);
 }
     
 
