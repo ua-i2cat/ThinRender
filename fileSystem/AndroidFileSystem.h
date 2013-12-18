@@ -59,6 +59,8 @@ public:
      * @param ANativeActivity* can be extracted from main function
      */
 	void setAssetManager(ANativeActivity* nativeActivity);
+
+    int getFileDescriptor(string filePath, long* start, long* end);
 protected:
 	std::string dataPath;
 	AAssetManager* assetManager;

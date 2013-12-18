@@ -104,3 +104,8 @@ void FileSystem::release(){
 	}
 	fileMap.clear();
 }
+
+int FileSystem::getFileDescriptor(string filePath, long* start, long* length) {
+    logInf("FileSystem::getFileDescriptor not implemented");
+	return -1;
+}

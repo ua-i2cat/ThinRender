@@ -97,6 +97,8 @@ public:
 	 */
 	virtual void destroyFileData(string filePath);
 
+    virtual int getFileDescriptor(string filePath, long* start, long* length);
+
 protected:
 	map<string, FileStruct* > fileMap;
 	FileSystem();
