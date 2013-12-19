@@ -25,6 +25,7 @@
 #include <android/asset_manager.h>
 #include <android_native_app_glue.h>
 
+int AudioPlayer::playerCount = 0;
 SLObjectItf AudioPlayer::engineObject = NULL;
 SLEngineItf AudioPlayer::engineEngine = NULL;
 SLObjectItf AudioPlayer::outputMixObject = NULL;
@@ -45,11 +46,19 @@ AudioPlayer::AudioPlayer(std::string filePath) {
     long length;
     int fileDescriptor = FileSystem::getInstance()->getFileDescriptor(filePath, &start, &length);
     createAssetAudioPlayer(fileDescriptor, start, length);
+    playerCount++;
 }
 
 AudioPlayer::~AudioPlayer() {
+    logInf("AudioPlayer::~AudioPlayer: stopping");
     stop();
-    shutdown();
+    logInf("AudioPlayer::~AudioPlayer: destroying the player");
+    destroyPlayer();
+    playerCount--;
+    if (playerCount == 0) {
+        logInf("AudioPlayer::~AudioPlayer: destroying the engine");
+        destroyEngine();
+    }
 }
 
 bool AudioPlayer::play() {
@@ -147,46 +156,29 @@ bool AudioPlayer::createAssetAudioPlayer(int fileDescriptor, long start, long le
 bool AudioPlayer::setPlayingAssetAudioPlayer(bool isPlaying)
 {
     SLresult result;
-
-    // make sure the asset audio player was created
-    if (NULL != fdPlayerPlay) {
-
-        // set the player's state
-        result = (*fdPlayerPlay)->SetPlayState(fdPlayerPlay, isPlaying ?
+    result = (*fdPlayerPlay)->SetPlayState(fdPlayerPlay, isPlaying ?
             SL_PLAYSTATE_PLAYING : SL_PLAYSTATE_PAUSED);
-        assert(SL_RESULT_SUCCESS == result);
-        (void)result;
-    }
+    return (result == SL_RESULT_SUCCESS);
 }
 
-// shut down the native audio system
-bool AudioPlayer::shutdown()
+void AudioPlayer::destroyEngine()
 {
+    logInf("AudioPlayer::destroyEngine: destroying the outputMixObject");
+    (*outputMixObject)->Destroy(outputMixObject);
+    outputMixObject = NULL;
 
-    __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying fdPlayerObject");
-    // destroy file descriptor audio player object, and invalidate all associated interfaces
-    if (fdPlayerObject != NULL) {
-        (*fdPlayerObject)->Destroy(fdPlayerObject);
-        fdPlayerObject = NULL;
-        fdPlayerPlay = NULL;
-        fdPlayerSeek = NULL;
-        fdPlayerMuteSolo = NULL;
-        fdPlayerVolume = NULL;
-    }
+    logInf("AudioPlayer::destroyEngine: destroying the engineObject");
+    (*engineObject)->Destroy(engineObject);
+    engineObject = NULL;
+    engineEngine = NULL;
+}
 
-    __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying outputMixObject");
-    // destroy output mix object, and invalidate all associated interfaces
-    if (outputMixObject != NULL) {
-        (*outputMixObject)->Destroy(outputMixObject);
-        outputMixObject = NULL;
-    }
-
-    __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying engineObject");
-    // destroy engine object, and invalidate all associated interfaces
-    if (engineObject != NULL) {
-        (*engineObject)->Destroy(engineObject);
-        engineObject = NULL;
-        engineEngine = NULL;
-    }
-    __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying engineObject done!");
+void AudioPlayer::destroyPlayer()
+{
+    (*fdPlayerObject)->Destroy(fdPlayerObject);
+    fdPlayerObject = NULL;
+    fdPlayerPlay = NULL;
+    fdPlayerSeek = NULL;
+    fdPlayerMuteSolo = NULL;
+    fdPlayerVolume = NULL;
 }

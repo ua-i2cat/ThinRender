@@ -41,6 +41,8 @@ public:
 	bool stop();
 
 private:
+    static int playerCount;
+
     static SLObjectItf engineObject;
     static SLEngineItf engineEngine;
     static SLObjectItf outputMixObject;
@@ -54,7 +56,8 @@ private:
     bool createEngine();
     bool createAssetAudioPlayer(int fileDescriptor, long start, long length);
     bool setPlayingAssetAudioPlayer(bool isPlaying); 
-    bool shutdown();
+    void destroyPlayer();
+    void destroyEngine();
 };
 
 #endif
