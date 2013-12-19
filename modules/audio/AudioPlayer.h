@@ -26,6 +26,9 @@
 #include <sys/types.h>
 #include <string>
 
+#include <SLES/OpenSLES.h>
+#include <SLES/OpenSLES_Android.h>
+
 class AudioPlayer {
 
 public:
@@ -38,6 +41,21 @@ public:
 	bool stop();
 
 private:
+    SLObjectItf engineObject;
+    SLEngineItf engineEngine;
+
+    SLObjectItf outputMixObject;
+
+    SLObjectItf fdPlayerObject;
+    SLPlayItf fdPlayerPlay;
+    SLSeekItf fdPlayerSeek;
+    SLMuteSoloItf fdPlayerMuteSolo;
+    SLVolumeItf fdPlayerVolume;
+
+    bool createEngine();
+    bool createAssetAudioPlayer(int fileDescriptor, long start, long length);
+    bool setPlayingAssetAudioPlayer(bool isPlaying); 
+    bool shutdown();
 };
 
 #endif

@@ -24,42 +24,163 @@
 #include "../../globalData/GlobalData.h"
 #include <android/asset_manager.h>
 #include <android_native_app_glue.h>
-#include <SLES/OpenSLES.h>
-#include <SLES/OpenSLES_Android.h>
-#include "audio.h"
 
 AudioPlayer::AudioPlayer(std::string filePath) {
-    audioCreateEngine();
-    audioCreateBufferQueueAudioPlayer();
+    SLObjectItf engineObject = NULL;
+    SLEngineItf engineEngine = NULL;
+    SLObjectItf outputMixObject = NULL;
+    SLObjectItf fdPlayerObject = NULL;
+    SLPlayItf fdPlayerPlay = NULL;
+    SLSeekItf fdPlayerSeek = NULL;
+    SLMuteSoloItf fdPlayerMuteSolo = NULL;
+    SLVolumeItf fdPlayerVolume = NULL;
+    
+    createEngine();
     
     AAssetManager *assetManager = GlobalData::getInstance()->app->activity->assetManager;
     long start;
     long length;
     int fileDescriptor = FileSystem::getInstance()->getFileDescriptor(filePath, &start, &length);
-    audioCreateAssetAudioPlayer(fileDescriptor, start, length);
+    createAssetAudioPlayer(fileDescriptor, start, length);
 }
 
 AudioPlayer::~AudioPlayer() {
     stop();
-    audioShutdown();
-}
-
-bool AudioPlayer::changeSource(std::string filePath) {
-    long start;
-    long length;
-    int fileDescriptor = FileSystem::getInstance()->getFileDescriptor(filePath, &start, &length);
-    audioChangeAssetAudioPlayer(fileDescriptor, start, length);
+    shutdown();
 }
 
 bool AudioPlayer::play() {
-    audioSetPlayingAssetAudioPlayer(true);
+    setPlayingAssetAudioPlayer(true);
 }
 
 bool AudioPlayer::pause() {
-    audioSetPlayingAssetAudioPlayer(false);
+    setPlayingAssetAudioPlayer(false);
 
 }
 
 bool AudioPlayer::stop() {
-    audioSetPlayingAssetAudioPlayer(false);
+    setPlayingAssetAudioPlayer(false);
+}
+
+bool AudioPlayer::createEngine()
+{
+    SLresult result;
+
+    // create engine
+    result = slCreateEngine(&engineObject, 0, NULL, 0, NULL, NULL);
+    assert(SL_RESULT_SUCCESS == result);
+
+    // realize the engine
+    result = (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
+    assert(SL_RESULT_SUCCESS == result);
+
+    // get the engine interface, which is needed in order to create other objects
+    result = (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE, &engineEngine);
+    assert(SL_RESULT_SUCCESS == result);
+
+    // create output mix, with environmental reverb specified as a non-required interface
+    const SLInterfaceID ids[1] = {SL_IID_ENVIRONMENTALREVERB};
+    const SLboolean req[1] = {SL_BOOLEAN_FALSE};
+    result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 1, ids, req);
+    assert(SL_RESULT_SUCCESS == result);
+
+    // realize the output mix
+    result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
+    assert(SL_RESULT_SUCCESS == result);
+}
+
+// create asset audio player
+bool AudioPlayer::createAssetAudioPlayer(int fileDescriptor, long start, long length)
+{
+    SLresult result;
+
+    // configure audio source
+    SLDataLocator_AndroidFD loc_fd = {SL_DATALOCATOR_ANDROIDFD, fileDescriptor, start, length};
+    SLDataFormat_MIME format_mime = {SL_DATAFORMAT_MIME, NULL, SL_CONTAINERTYPE_UNSPECIFIED};
+    SLDataSource audioSrc = {&loc_fd, &format_mime};
+
+    // configure audio sink
+    SLDataLocator_OutputMix loc_outmix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
+    SLDataSink audioSnk = {&loc_outmix, NULL};
+
+    // create audio player
+    const SLInterfaceID ids[3] = {SL_IID_SEEK, SL_IID_MUTESOLO, SL_IID_VOLUME};
+    const SLboolean req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
+    result = (*engineEngine)->CreateAudioPlayer(engineEngine, &fdPlayerObject, &audioSrc, &audioSnk,
+            3, ids, req);
+    assert(SL_RESULT_SUCCESS == result);
+
+    // realize the player
+    result = (*fdPlayerObject)->Realize(fdPlayerObject, SL_BOOLEAN_FALSE);
+    assert(SL_RESULT_SUCCESS == result);
+
+    // get the play interface
+    result = (*fdPlayerObject)->GetInterface(fdPlayerObject, SL_IID_PLAY, &fdPlayerPlay);
+    assert(SL_RESULT_SUCCESS == result);
+
+    // get the seek interface
+    result = (*fdPlayerObject)->GetInterface(fdPlayerObject, SL_IID_SEEK, &fdPlayerSeek);
+    assert(SL_RESULT_SUCCESS == result);
+
+    // get the mute/solo interface
+    result = (*fdPlayerObject)->GetInterface(fdPlayerObject, SL_IID_MUTESOLO, &fdPlayerMuteSolo);
+    assert(SL_RESULT_SUCCESS == result);
+
+    // get the volume interface
+    result = (*fdPlayerObject)->GetInterface(fdPlayerObject, SL_IID_VOLUME, &fdPlayerVolume);
+    assert(SL_RESULT_SUCCESS == result);
+
+    // enable whole file looping
+    result = (*fdPlayerSeek)->SetLoop(fdPlayerSeek, SL_BOOLEAN_TRUE, 0, SL_TIME_UNKNOWN);
+    assert(SL_RESULT_SUCCESS == result);
+
+    return true;
+}
+
+// set the playing state for the asset audio player
+bool AudioPlayer::setPlayingAssetAudioPlayer(bool isPlaying)
+{
+    SLresult result;
+
+    // make sure the asset audio player was created
+    if (NULL != fdPlayerPlay) {
+
+        // set the player's state
+        result = (*fdPlayerPlay)->SetPlayState(fdPlayerPlay, isPlaying ?
+            SL_PLAYSTATE_PLAYING : SL_PLAYSTATE_PAUSED);
+        assert(SL_RESULT_SUCCESS == result);
+        (void)result;
+    }
+}
+
+// shut down the native audio system
+bool AudioPlayer::shutdown()
+{
+
+    __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying fdPlayerObject");
+    // destroy file descriptor audio player object, and invalidate all associated interfaces
+    if (fdPlayerObject != NULL) {
+        (*fdPlayerObject)->Destroy(fdPlayerObject);
+        fdPlayerObject = NULL;
+        fdPlayerPlay = NULL;
+        fdPlayerSeek = NULL;
+        fdPlayerMuteSolo = NULL;
+        fdPlayerVolume = NULL;
+    }
+
+    __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying outputMixObject");
+    // destroy output mix object, and invalidate all associated interfaces
+    if (outputMixObject != NULL) {
+        (*outputMixObject)->Destroy(outputMixObject);
+        outputMixObject = NULL;
+    }
+
+    __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying engineObject");
+    // destroy engine object, and invalidate all associated interfaces
+    if (engineObject != NULL) {
+        (*engineObject)->Destroy(engineObject);
+        engineObject = NULL;
+        engineEngine = NULL;
+    }
+    __android_log_write(ANDROID_LOG_INFO, "audio-api", "Destroying engineObject done!");
 }
