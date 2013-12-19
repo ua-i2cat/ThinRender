@@ -25,17 +25,20 @@
 #include <android/asset_manager.h>
 #include <android_native_app_glue.h>
 
+SLObjectItf AudioPlayer::engineObject = NULL;
+SLEngineItf AudioPlayer::engineEngine = NULL;
+SLObjectItf AudioPlayer::outputMixObject = NULL;
+
 AudioPlayer::AudioPlayer(std::string filePath) {
-    SLObjectItf engineObject = NULL;
-    SLEngineItf engineEngine = NULL;
-    SLObjectItf outputMixObject = NULL;
     SLObjectItf fdPlayerObject = NULL;
     SLPlayItf fdPlayerPlay = NULL;
     SLSeekItf fdPlayerSeek = NULL;
     SLMuteSoloItf fdPlayerMuteSolo = NULL;
     SLVolumeItf fdPlayerVolume = NULL;
-    
-    createEngine();
+
+    if (engineObject == NULL) {
+        createEngine();
+    }
     
     AAssetManager *assetManager = GlobalData::getInstance()->app->activity->assetManager;
     long start;
@@ -61,6 +64,9 @@ bool AudioPlayer::pause() {
 bool AudioPlayer::stop() {
     setPlayingAssetAudioPlayer(false);
 }
+
+
+// Private methods
 
 bool AudioPlayer::createEngine()
 {

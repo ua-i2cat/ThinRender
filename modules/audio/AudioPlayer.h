@@ -41,10 +41,9 @@ public:
 	bool stop();
 
 private:
-    SLObjectItf engineObject;
-    SLEngineItf engineEngine;
-
-    SLObjectItf outputMixObject;
+    static SLObjectItf engineObject;
+    static SLEngineItf engineEngine;
+    static SLObjectItf outputMixObject;
 
     SLObjectItf fdPlayerObject;
     SLPlayItf fdPlayerPlay;
