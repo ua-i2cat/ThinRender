@@ -54,10 +54,12 @@ public:
      * @param Node* to attach the RectGUI
      */
 	RectGUI(float top, float left, float width, float height, Node* nodeRect);
+
     /**
      * the previous constructor with different orther (WTF!)
      */
 	RectGUI(Node* nodeRect, float left, float top, float w, float h);
+
     /**
      *  Destructor that only destroy the internal mesh, the Text pointer and Texture pointer are controlled by the respectives managers
      */
@@ -74,6 +76,7 @@ public:
     //better const char*?
     //the texture expected have the same format that the initial one of Texture pointer
 	void setTexture(unsigned char* imageData);
+
     /**
      * Reload the texture using a an opengl pointer to 2D texture, the ratio is used if this texture2D isn't a npot image
      * @param unsigned int glTextId the glTexture2D int
@@ -89,26 +92,26 @@ public:
      * @param float newTop
      */
     void setPosition(float newLeft, float newTop);
-    
+
     /**
      * setWidth method actualizes the internal width maintaining top and left
      * @param float newWidth
      */
 	void setWidth(float newWidth);
-    
+
     /**
      * setHeight method actualizes the internal height maintaining top and left
      * @param float newHeight
      */
     void setHeight(float newHeight);
-    
+
     /**
      * setWidthAndHeight method actualizes the internal width and height maintaining top and left
      * @param float newWidth
      * @param float newHeight
      */
 	void setWidthAndHeight(float newWidth, float newHeight);
-    
+
     /**
      * setShader destroy the previous shader and sets the new one
      * @param Shader* shader (expected a shader for gui...)
@@ -129,25 +132,25 @@ public:
      * @return float with top of rectangle from screen space (1 is top of screen and 0 bottom)
      */
 	float getTop();
-    
+
     /**
      * getLeft
      * @return float with left of rectangle from screen space (1 is right of screen and 0 left)
      */
 	float getLeft();
-    
+
     /**
      * getWidth
      * @return float with left of rectangle from screen space (1 is right of screen and 0 left)
      */
 	float getWidth();
-    
+
     /**
      * getHeight
      * @return float with left of rectangle from screen space (1 is right of screen and 0 left)
      */
 	float getHeight();
- 
+
     /**
      * setText does not deletes the previous text, is managed via TextManager
      * @param std::string message to set at Text class
@@ -156,7 +159,7 @@ public:
      */
 	void setText(std::string message, std::string typographyFile, int fontSize);
 	void setBlockText(std::string message, std::string typographyFile, int fontSize, int align = 0);
-    
+
     /**
      * isInside calculates the AABB normalized
      * @param float x
@@ -164,23 +167,25 @@ public:
      * @return bool true if x and y are inside the rect and is clickable false otherwise
      */
 	bool isInside(float x, float y);
-    
+
     /**
      * setClickable sets if rect is clicable or not, affects directly to isInside method
      * @param bool click
      */
 	void setClickable(bool click);
-    
+
     /**
      * getMessage
      * @return std::string with the text content
      */
 	std::string getMessage();
+
     /**
      * setTextColor sets only text color
      * @param glm::vec4 with color in rgba format
      */
 	void setTextColor(glm::vec4 color);
+
     /**
      * setColor sets only rect color
      * @param glm::vec4 with color in rgba format

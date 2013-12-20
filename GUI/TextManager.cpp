@@ -22,6 +22,7 @@
 
 #include "TextManager.h"
 #include "../fileSystem/FileSystem.h"
+
 TextManager* TextManager::instance = 0;
 
 TextManager* TextManager::getInstance(){
@@ -44,7 +45,7 @@ TextManager::TextManager(){
 TextManager::~TextManager(){
 	std::map<std::string, std::map<int, Text*> >::iterator firstIterator;
 	std::map<int, Text*>::iterator secondIterator;
-    
+
     for(int n = 0; n < FTFaceUsed.size(); n++){
         FT_Done_Face(FTFaceUsed.at(n));
     }
@@ -81,8 +82,7 @@ Text* TextManager::getText(std::string fontFile, int fontSize){
 	}
 	FT_Library ft;
 
-    
-	if(FT_Init_FreeType(&ft)) {
+	if(FT_Init_FreeType(&ft)){
 		logErr("Could not init freetype library");
 		return 0;
 	}

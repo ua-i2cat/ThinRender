@@ -20,7 +20,6 @@
  *  Author:         Marc Fernandez Vanaclocha <marc.fernandez@i2cat.net>
  */
 
-
 #include "SliderGUI.h"
 #include "../../globalData/GlobalData.h"
 #include "../../log/Log.h"
@@ -53,7 +52,7 @@ void SliderGUI::includeRect(RectGUI* rect){
 		}
 		rect->setPosition(left,rect->getTop());
 		maxTranslation = left - this->left;
-	}else {
+	}else{
 		float top = 0.0f;
 		for(int i = 0; i < rects.size(); i++){
 			top -= rects[i]->getHeight() + 10.0f;
@@ -73,7 +72,7 @@ void SliderGUI::update(float xDiff, float yDiff){
 		if(position.x < minTranslation) position.x = minTranslation;
 		//logInf("position.x: %f",position.x);
 		position.x = -position.x;
-	}else {
+	}else{
 		position.y = -abs(position.y);
 		position.y += yDiff;
 		if(position.y < maxTranslation) position.y = maxTranslation;
@@ -82,6 +81,7 @@ void SliderGUI::update(float xDiff, float yDiff){
 	}
 	internalNode->setPosition(position);
 }
+
 bool SliderGUI::isInside(float x, float y){
 	if(x < left || x > (left + width) || y > top || y < (top - height)){
 		return false;
@@ -98,6 +98,7 @@ RectGUI* SliderGUI::click(float x, float y){
 	}
 	return 0;
 }
+
 void SliderGUI::draw(){
 	glViewport((int)left,(int)top-(int)height,(int)width,(int)height);
 	glm::mat4 resultMatrix = projMatrix*internalNode->getFullTransform();
