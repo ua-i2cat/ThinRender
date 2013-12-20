@@ -24,6 +24,7 @@
 #include "AndroidFileSystem.h"
 #include <sys/stat.h>
 #include <errno.h>
+
 AndroidFileSystem::AndroidFileSystem(){
 	init();
 }
@@ -38,18 +39,18 @@ int AndroidFileSystem::openFile(string filePath){
 	}
 	AAsset* asset = AAssetManager_open(assetManager, filePath.c_str(), AASSET_MODE_UNKNOWN);
 
-	if (asset == NULL){
+	if(asset == NULL){
 		logErr("COULD NOT OPEN ASSET");
 		return -1;
 	}
 
-    const void* pData = AAsset_getBuffer(asset);
-    off_t fileLength = AAsset_getLength(asset);
+	const void* pData = AAsset_getBuffer(asset);
+	off_t fileLength = AAsset_getLength(asset);
 
-    FileStruct* fileStruct = new FileStruct(fileLength+1);
-    memcpy(fileStruct->data, pData, fileLength * sizeof(char));
+	FileStruct* fileStruct = new FileStruct(fileLength+1);
+	memcpy(fileStruct->data, pData, fileLength * sizeof(char));
 
-    fileStruct->data[fileLength] = '\0';
+	fileStruct->data[fileLength] = '\0';
 	fileMap[filePath] = fileStruct;
 
 	AAsset_close(asset);
@@ -72,25 +73,22 @@ void AndroidFileSystem::init(){
 void AndroidFileSystem::setAssetManager(ANativeActivity* nativeActivity){
 	this->assetManager = nativeActivity->assetManager;
 	dataPath = "/sdcard/renderScenes/";
-    struct stat sb;
-    int32_t res = stat(dataPath.c_str(), &sb);
-    if (0 == res && sb.st_mode & S_IFDIR)
-    {
-        logInf("'files/' dir already in app's internal data storage.");
-    }
-    else if (ENOENT == errno)
-    {
-        mkdir(dataPath.c_str(), 0770);
-    }
+	struct stat sb;
+	int32_t res = stat(dataPath.c_str(), &sb);
+	if(0 == res && sb.st_mode & S_IFDIR){
+		logInf("'files/' dir already in app's internal data storage.");
+	}else if(ENOENT == errno){
+		mkdir(dataPath.c_str(), 0770);
+	}
 }
 
-int AndroidFileSystem::getFileDescriptor(string filePath, long* start, long* length) {
-    AAsset* asset = AAssetManager_open(assetManager, filePath.c_str(), AASSET_MODE_UNKNOWN);
-    if (asset == NULL) {
-        return 0;
-        // TODO: error handling? 
-    }
-    int fd = AAsset_openFileDescriptor(asset, (off_t*) start, (off_t*) length);
-    AAsset_close(asset);
-    return fd;
+int AndroidFileSystem::getFileDescriptor(string filePath, long* start, long* length){
+	AAsset* asset = AAssetManager_open(assetManager, filePath.c_str(), AASSET_MODE_UNKNOWN);
+	if(asset == NULL){
+		return 0;
+		// TODO: error handling?
+	}
+	int fd = AAsset_openFileDescriptor(asset, (off_t*) start, (off_t*) length);
+	AAsset_close(asset);
+	return fd;
 }

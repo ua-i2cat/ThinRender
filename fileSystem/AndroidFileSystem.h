@@ -28,6 +28,7 @@
 #include <android/asset_manager.h>
 #include <android_native_app_glue.h>
 #include <string>
+
 /**
  * Class to manage the file access on Android OS
  */
