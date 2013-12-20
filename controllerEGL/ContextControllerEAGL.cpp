@@ -45,29 +45,26 @@ int ContextControllerEAGL::startDisplay(GLKView *view){
     height = screenRect.size.height;
     GlobalData::getInstance()->screenWidth = width;
     GlobalData::getInstance()->screenHeight = height;
-    
+
     context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-    
-    if (!context || ![EAGLContext setCurrentContext:context]) {
+
+    if(!context || ![EAGLContext setCurrentContext:context]){
         logErr("ContextControllerEAGL::startDisplay context creation error, if %li == 0 context alloc failed else set current context failed", (unsigned long)context);
         return -1;
     }
-    
+
 	logInf("screen w:%i h:%i", width, height);
     view.context = context;
     view.drawableColorFormat = GLKViewDrawableColorFormatRGBA8888;
     view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     view.drawableStencilFormat = GLKViewDrawableStencilFormatNone;
-    
+
 	// Initialize GL state.
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
-
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//glEnable(GL_STENCIL_TEST);
 	//int error = glGetError();
