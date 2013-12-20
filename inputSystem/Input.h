@@ -52,7 +52,7 @@ public:
      * static function, the first execution or the first after calling freeInstance() calls the private constructor
      */
 	static Input* getInstance();
-    
+
     /**
      * static function, if the instance is different to 0 calls the destructor and sets it to 0
      */
@@ -111,7 +111,6 @@ public:
      */
 	std::vector<event> getEventsNotLooked();
 private:
-    
 	Input();
 	~Input();
 	static Input* instance;

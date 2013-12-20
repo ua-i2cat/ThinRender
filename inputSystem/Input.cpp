@@ -24,15 +24,14 @@
 
 Input* Input::instance = 0;
 
-
 Input* Input::getInstance(){
-	if(Input::instance == 0) {
+	if(Input::instance == 0){
 		instance = new Input();
 	}
 	return instance;
 }
 void Input::freeInstance(){
-	if(Input::instance != 0) {
+	if(Input::instance != 0){
 		delete instance;
 	}
     instance = 0;
@@ -46,12 +45,11 @@ Input::~Input(){
 	eventVector.clear();
 }
 
-/*
- -deleteEvent borra el event del vector
- -updateEventToEnd posa l'actiu a false (s'ha alliberat el event, p.e: dit fora de la pantalla)
- -newEvent quan es polsa
- -updateEvent quan es mou, posarem visited a false sempre
- -getEventsNotLooked retorna tots els events q tenen visited a false, i es seteja a true
+// TODO: better doxygen docs
+
+/**
+ * Delete an event from the vector
+ * @param int id id of the element to delete
  */
 void Input::deleteEvent(int id){
     for(std::vector<event>::iterator it = eventVector.begin(); it != eventVector.end(); it++){
@@ -62,6 +60,9 @@ void Input::deleteEvent(int id){
     }
 }
 
+/*
+ * Sets the event's active flag to false (e.g. finger outside the screen)
+ */
 bool Input::updateEventToEnd(float lastX, float lastY){
     for(std::vector<event>::iterator it = eventVector.begin(); it < eventVector.end(); it++){
         if((floor((*it).x) == floor(lastX) || floor((*it).x) == (floor(lastX)-1) || floor((*it).x) == (floor(lastX)+1)) && (floor((*it).y) == floor(lastY) || floor((*it).y) == (floor(lastY)+1) || floor((*it).y) == (floor(lastY)-1))){
@@ -73,6 +74,10 @@ bool Input::updateEventToEnd(float lastX, float lastY){
     }
     return false;
 }
+
+/*
+ * Sets the event's active flag to false (e.g. finger outside the screen)
+ */
 bool Input::updateEventToEnd(int id){
     for(std::vector<event>::iterator it = eventVector.begin(); it < eventVector.end(); it++){
         if((*it).idEvent == id){
@@ -84,6 +89,10 @@ bool Input::updateEventToEnd(int id){
     }
     return false;
 }
+
+/**
+ * On screen touch
+ */
 void Input::newEvent(float x,float y){
     event e = {x,y,x,y,lastID,BEGIN_INPUT,true,false, false};
     eventVector.push_back(e);
@@ -93,6 +102,10 @@ void Input::newEvent(int id, float x,float y){
     event e = {x,y,x,y,id,BEGIN_INPUT,true,false, false};
     eventVector.push_back(e);
 }
+
+/**
+ * Always mark the event as not visited in case of movement
+ */
 bool Input::updateEvent(float lastX, float lastY, float newX, float newY){
     for(std::vector<event>::iterator it = eventVector.begin(); it < eventVector.end(); it++){
         if((*it).x == lastX && (*it).y == lastY){
@@ -107,6 +120,10 @@ bool Input::updateEvent(float lastX, float lastY, float newX, float newY){
     }
     return false;
 }
+
+/**
+ * Always mark the event as not visited in case of movement
+ */
 bool Input::updateEvent(int id, float newX, float newY){
     for(std::vector<event>::iterator it = eventVector.begin(); it < eventVector.end(); it++){
         if((*it).idEvent == id){
@@ -125,6 +142,7 @@ bool Input::updateEvent(int id, float newX, float newY){
 void Input::clearEvents(){
 	eventVector.clear();
 }
+
 bool Input::noActiveEvents(){
     for(std::vector<event>::iterator it = eventVector.begin(); it < eventVector.end(); it++){
         if((*it).active){
@@ -133,6 +151,10 @@ bool Input::noActiveEvents(){
     }
     return true;
 }
+
+/**
+ * Returns the unvisited events and marks them as visited
+ */
 std::vector<event> Input::getEventsNotLooked(){
     std::vector<event> eV;
     for(std::vector<event>::iterator it = eventVector.begin(); it < eventVector.end(); it++){
