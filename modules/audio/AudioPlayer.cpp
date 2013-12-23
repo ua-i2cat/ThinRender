@@ -40,8 +40,7 @@ AudioPlayer::AudioPlayer(std::string filePath) {
     if (engineObject == NULL) {
         createEngine();
     }
-    
-    AAssetManager *assetManager = GlobalData::getInstance()->app->activity->assetManager;
+
     long start;
     long length;
     int fileDescriptor = FileSystem::getInstance()->getFileDescriptor(filePath, &start, &length);
