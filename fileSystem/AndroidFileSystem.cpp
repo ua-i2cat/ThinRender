@@ -85,10 +85,13 @@ void AndroidFileSystem::setAssetManager(ANativeActivity* nativeActivity){
 int AndroidFileSystem::getFileDescriptor(string filePath, long* start, long* length){
 	AAsset* asset = AAssetManager_open(assetManager, filePath.c_str(), AASSET_MODE_UNKNOWN);
 	if(asset == NULL){
-		return 0;
-		// TODO: error handling?
+		logErr("COULD NOT OPEN ASSET");
+		return -1;
 	}
 	int fd = AAsset_openFileDescriptor(asset, (off_t*) start, (off_t*) length);
+	if(fd < 0){
+		return -1;
+	}
 	AAsset_close(asset);
 	return fd;
 }
