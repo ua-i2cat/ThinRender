@@ -62,7 +62,7 @@ int AndroidFileSystem::writeFile(string filePath, const char* content){
 	int index;
 	std::string path = dataPath+filePath;
 	fp = fopen(path.c_str(),"w"); /* open for writing */
-	fprintf(fp,"%s", content, 0);
+	fprintf(fp,"%s", content);
 	fclose(fp); /* close the file before ending program */
 	return 0;
 }

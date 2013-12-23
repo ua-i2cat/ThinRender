@@ -115,7 +115,7 @@ int ContextControllerEGL::startDisplay(){
 
 	errorEGL = eglGetError();
 	if(errorEGL != EGL_SUCCESS) logErr("error a eglCreateWindowSurface %i",errorEGL);
-	logInf("GlobalData::getInstance()->app->window : %i", GlobalData::getInstance()->app->window);
+	logInf("GlobalData::getInstance()->app->window : %i", (int)GlobalData::getInstance()->app->window);
 	EGLint AttribList[] = {
 		EGL_CONTEXT_CLIENT_VERSION, 2,
 		EGL_NONE
@@ -124,7 +124,7 @@ int ContextControllerEGL::startDisplay(){
 	if(EGL_NO_CONTEXT == context) logErr("context failed, eglCreateContext return EGL_NO_CONTEXT");
 	errorEGL = eglGetError();
 	if(errorEGL != EGL_SUCCESS) logErr("error a eglCreateContext %i",errorEGL);
-	logInf("context: %i display: %i surface: %i",context, display,surface);
+	logInf("context: %i display: %i surface: %i", (int)context, (int)display, (int)surface);
 
 	if(eglMakeCurrent(display, surface, surface, context) == EGL_FALSE){
 		logWar("Unable to eglMakeCurrent");

@@ -91,7 +91,7 @@ namespace SceneLoader {
 		glm::vec3 vec3Result = glm::vec3(result[0], result[1], result[2]);
 		return vec3Result;
 	}
-    
+
     /**
      * static extractVec3 returns a int with all option masks from a string
      * @value std::string value
@@ -140,7 +140,7 @@ namespace SceneLoader {
 		delete[] tempBuffer;
 		return result;
 	}
-   
+
     /**
      * static parseNode sets all node data to destSceneNode pointer
      * @value xml_node<>* nodeXML
@@ -174,7 +174,7 @@ namespace SceneLoader {
 			}
 			else if(atributeName.compare("rotateX")==0){
 				float radiants = (float)fast_atof(value.c_str()) * Maths::PI / 180.0f;
-				logInf("rotateX value %s result in radiants %f node pointer value %i", value.c_str(), radiants, destSceneNode);
+				logInf("rotateX value %s result in radiants %f node pointer value %i", value.c_str(), radiants, (int)destSceneNode);
 				destSceneNode->rotate(glm::vec3(1.0f,0.0f,0.0f), radiants);
 			}
 			else if(atributeName.compare("rotateY")==0){
@@ -217,7 +217,7 @@ namespace SceneLoader {
 			value = attribute->value();
 			logInf("mesh attribute %s value %s", atributeName.c_str(), value.c_str());
 			if(atributeName.compare("name")==0){
-				logInf("parse mesh name %s sceneNode pointer value %i",value.c_str(), sceneNode);
+				logInf("parse mesh name %s sceneNode pointer value %i",value.c_str(), (int)sceneNode);
 				aux = currentSecene->createMesh(value);
 				aux->name = value;
 				sceneNode->attachSceneObject(aux);
@@ -241,7 +241,7 @@ namespace SceneLoader {
 			}
 		}
 	}
-    
+
     /**
      * static parseCamera sets all node data to a Camera and set it to sceneNode pointer
      * @value xml_node<>* nodeXML
@@ -309,7 +309,7 @@ namespace SceneLoader {
 			}
 		}
 	}
-    
+
     /**
      * static recursive sets all node data to parent pointer
      * @value xml_node<>* nodeXML

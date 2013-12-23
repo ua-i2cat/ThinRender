@@ -50,7 +50,7 @@ void PickRTT::initFrameBuffer(int w, int h){
 
 	GLenum status;
 	if ((status = glCheckFramebufferStatus(GL_FRAMEBUFFER)) != GL_FRAMEBUFFER_COMPLETE) {
-		logErr("PickRTT glCheckFramebufferStatus: error %p", status);
+		logErr("PickRTT glCheckFramebufferStatus: error %p", (void*)status);
 		return;
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

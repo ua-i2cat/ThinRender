@@ -64,7 +64,7 @@ void BasicRTT::initFrameBuffer(int w, int h){
 
 	GLenum status;
 	if ((status = glCheckFramebufferStatus(GL_FRAMEBUFFER)) != GL_FRAMEBUFFER_COMPLETE) {
-		logErr("BasicSceneManager glCheckFramebufferStatus: error %p", status);
+		logErr("BasicSceneManager glCheckFramebufferStatus: error %p", (void*)status);
 		return;
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -53,11 +53,12 @@ private:
     SLMuteSoloItf fdPlayerMuteSolo;
     SLVolumeItf fdPlayerVolume;
 
-    bool createEngine();
     bool createAssetAudioPlayer(int fileDescriptor, long start, long length);
-    bool setPlayingAssetAudioPlayer(bool isPlaying); 
+    bool setPlayingAssetAudioPlayer(bool isPlaying);
     void destroyPlayer();
-    void destroyEngine();
+
+	static bool createEngine();
+    static void destroyEngine();
 };
 
 #endif

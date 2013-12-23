@@ -48,7 +48,7 @@ using namespace rapidxml;
 namespace SceneSaver {
 	BasicSceneManager* currentSecene;
 	static xml_document<> doc;
-    
+
     /**
      * static serializeCamera
      * @value Camera* camera
@@ -78,7 +78,7 @@ namespace SceneSaver {
 		logInf("end serialize camera");
 		parentXMLNode->append_node(child);
 	}
-    
+
     /**
      * static serializeMesh
      * @value Mesh* mesh
@@ -130,7 +130,7 @@ namespace SceneSaver {
 				serializeCamera((Camera*)auxiliarSceneObject, parentXMLNode);
 				break;
 			case SceneObject::MESH_TYPE:
-				logInf("serialize mesh pointer %i", auxiliarSceneObject);
+				logInf("serialize mesh pointer %i", (int)auxiliarSceneObject);
 				serializeMesh((Mesh*)auxiliarSceneObject, parentXMLNode);
 				break;
 			case SceneObject::LIGHT_TYPE:
