@@ -162,22 +162,28 @@ bool AudioPlayer::setPlayingAssetAudioPlayer(bool isPlaying)
 
 void AudioPlayer::destroyEngine()
 {
-    logInf("AudioPlayer::destroyEngine: destroying the outputMixObject");
-    (*outputMixObject)->Destroy(outputMixObject);
-    outputMixObject = NULL;
+	if(outputMixObject != NULL){
+		logInf("AudioPlayer::destroyEngine: destroying the outputMixObject");
+		(*outputMixObject)->Destroy(outputMixObject);
+		outputMixObject = NULL;
+	}
 
-    logInf("AudioPlayer::destroyEngine: destroying the engineObject");
-    (*engineObject)->Destroy(engineObject);
-    engineObject = NULL;
-    engineEngine = NULL;
+	if(engineObject != NULL){
+		logInf("AudioPlayer::destroyEngine: destroying the engineObject");
+		(*engineObject)->Destroy(engineObject);
+		engineObject = NULL;
+		engineEngine = NULL;
+	}
 }
 
 void AudioPlayer::destroyPlayer()
 {
-    (*fdPlayerObject)->Destroy(fdPlayerObject);
-    fdPlayerObject = NULL;
-    fdPlayerPlay = NULL;
-    fdPlayerSeek = NULL;
-    fdPlayerMuteSolo = NULL;
-    fdPlayerVolume = NULL;
+	if(fdPlayerObject != NULL){
+		(*fdPlayerObject)->Destroy(fdPlayerObject);
+		fdPlayerObject = NULL;
+		fdPlayerPlay = NULL;
+		fdPlayerSeek = NULL;
+		fdPlayerMuteSolo = NULL;
+		fdPlayerVolume = NULL;
+	}
 }
