@@ -28,6 +28,7 @@ class BasicSceneManager;
 #include "../scene/BasicSceneManager.h"
 #include <string>
 #include <stack>
+
 /**
  * Class to manage global parameters, used to share OS data to the project, uses Singleton pattern
  */

@@ -116,8 +116,7 @@ int ContextControllerEGL::startDisplay(){
 	errorEGL = eglGetError();
 	if(errorEGL != EGL_SUCCESS) logErr("error a eglCreateWindowSurface %i",errorEGL);
 	logInf("GlobalData::getInstance()->app->window : %i", GlobalData::getInstance()->app->window);
-	EGLint AttribList[] =
-	{
+	EGLint AttribList[] = {
 		EGL_CONTEXT_CLIENT_VERSION, 2,
 		EGL_NONE
 	};
@@ -127,14 +126,14 @@ int ContextControllerEGL::startDisplay(){
 	if(errorEGL != EGL_SUCCESS) logErr("error a eglCreateContext %i",errorEGL);
 	logInf("context: %i display: %i surface: %i",context, display,surface);
 
-	if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
+	if(eglMakeCurrent(display, surface, surface, context) == EGL_FALSE){
 		logWar("Unable to eglMakeCurrent");
 		errorEGL = eglGetError();
 		if(errorEGL != EGL_SUCCESS) logErr("error a eglMakeCurrent %i",errorEGL);
 		return -1;
 	}
 
-	if (eglSwapInterval(display, EGL_MIN_SWAP_INTERVAL) == EGL_FALSE) {
+	if(eglSwapInterval(display, EGL_MIN_SWAP_INTERVAL) == EGL_FALSE){
 		logWar("Unable to eglSwapInterval EGL_MIN_SWAP_INTERVAL");
 		errorEGL = eglGetError();
 		if(errorEGL != EGL_SUCCESS) logErr("error a eglSwapInterval %i",errorEGL);
@@ -158,7 +157,7 @@ int ContextControllerEGL::startDisplay(){
 		aux = h;
 		h = w;
 		w = aux;
-	//	glViewport(0,0,w,h);
+		//glViewport(0,0,w,h);
 	}
 	this->width = w;
 	this->height = h;
@@ -200,12 +199,12 @@ ContextControllerEGL::~ContextControllerEGL(){
 	endDisplay();
 }
 void ContextControllerEGL::endDisplay(){
-    if (this->display != EGL_NO_DISPLAY) {
+    if(this->display != EGL_NO_DISPLAY){
         eglMakeCurrent(this->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-        if (this->context != EGL_NO_CONTEXT) {
+        if(this->context != EGL_NO_CONTEXT){
             eglDestroyContext(this->display, this->context);
         }
-        if (this->surface != EGL_NO_SURFACE) {
+        if(this->surface != EGL_NO_SURFACE){
             eglDestroySurface(this->display, this->surface);
         }
         eglTerminate(this->display);

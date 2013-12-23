@@ -28,6 +28,7 @@
 #include <android/asset_manager.h>
 #include <android_native_app_glue.h>
 #include <string>
+
 /**
  * Class to manage the file access on Android OS
  */
@@ -59,6 +60,8 @@ public:
      * @param ANativeActivity* can be extracted from main function
      */
 	void setAssetManager(ANativeActivity* nativeActivity);
+
+    int getFileDescriptor(string filePath, long* start, long* end);
 protected:
 	std::string dataPath;
 	AAssetManager* assetManager;

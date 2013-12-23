@@ -28,27 +28,28 @@
 
 void printShaderLog(GLuint object){
 	GLint log_length = 0;
-	if (glIsShader(object))
+	if(glIsShader(object)){
 		glGetShaderiv(object, GL_INFO_LOG_LENGTH, &log_length);
-	else if (glIsProgram(object))
+	}else if (glIsProgram(object)){
 		glGetProgramiv(object, GL_INFO_LOG_LENGTH, &log_length);
-	else {
+	}else{
 		logErr("printlog: Not a shader or a program\n");
 		return;
 	}
 
 	char* log = (char*)malloc(log_length);
 
-	if (glIsShader(object))
+	if(glIsShader(object)){
 		glGetShaderInfoLog(object, log_length, NULL, log);
-	else if (glIsProgram(object))
+	}else if(glIsProgram(object)){
 		glGetProgramInfoLog(object, log_length, NULL, log);
+	}
 
 	logErr("printShaderLog %s", log);
 	free(log);
 }
 
-Text::Text(Text* text) {
+Text::Text(Text* text){
 	maxHeight = text->maxHeight;
     c = new glyphData[256];
 	vbo = 0;
@@ -65,7 +66,7 @@ Text::Text(Text* text) {
 	atlasWidth = w;
 	atlasHeight = h;
 }
-Text::Text(FT_Face face, int height) {
+Text::Text(FT_Face face, int height){
     c = new glyphData[256];
 	color = glm::vec4(0.0f,0.0f,0.0f,1.0f);
 	cIndex = 0;
@@ -80,7 +81,7 @@ Text::Text(FT_Face face, int height) {
 		return;
 	}
 	const char* source = FileSystem::getInstance()->getFileData("text.v.glsl");
-	if (source == NULL) {
+	if (source == NULL){
 		logErr("Error data text.v.glsl");
 		return;
 	}
@@ -91,7 +92,7 @@ Text::Text(FT_Face face, int height) {
 	glCompileShader(vs);
 	compile_ok = GL_FALSE;
 	glGetShaderiv(vs, GL_COMPILE_STATUS, &compile_ok);
-	if (compile_ok == GL_FALSE) {
+	if(compile_ok == GL_FALSE){
 		logErr("text.v.glsl");
 		printShaderLog(vs);
 		glDeleteShader(vs);
@@ -99,7 +100,7 @@ Text::Text(FT_Face face, int height) {
 	}
 
 	source = FileSystem::getInstance()->getFileData("text.f.glsl");
-	if (source == NULL) {
+	if(source == NULL){
 		logErr("Error data text.f.glsl");
 		return;
 	}
@@ -110,7 +111,7 @@ Text::Text(FT_Face face, int height) {
 	glCompileShader(fs);
 	compile_ok = GL_FALSE;
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &compile_ok);
-	if (compile_ok == GL_FALSE) {
+	if(compile_ok == GL_FALSE){
 		logErr("text.v.glsl");
 		printShaderLog(fs);
 		glDeleteShader(fs);
@@ -122,38 +123,38 @@ Text::Text(FT_Face face, int height) {
 	glAttachShader(programText, fs);
 	glLinkProgram(programText);
 
-    glDeleteShader(vs);//these are marked to delete but until they are attached to the program, they will remain 
+    glDeleteShader(vs);//these are marked to delete but until they are attached to the program, they will remain
     glDeleteShader(fs);
-    
+
 	glGetProgramiv(programText, GL_LINK_STATUS, &link_ok);
-	if (!link_ok) {
+	if(!link_ok){
 		logWar("glLinkProgram:");
 		return;
 	}
 
     std::string attributeName = "coord";
 	attribute_coord = glGetAttribLocation(programText, attributeName.c_str());
-	if (attribute_coord == -1) {
+	if(attribute_coord == -1){
 		logErr("Could not bind attribute %s\n", attributeName.c_str());
 		return;
 	}
 
 	attributeName = "tex";
 	uniform_tex = glGetUniformLocation(programText, attributeName.c_str());
-	if (uniform_tex == -1) {
+	if(uniform_tex == -1){
 		logErr("Could not bind uniform %s\n", attributeName.c_str());
 		return;
 	}
 	attributeName = "color";
 	uniform_color = glGetUniformLocation(programText, attributeName.c_str());
-	if (uniform_color == -1) {
+	if(uniform_color == -1){
 		logErr("Could not bind uniform %s\n", attributeName.c_str());
 		return;
 	}
 
 	attributeName = "pvmMatrix";
 	uniform_pvmMatrix = glGetUniformLocation(programText, attributeName.c_str());
-	if (uniform_pvmMatrix == -1) {
+	if(uniform_pvmMatrix == -1){
 		logErr("Could not bind uniform %s\n", attributeName.c_str());
 		return;
 	}
@@ -169,12 +170,12 @@ Text::Text(FT_Face face, int height) {
 	memset(c, 0, sizeof(glyphData) * 256);
 
 	/* Find minimum size for a texture holding all visible ASCII characters */
-	for (int i = 32; i < 256; i++) {
-		if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
+	for(int i = 32; i < 256; i++){
+		if(FT_Load_Char(face, i, FT_LOAD_RENDER)){
 			logErr("Loading character %c failed!\n", i);
 			continue;
 		}
-		if (roww + g->bitmap.width + 1 >= MAXWIDTH) {
+		if(roww + g->bitmap.width + 1 >= MAXWIDTH){
 			w = std::max(w, roww);
 			h += rowh;
 			roww = 0;
@@ -210,12 +211,12 @@ Text::Text(FT_Face face, int height) {
 	int oy = 0;
 	rowh = 0;
 
-	for (int i = 32; i < 256; i++) {
-		if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
+	for(int i = 32; i < 256; i++){
+		if(FT_Load_Char(face, i, FT_LOAD_RENDER)){
 			logErr("Loading character %c failed!\n", i);
 			continue;
 		}
-		if (ox + g->bitmap.width + 1 >= MAXWIDTH) {
+		if(ox + g->bitmap.width + 1 >= MAXWIDTH){
 			oy += rowh+1;
 			rowh = 0;
 			ox = 0;
@@ -245,25 +246,26 @@ Text::~Text() {
     delete[] c;
 }
 
-
 float Text::calculateLength(const char *start, const char *end){
 	const uint8_t *p;
 	float x = 0.0f;
-	for (p = (const uint8_t *)start; *p; p++) {
+	for(p = (const uint8_t *)start; *p; p++){
 		if(p == (const uint8_t *)end) return x;
 		x += c[*p].ax;
 	}
 	return x;
 }
+
 int Text::calculateNumWhiteSpaces(const char *start, const char *end){
 	const uint8_t *p;
 	int res = 0;
-	for (p = (const uint8_t *)start; p != (const uint8_t *)end; p++) {
+	for(p = (const uint8_t *)start; p != (const uint8_t *)end; p++){
 		if(*p == ' ') res ++;
 	}
 	return res;
 }
-//fuck comments :D
+
+// TODO: comments/explain
 uint8_t* Text::calculatePointerEndLine(const char *text, float width){
 	uint8_t *p = (uint8_t *)text;
 	uint8_t *candidate = p;
@@ -285,6 +287,7 @@ uint8_t* Text::calculatePointerEndLine(const char *text, float width){
 	}
 	return p;
 }
+
 //first only left alignment
 //align 0 left, 1 center, 2 justified
 void Text::setBlockText(std::string text, float width, int align){
@@ -317,7 +320,7 @@ void Text::setBlockText(std::string text, float width, int align){
 			whiteSpaceModificator = 1.0f;
 		}
 	}
-	for (p = (const uint8_t *)text.c_str(); *p; p++) {
+	for(p = (const uint8_t *)text.c_str(); *p; p++){
 		if(p == lineEnding){
 			line--;
 			if(*p == '\\') p++;
@@ -377,7 +380,7 @@ void Text::setText(std::string text, float x, float y){
 	point coords[6 * strlen(text.c_str())];
 	cIndex = 0;
 	/* Loop through all characters */
-	for (p = (const uint8_t *)text.c_str(); *p; p++) {
+	for(p = (const uint8_t *)text.c_str(); *p; p++){
 		/* Calculate the vertex and texture coordinates */
 		float x2 = x + c[*p].bl;//bl bitmap left
 		float y2 = -y - c[*p].bt;//bt bitmap top
@@ -402,7 +405,7 @@ void Text::setText(std::string text, float x, float y){
 	}
 	glBufferData(GL_ARRAY_BUFFER, sizeof(coords), coords, GL_STATIC_DRAW);
 }
-void Text::render() {
+void Text::render(){
 	glUseProgram(programText);
 
 	/* Use the texture containing the atlas */
@@ -422,7 +425,7 @@ void Text::render() {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Text::render(glm::mat4 pvmMatrix) {
+void Text::render(glm::mat4 pvmMatrix){
 	glUseProgram(programText);
 
 	/* Use the texture containing the atlas */
@@ -438,7 +441,6 @@ void Text::render(glm::mat4 pvmMatrix) {
 	glVertexAttribPointer(attribute_coord, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
 	/* Draw all the character on the screen in one go */
-
 	glDrawArrays(GL_TRIANGLES, 0, cIndex);
 	glDisableVertexAttribArray(attribute_coord);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -447,7 +449,7 @@ void Text::render(glm::mat4 pvmMatrix) {
 float Text::getWidthOfMessage(const char* message){
 	const uint8_t *p;
 	float x = 0.0f;
-	for (p = (const uint8_t *)message; *p; p++) {
+	for(p = (const uint8_t *)message; *p; p++){
 		x += c[*p].ax;
 	}
 	return x;
@@ -456,14 +458,14 @@ float Text::getHeightOfMessage(const char* message){
 	const uint8_t *p;
 	float y = 0.0f;
 	float auxiliarY = 0.0f;
-	for (p = (const uint8_t *)message; *p; p++) {
+	for(p = (const uint8_t *)message; *p; p++){
 		auxiliarY = c[*p].bt;
 		if(auxiliarY > y) y = auxiliarY;
 	}
 	return y;
 }
 
-std::string Text::parseAndReplaceAccents(std::string text) {
+std::string Text::parseAndReplaceAccents(std::string text){
 
 	std::map<std::string, int> replacements;
 
@@ -526,10 +528,9 @@ std::string Text::parseAndReplaceAccents(std::string text) {
 	replacements["¡"] = 161;
 	replacements["¿"] = 191;
 
-	for(map<std::string, int>::iterator it = replacements.begin(); it != replacements.end(); ++it) {
-
+	for(map<std::string, int>::iterator it = replacements.begin(); it != replacements.end(); ++it){
 		size_t pos = text.find(it->first);
-		while (pos != std::string::npos) {
+		while (pos != std::string::npos){
 			char sub[2] = {(char) it->second, '\0'};
 			text.replace(pos, it->first.length(), std::string(sub));
 			pos = text.find(it->first, pos + 1);

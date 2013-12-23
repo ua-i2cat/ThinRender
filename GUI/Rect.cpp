@@ -24,7 +24,6 @@
 #include "../log/Log.h"
 #include "TextManager.h"
 
-
 RectGUI::RectGUI(float top, float left, float width, float height, Node* nodeRect){
 	plane = MeshManager::getInstance()->getMeshPlane2D(0.0f, float(GlobalData::getInstance()->screenHeight), width, height);
 	plane->shader->color = glm::vec4(0.0f,0.0f,0.0f,1.0f);
@@ -34,7 +33,6 @@ RectGUI::RectGUI(float top, float left, float width, float height, Node* nodeRec
 	this->height = height;
 	setProjectionMatrix();
 	setPosition(left, top);
-//	setWidthAndHeight(width, height);
 	text = 0;
 	clickable = false;
 	textMessage = "";
@@ -42,7 +40,6 @@ RectGUI::RectGUI(float top, float left, float width, float height, Node* nodeRec
 }
 
 RectGUI::RectGUI(Node* nodeRect, float left, float top, float w, float h){
-
 	plane = MeshManager::getInstance()->getMeshPlane2D(0.0f, float(GlobalData::getInstance()->screenHeight), w, h);
 	plane->shader->color = glm::vec4(0.0f,0.0f,0.0f,1.0f);
 	plane->options = Mesh::GUI_MASK;
@@ -54,25 +51,6 @@ RectGUI::RectGUI(Node* nodeRect, float left, float top, float w, float h){
 	setProjectionMatrix();
 	setPosition(left, top);
 
-/*	logInf("setPosition left: %f top: %f w: %f h: %f", left, top, w, h);
-	glm::mat4 pvmMatrix = projMatrix * node->getFullTransform();
-	glm::vec4 vertex = glm::vec4(left,top,0.0f,1.0f);
-	glm::vec4 result = pvmMatrix * vertex;
-	logInf("0 result from vertex {%f, %f, %f} {%f, %f, %f}", vertex.x,vertex.y,vertex.z, result.x,result.y,result.z);
-
-	vertex = glm::vec4(left,top-h,0.0f,1.0f);
-	result = pvmMatrix * vertex;
-	logInf("1 result from vertex {%f, %f, %f} {%f, %f, %f}", vertex.x,vertex.y,vertex.z, result.x,result.y,result.z);
-
-	vertex = glm::vec4(left+w,top,0.0f,1.0f);
-	result = pvmMatrix * vertex;
-	logInf("2 result from vertex {%f, %f, %f} {%f, %f, %f}", vertex.x,vertex.y,vertex.z, result.x,result.y,result.z);
-
-	vertex = glm::vec4(left+w,top-h,0.0f,1.0f);
-	result = pvmMatrix * vertex;
-	logInf("3 result from vertex {%f, %f, %f} {%f, %f, %f}", vertex.x,vertex.y,vertex.z, result.x,result.y,result.z);
-*/
-//	setWidthAndHeight(w, h);
 	text = 0;
 	clickable = false;
 	textMessage = "";
@@ -83,12 +61,6 @@ RectGUI::~RectGUI(){
 	if(plane != 0){
 		delete plane;
 	}
-//	if(text != 0){//managed by textManager! because it doesn't need to remake again and again the texture atlas!
- //       delete text;
-//	}
-	/*if(node != 0){
-		delete node;
-	}*/
 }
 
 void RectGUI::setTexture(Texture* texture){
@@ -96,7 +68,6 @@ void RectGUI::setTexture(Texture* texture){
         plane->shader->texture = 0;
         return;
     }
-	//if(plane->shader->texture != 0) delete plane->shader->texture;//TextureManager deletes all the current textures!!
     if(plane->shader->texture != 0 && plane->shader->texture->getXratio() == texture->getXratio() && plane->shader->texture->getYratio() == texture->getYratio()){
     	plane->shader->texture = texture;
     	return;
@@ -183,7 +154,10 @@ void RectGUI::draw(glm::mat4 intermediateMatrix){
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glm::mat4 pvmMatrix = intermediateMatrix * node->getFullTransform();
 	if(plane->shader->texture != 0){
-		plane->render(pvmMatrix, projMatrix, glm::mat4(), 0, plane->shader->texture->getTextureId(), glm::vec4(0.0f), glm::vec4(0.0f), glm::vec3(0.0f), glm::mat4(0.0f), glm::mat4(0.0f));
+		plane->render(
+				pvmMatrix, projMatrix, glm::mat4(), 0, plane->shader->texture->getTextureId(), glm::vec4(0.0f),
+				glm::vec4(0.0f), glm::vec3(0.0f), glm::mat4(0.0f), glm::mat4(0.0f)
+			);
 	}
 	if(text != 0){
 		text->render(pvmMatrix);
@@ -237,9 +211,11 @@ void RectGUI::setProjectionMatrix(){
 	float zFarOrtho = 10.0f;
 	projMatrix = glm::ortho(leftOrtho, rightOrtho, bottomOrtho, topOrtho, zNearOrtho, zFarOrtho);
 }
+
 void RectGUI::setClickable(bool click){
 	clickable = click;
 }
+
 bool RectGUI::isInside(float x, float y){
 	if(!enabled)return false;
 	if(!clickable) return false;
@@ -252,9 +228,11 @@ bool RectGUI::isInside(float x, float y){
 std::string RectGUI::getMessage(){
 	return textMessage;
 }
+
 void RectGUI::setEnabled(bool enabled){
 	this->enabled = enabled;
 }
+
 bool RectGUI::getEnabled(){
 	return enabled;
 }

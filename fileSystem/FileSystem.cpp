@@ -51,11 +51,11 @@ void FileSystem::freeInstance(){
 }
 
 int FileSystem::openFile(string filePath){
-    logInf("FileSystem::openFile not implemented");
+	logInf("FileSystem::openFile not implemented");
 	return -1;
 }
 int FileSystem::writeFile(string filePath, const char* content){
-    logInf("FileSystem::openFile not implemented");
+	logInf("FileSystem::openFile not implemented");
 	return -1;
 }
 
@@ -79,11 +79,11 @@ char* FileSystem::getFileData(string filePath){
 
 void FileSystem::destroyFileData(string filePath){
 	std::map<string, FileStruct* >::iterator it;
-    it = fileMap.find(filePath);
-    if(it == fileMap.end()) return;
-    delete[] (it->second)->data;
-    (it->second)->data = 0;
-    fileMap.erase(it);
+	it = fileMap.find(filePath);
+	if(it == fileMap.end()) return;
+	delete[] (it->second)->data;
+	(it->second)->data = 0;
+	fileMap.erase(it);
 }
 
 FileSystem::FileSystem(){
@@ -98,9 +98,14 @@ void FileSystem::init(){
 }
 
 void FileSystem::release(){
-	for(map<string, FileStruct*>::iterator it = fileMap.begin(); it != fileMap.end(); ++it) {
+	for(map<string, FileStruct*>::iterator it = fileMap.begin(); it != fileMap.end(); ++it){
 		delete (it->second);
 		(it->second) = 0;
 	}
 	fileMap.clear();
+}
+
+int FileSystem::getFileDescriptor(string filePath, long* start, long* length){
+	logInf("FileSystem::getFileDescriptor not implemented");
+	return -1;
 }

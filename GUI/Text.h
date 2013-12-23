@@ -33,6 +33,7 @@
 
 // Maximum texture width
 #define MAXWIDTH 1024
+
 /**
  * Class that manages the creation of glyph, atlas and vertex with uv using free type
  */
@@ -42,10 +43,10 @@ public:
 	int maxHeight;
     /** texture objext */
 	GLuint tex;
-    
+
     /** width of texture in pixels */
 	int w;
-    
+
     /** height of texture in pixels */
     int h;
 	struct point {
@@ -54,6 +55,7 @@ public:
 		GLfloat s;
 		GLfloat t;
 	};
+
 	struct glyphData{
 		float ax;	/// advance.x
 		float ay;	/// advance.y
@@ -64,26 +66,23 @@ public:
 		float tx;	/// x offset of glyph in texture coordinates
 		float ty;	/// y offset of glyph in texture coordinates
 	};
-    
+
     glyphData * c;
-    
+
     ///shader, uniforms and vertex buffer object
 	GLuint uniform_tex, attribute_coord, uniform_color, uniform_pvmMatrix;
 	GLuint programText;
 	GLuint vbo;
-
 	/**
      * copy constructor
      * @param Text* text to clone
      */
     Text(Text* text);
-	
     /**
      * creates shader, uniform, vbo and glyph data
-     * @param FT_Face with 
+     * @param FT_Face with
      */
     Text(FT_Face face, int height);
-    
     /**
      * destructor frees all opengl data and glyphData, the destruction of freetype libraries are managed by TextManager
      */
