@@ -24,9 +24,14 @@
 #include "../fileSystem/FileSystem.h"
 #include "../Platform.h"
 #include "../log/Log.h"
-//extern "C" {
-    #include "../utils/JPEG.h"
-//}
+
+#ifdef ANDROID_PLATFORM
+extern "C" {
+	#include "../utils/JPEG.h"
+}
+#else
+#include "../utils/JPEG.h"
+#endif
 
 TextureManager* TextureManager::instance = 0;
 

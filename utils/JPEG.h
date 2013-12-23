@@ -1,9 +1,9 @@
-/* 
+/*
  * From http://www.stanford.edu/~acoates/decompressJpegFromMemory.txt
- * 
+ *
  * With a few modifications it allows us to use libjpeg reading a compressed
  * picture from memory instead of using a FILE pointer.
- * 
+ *
  */
 #ifndef JPEG_WRAPPER_H
 #define JPEG_WRAPPER_H
@@ -62,7 +62,7 @@ static void my_set_source_mgr(j_decompress_ptr cinfo, const char* data, size_t l
 void parseJPEG(const char* data, size_t len, int* size, int* w, int* h) {
     struct jpeg_decompress_struct cinfo;
     struct jpeg_error_mgr jerr;
-    
+
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_decompress(&cinfo);
     my_set_source_mgr(&cinfo, data, len);
@@ -80,20 +80,20 @@ void parseJPEG(const char* data, size_t len, int* size, int* w, int* h) {
 }
 
 int decompressJPEG(const char* data, size_t len, char* out) {
-    struct jpeg_decompress_struct cinfo; 
+    struct jpeg_decompress_struct cinfo;
     struct jpeg_error_mgr jerr;
     char* out_buffer = out;
     int size;
 
     // Setup decompression structure
-    cinfo.err = jpeg_std_error(&jerr); 
-    jpeg_create_decompress(&cinfo); 
+    cinfo.err = jpeg_std_error(&jerr);
+    jpeg_create_decompress(&cinfo);
     my_set_source_mgr(&cinfo, data,len);
 
     // read info from header.
     (void) jpeg_read_header(&cinfo, TRUE);
     jpeg_start_decompress(&cinfo);
-   
+
     int row_stride = cinfo.output_width * cinfo.output_components;// * 2;
     JSAMPARRAY buffer = (*cinfo.mem->alloc_sarray)
         ((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
