@@ -181,8 +181,7 @@ void Node::translate(float x, float y, float z, TransformSpace relativeTo){
 	translate(glm::vec3(x,y,z), relativeTo);
 }
 
-void Node::translate(glm::vec3 positionOffset, TransformSpace relativeTo)
-{
+void Node::translate(glm::vec3 positionOffset, TransformSpace relativeTo){
 	switch(relativeTo)
 	{
 	case TS_LOCAL:
@@ -205,30 +204,21 @@ void Node::translate(glm::vec3 positionOffset, TransformSpace relativeTo)
 	setModified();
 }
 
-void Node::scale(glm::vec3 scaleOffset)
-{
+void Node::scale(glm::vec3 scaleOffset){
 	localScale = localScale * scaleOffset;
 	setModified();
 }
 
-void Node::scale(float x, float y, float z)
-{
+void Node::scale(float x, float y, float z){
 	localScale.x *= x;
 	localScale.y *= y;
 	localScale.z *= z;
 	setModified();
 }
-void Node::lookAt(glm::vec3 targetPoint)
-{
-
-//	logInf("localPosition {%f, %f, %f}", localPosition.x, localPosition.y, localPosition.z);
-	//glm::vec3 worldPos = getHierarchyPosition();
+void Node::lookAt(glm::vec3 targetPoint){
 	glm::vec3 worldPos = localPosition;
 	glm::mat4 parentInversTransform = glm::inverse(parent->getFullTransform());
 	targetPoint = glm::vec3(parentInversTransform * glm::vec4(targetPoint, 1.0f));
-	//logInf("worldPos {%f, %f, %f}", worldPos.x, worldPos.y, worldPos.z);
-	//logInf("targetPoint {%f, %f, %f}", targetPoint.x, targetPoint.y, targetPoint.z);
-
 
 	glm::vec3 upVector = glm::vec3(0.0f,1.0f,0.0f);
 	glm::vec3 destVector = targetPoint - worldPos;
@@ -239,47 +229,16 @@ void Node::lookAt(glm::vec3 targetPoint)
 		// special case when vectors in opposite directions:
 		// there is no "ideal" rotation axis
 		// So guess one; any will do as long as it's perpendicular to start
-		/*upVector = glm::cross(glm::vec3(0.0f, 0.0f, 1.0f), upVector);
-		if (glm::length2(upVector) < 0.01f ) // bad luck, they were parallel, try again!
-			upVector = glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f,1.0f,0.0f));
-
-		upVector = glm::normalize(upVector);*/
 		upVector = glm::vec3(0.0f,0.0f,1.0f);
 	}
-//	logInf("worldPos %f %f %f targetPoint %f %f %f", worldPos.x,worldPos.y,worldPos.z , targetPoint.x,targetPoint.y,targetPoint.z);
-//	logInf("destVector {%f, %f, %f} dot: %f upVector {%f, %f, %f}", destVector.x, destVector.y, destVector.z, cosTheta, upVector.x, upVector.y, upVector.z);
+    
 	glm::mat4 resultMatrix = glm::lookAt(
 			worldPos,			// the position of your camera, in world space
 			targetPoint,   		// where you want to look at, in world space
 			upVector	// up vector glm::vec3(0,1,0), but (0,-1,0) would make you looking upside-down, which can be great too
 		);
-//	glm::vec4 result = resultMatrix * glm::vec4(targetPoint, 1.0f);
-/*	logInf("lookAt result {%f, %f, %f}  target point {%f, %f, %f}", result.x, result.y, result.z, targetPoint.x, targetPoint.y, targetPoint.z);//OK
-*/
-	/*logInf("result matrix look at:");
-	int j;
-	for (j=0; j<4; j++){
-		logInf("|%f %f %f %f|",resultMatrix[0][j], resultMatrix[1][j], resultMatrix[2][j], resultMatrix[3][j]);
-	}
-
-	resultMatrix = glm::inverse(parent->getFullTransform()) * resultMatrix;
-	logInf("============= result matrix look at:");
-	for (j=0; j<4; j++){
-		logInf("|%f %f %f %f|",resultMatrix[0][j], resultMatrix[1][j], resultMatrix[2][j], resultMatrix[3][j]);
-	}*/
 	glm::quat resultOrientation = glm::toQuat(resultMatrix);
-//	logInf("!!!!!!!!!!!!!!!!!resultOrientation {%f, %f, %f, %f}", resultOrientation.w, resultOrientation.x, resultOrientation.y, resultOrientation.z);
-
-
-//	resultOrientation = convertWorldToLocalOrientation(resultOrientation);
-//	logInf("AAAAAAAAAAAAAAAAAresultOrientation {%f, %f, %f, %f}", resultOrientation.w, resultOrientation.x, resultOrientation.y, resultOrientation.z);
-
-//		return glm::inverse(getHierarchyOrientation()) * worldOrientation;
 	setOrientation(glm::inverse(resultOrientation));
-
-//	logInf("orientation {%f, %f, %f, %f}", localOrientation.w, localOrientation.x, localOrientation.y, localOrientation.z);
-//	logInf("derivedOrientation {%f, %f, %f, %f}", getHierarchyOrientation().w, getHierarchyOrientation().x, getHierarchyOrientation().y, getHierarchyOrientation().z);
-
 }
 
 glm::quat Node::getHierarchyOrientation(){
@@ -431,26 +390,12 @@ glm::quat Node::getRotationFromTo(glm::vec3 origin, glm::vec3 dest)//, glm::vec3
 	if (d >= 1.0f){
 		return glm::quat();//IDENTITY
 	}
-	if (d < (1e-6f - 1.0f))
-	{
-		/*if (fallbackAxis != Vector3::ZERO)
-		{
-			// rotate 180 degrees about the fallback axis
-			q.FromAngleAxis(Radian(Math::PI), fallbackAxis);
-		}
-		else
-		{*/
-			// Generate an axis
-			glm::vec3 axis = glm::cross(glm::vec3(1.0f,0.0f,0.0f), v1);//Vector3::UNIT_X.crossProduct(*this);
-			//if (axis.isZeroLength()) // pick another if colinear
-				//axis = glm::cross(glm::vec3(0.0f,1.0f,0.0f), v1);
-			axis = glm::normalize(axis);
-			q = glm::angleAxis(Maths::PI, axis);
-//			q.FromAngleAxis(Radian(Math::PI), axis);
-		//}
+	if (d < (1e-6f - 1.0f)){
+		glm::vec3 axis = glm::cross(glm::vec3(1.0f,0.0f,0.0f), v1);//Vector3::UNIT_X.crossProduct(*this);
+		axis = glm::normalize(axis);
+		q = glm::angleAxis(Maths::PI, axis);
 	}
-	else
-	{
+	else{
 		float s = Maths::sqrtf( (1+d)*2 );
 		float invs = 1 / s;
 		glm::vec3 c = glm::cross(v0, v1);
@@ -464,25 +409,21 @@ glm::quat Node::getRotationFromTo(glm::vec3 origin, glm::vec3 dest)//, glm::vec3
 	return q;
 }
 
-glm::vec3 Node::getForwardVector()
-{
+glm::vec3 Node::getForwardVector(){
 	glm::vec3 result = localOrientation * glm::vec3(0.0f,0.0f,-1.0f);
 	return result;
 }
 
-glm::vec3 Node::getWorldForwardVector()
-{
+glm::vec3 Node::getWorldForwardVector(){
 	glm::vec3 result = getHierarchyOrientation() * glm::vec3(0.0f,0.0f,-1.0f);
 	return result;
 }
-glm::vec3 Node::getUpVector()
-{
+glm::vec3 Node::getUpVector(){
 	glm::vec3 result = localOrientation * glm::vec3(0.0f,1.0f,0.0f);
 	return result;
 }
 
-glm::vec3 Node::getRightVector()
-{
+glm::vec3 Node::getRightVector(){
 	glm::vec3 result = localOrientation * glm::vec3(1.0f,0.0f,0.0f);
 	return result;
 }

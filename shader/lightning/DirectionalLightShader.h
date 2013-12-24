@@ -61,6 +61,6 @@ public:
 	void setVars(glm::mat4 projView, glm::mat4 model, glm::mat4 view, glm::mat4 projection, Light* renderLight, glm::vec4 lightWorldPosition, glm::vec4 light_direction, glm::vec3 light_ambient, glm::mat4 projectionLight, glm::mat4 viewLight, GLuint depthTexture, bool receiveShadows);
 
 	GLint uniformModelMatrix, uniformViewMatrix, uniformProjectionMatrix;
-	GLint uniformLightPosition, uniformLightAmbient;
+	GLint uniformLightPosition, uniformLightAmbient, uniformTexture;
 };
 #endif

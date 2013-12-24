@@ -80,6 +80,13 @@ void DirectionalLightShader::loadVars(){
 	if (uniformLightAmbient == -1){
 		logErr("Could not bind uniform %s\n", uniformName);
 	}
+    
+    uniformName = "texture";
+    uniformTexture = glGetUniformLocation(program, uniformName);
+	if (uniformTexture == -1){
+		logErr("Could not bind uniform %s\n", uniformName);
+	}
+
 }
 
 
@@ -94,6 +101,6 @@ void DirectionalLightShader::setVars(glm::mat4 projView, glm::mat4 model, glm::m
 	if(texture){
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture->getTextureId());
-		glUniform1i(attributeTexture, /*GL_TEXTURE*/0);
+		glUniform1i(uniformTexture, 0);
 	}
 }

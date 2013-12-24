@@ -219,7 +219,6 @@ Image* TextureManager::loadImageMemoryPNG(const void *buffer, int bufsize)
 	png_bytep* row_p = new png_bytep [image->height];
 
 	int i;
-	bool StandardOrientation = true;
 	for (i = 0; i < height; i++)
 	{
 		row_p[height - 1 - i] = &(image->pixel_data[png_get_rowbytes(png_ptr, info_ptr)*i]);

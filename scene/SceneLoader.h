@@ -174,7 +174,6 @@ namespace SceneLoader {
 			}
 			else if(atributeName.compare("rotateX")==0){
 				float radiants = (float)fast_atof(value.c_str()) * Maths::PI / 180.0f;
-				logInf("rotateX value %s result in radiants %f node pointer value %i", value.c_str(), radiants, (int)destSceneNode);
 				destSceneNode->rotate(glm::vec3(1.0f,0.0f,0.0f), radiants);
 			}
 			else if(atributeName.compare("rotateY")==0){
@@ -217,7 +216,6 @@ namespace SceneLoader {
 			value = attribute->value();
 			logInf("mesh attribute %s value %s", atributeName.c_str(), value.c_str());
 			if(atributeName.compare("name")==0){
-				logInf("parse mesh name %s sceneNode pointer value %i",value.c_str(), (int)sceneNode);
 				aux = currentSecene->createMesh(value);
 				aux->name = value;
 				sceneNode->attachSceneObject(aux);

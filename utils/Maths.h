@@ -39,17 +39,17 @@ namespace Maths
 {
 	const static float PI = 3.141592653589793f;
 
-	static inline float sinf(float alpha){
+	static inline float sinf(const float & alpha){
 		return sin(alpha);
 	}
-	static inline float cosf(float alpha){
+	static inline float cosf(const float & alpha){
 		return cos(alpha);
 	}
-	static inline float sqrtf(float x){
+	static inline float sqrtf(const float & x){
 		return sqrt(x);
 	}
-    static inline float signf(float x){
-        return x < 0 ? -1.0f : 1.0f;
+    static inline float signf(const float & x){
+        return x < 0.0f ? -1.0f : 1.0f;
     }
 };
 

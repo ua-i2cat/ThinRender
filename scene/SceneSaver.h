@@ -130,7 +130,6 @@ namespace SceneSaver {
 				serializeCamera((Camera*)auxiliarSceneObject, parentXMLNode);
 				break;
 			case SceneObject::MESH_TYPE:
-				logInf("serialize mesh pointer %i", (int)auxiliarSceneObject);
 				serializeMesh((Mesh*)auxiliarSceneObject, parentXMLNode);
 				break;
 			case SceneObject::LIGHT_TYPE:
