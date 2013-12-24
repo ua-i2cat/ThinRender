@@ -208,8 +208,9 @@ void BasicSceneManager::createShadowMap(){
 		projectionLight = cameraAux->getProjectionMatrix();//getOrthogonalProjectionMatrix();
 
 		Node* cameraNodeAux = cameraAux->getAttachedNode();
-		lightWorldPosition = cameraNodeAux->getHierarchyPosition();
-		lightWorldDirection = cameraNodeAux->getWorldForwardVector();
+		//trick of the trade
+        //lightWorldPosition = cameraNodeAux->getHierarchyPosition();
+		//lightWorldDirection = cameraNodeAux->getWorldForwardVector();
 
 		viewLight = cameraAux->getViewMatrix();
 
@@ -258,6 +259,8 @@ void BasicSceneManager::updateVariables(){
 	if(currentLight != 0){
 		auxNode = currentLight->getAttachedNode();
 		if(auxNode == 0) return;
+        lightWorldPosition = auxNode->getHierarchyPosition();
+		lightWorldDirection = auxNode->getWorldForwardVector();
 		light_diffuse = currentLight->getDiffuse();
 		light_specular = currentLight->getSpecular();
 		glm::mat4 lightMatrix = view * auxNode->getFullTransform();
