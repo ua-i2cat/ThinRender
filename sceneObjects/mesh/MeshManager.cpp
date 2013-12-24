@@ -318,10 +318,10 @@ Mesh* MeshManager::parseMD5(string filename, char* buffer, int lenght){
 			prepareSubMeshNormals(resultMesh, auxSubMesh);
 			resultMesh->subMeshes.push_back(auxSubMesh);
 		}
-        
+
 		copyNextWord(tempBuffer, BUFFERSIZE, buffer, &n);//autoincrease i
         if(n>=lenght)break;
-        
+
 	}
 	return resultMesh;
 }
@@ -485,11 +485,10 @@ Mesh* MeshManager::parseOBJ(string filename, char* buffer, int lenght){
 		break;
 	}
 	}
+
 	resultMesh->subMeshes.push_back(auxSubMesh);
 
-
-
-    for (int t = 0; t < idSubMesh; t++) {
+    for (int t = 0; t < resultMesh->subMeshes.size(); t++) {
         auxSubMesh = resultMesh->subMeshes.at(t);
 
         //logInf("calculating normals auxSubMesh->vertices.size() %lu", auxSubMesh->vertices.size());
@@ -521,14 +520,15 @@ Mesh* MeshManager::parseOBJ(string filename, char* buffer, int lenght){
                 if(nb_seen[current] == 1){
                     auxSubMesh->normals[current] = normal;
                 }else{
-                    auxSubMesh->normals[current].x = auxSubMesh->normals[current].x * (1.0 - 1.0/nb_seen[current]) + normal.x * 1.0/nb_seen[current];
-                    auxSubMesh->normals[current].y = auxSubMesh->normals[current].y * (1.0 - 1.0/nb_seen[current]) + normal.y * 1.0/nb_seen[current];
-                    auxSubMesh->normals[current].z = auxSubMesh->normals[current].z * (1.0 - 1.0/nb_seen[current]) + normal.z * 1.0/nb_seen[current];
+                    auxSubMesh->normals[current].x = auxSubMesh->normals[current].x * (1.0f - 1.0f/(float)nb_seen[current]) + normal.x * 1.0f/(float)nb_seen[current];
+                    auxSubMesh->normals[current].y = auxSubMesh->normals[current].y * (1.0f - 1.0f/(float)nb_seen[current]) + normal.y * 1.0f/(float)nb_seen[current];
+                    auxSubMesh->normals[current].z = auxSubMesh->normals[current].z * (1.0f - 1.0f/(float)nb_seen[current]) + normal.z * 1.0f/(float)nb_seen[current];
                     auxSubMesh->normals[current] = glm::normalize(auxSubMesh->normals[current]);
                 }
             }
         }
     }
+
 	return resultMesh;
 }
 void MeshManager::getNextWord(char* buffer, int* i){
