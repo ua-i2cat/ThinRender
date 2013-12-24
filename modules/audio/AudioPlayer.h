@@ -29,16 +29,18 @@
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 
+/**
+ * Basic audio player class. Currently it only accepts one audio file per instance.
+ */
 class AudioPlayer {
 
 public:
     AudioPlayer(std::string filePath);
     ~AudioPlayer();
 
-    bool changeSource(std::string filePath);
 	bool play();
 	bool pause();
-	bool stop();
+	bool stop(); // TODO: implement stop
 
 private:
     static int playerCount;

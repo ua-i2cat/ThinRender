@@ -92,10 +92,8 @@ bool AudioPlayer::createEngine()
     result = (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE, &engineEngine);
     assert(SL_RESULT_SUCCESS == result);
 
-    // create output mix, with environmental reverb specified as a non-required interface
-    const SLInterfaceID ids[1] = {SL_IID_ENVIRONMENTALREVERB};
-    const SLboolean req[1] = {SL_BOOLEAN_FALSE};
-    result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 1, ids, req);
+    // create output mix
+    result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 0, NULL, NULL);
     assert(SL_RESULT_SUCCESS == result);
 
     // realize the output mix
