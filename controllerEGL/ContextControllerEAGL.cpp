@@ -43,6 +43,11 @@ int ContextControllerEAGL::startDisplay(GLKView *view){
 	CGRect screenRect = [[UIScreen mainScreen] bounds];
     width = screenRect.size.width;
     height = screenRect.size.height;
+    if(GlobalData::getInstance()->screenMode == GlobalData::HORIZONTAL_SCREEN){
+        int aux = width;
+        width = height;
+        height = aux;
+    }
     GlobalData::getInstance()->screenWidth = width;
     GlobalData::getInstance()->screenHeight = height;
 

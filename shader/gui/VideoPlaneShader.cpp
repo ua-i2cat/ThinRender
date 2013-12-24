@@ -22,7 +22,6 @@
 
 #include "VideoPlaneShader.h"
 #include "../../log/Log.h"
-
 VideoPlaneShader::VideoPlaneShader(){
 	logInf("VideoPlaneShader::VideoPlaneShader");
 	texture = 0;
@@ -30,8 +29,12 @@ VideoPlaneShader::VideoPlaneShader(){
 	hasTangents = false;
 	hasBitangents = false;
 	hasUV = true;
+    #ifdef ANDROID_PLATFORM
 	loadShader("VideoPlaneShader");
-	color = glm::vec4(1.0f,1.0f,1.0f,1.0f);
+#else
+    loadShader("VideoIOSShader");
+#endif
+    color = glm::vec4(1.0f,1.0f,1.0f,1.0f);
 }
 void VideoPlaneShader::loadVars(){
 	logInf("VideoPlaneShader::loadVars");
@@ -47,22 +50,33 @@ void VideoPlaneShader::loadVars(){
 		logErr("Could not bind attribute %s\n", attributeName);
 		attributeTexture = 0;
 	}
-	const char* uniformName = "texture";
+    const char* uniformName;
+#ifdef IOS_PLATFORM
+    uniformName = "luminanceTexture";
+	uniformLuminanceTexture = glGetUniformLocation(program, uniformName);
+	if (uniformLuminanceTexture == -1) {
+		logErr("Could not bind uniform %s\n", uniformName);
+		return;
+	}
+    
+    uniformName = "chrominanceTexture";
+	uniformChrominanceTexture = glGetUniformLocation(program, uniformName);
+	if (uniformChrominanceTexture == -1) {
+		logErr("Could not bind uniform %s\n", uniformName);
+		return;
+	}
+#else
+	uniformName = "texture";
 	uniformTexture = glGetUniformLocation(program, uniformName);
 	if (uniformTexture == -1) {
 		logErr("Could not bind uniform %s\n", uniformName);
 		return;
 	}
-
+    
+#endif
 	uniformName = "mvp";
 	uniformMVP = glGetUniformLocation(program, uniformName);
 	if (uniformMVP == -1) {
-		logErr("Could not bind uniform %s\n", uniformName);
-		return;
-	}
-	uniformName = "color";
-	uniformColor = glGetUniformLocation(program, uniformName);
-	if (uniformColor == -1){
 		logErr("Could not bind uniform %s\n", uniformName);
 		return;
 	}
@@ -74,20 +88,32 @@ void VideoPlaneShader::setVars(glm::mat4 projView, glm::mat4 model, glm::mat4 vi
 	int error = glGetError();
 	if(error != GL_NO_ERROR)logErr("1");
 	glUniformMatrix4fv(uniformMVP, 1, GL_FALSE, glm::value_ptr(projView));
-	glUniform4f(uniformColor, color.x, color.y, color.z, color.w);
-
-
+	
 	error = glGetError();
 	if(error != GL_NO_ERROR)logErr("2");
 
-	glActiveTexture(GL_TEXTURE0);
+	
 #ifdef ANDROID_PLATFORM
+    glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture->getTextureId());
-#else
-    glBindTexture(GL_TEXTURE, texture->getTextureId());
-#endif
     glUniform1i(uniformTexture, 0);
+#else
+    GLuint luminanceTexture, chrominanceTexture;
+    getVideoTextures(luminanceTexture, chrominanceTexture);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, luminanceTexture);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glUniform1i(uniformLuminanceTexture, 0);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, chrominanceTexture);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glUniform1i(uniformChrominanceTexture, 1);
+    releaseVideoCache();
+#endif
+    
 
 	error = glGetError();
-	if(error != GL_NO_ERROR)logErr("3");
+	if(error != GL_NO_ERROR)logErr("VideoPlaneShader::setVars error 3 error num %i", error);
 }
