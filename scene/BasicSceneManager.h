@@ -24,6 +24,7 @@
 
 class RectGUI;
 class SliderGUI;
+//class SliderBlockGUI;
 #include "Node.h"
 #include "../sceneObjects/SceneObject.h"
 #include "../shader/Shader.h"
@@ -49,9 +50,9 @@ class SliderGUI;
  */
 class BasicSceneManager {
 public:
-	
+
     BasicSceneManager();
-	
+
     /**
      * Destroy nodes and internal data, does not destroy meshes, textures and Text but destroys rects, incoherence
      */
@@ -61,18 +62,18 @@ public:
      * void method
      */
 	virtual void loadScene();
-    
+
     /**
      * loadScene loads a scene from xml file
      * @param std::string fileName to a file with xml and a specific format
      */
 	void loadScene(std::string fileName);
-    
+
     /**
      * saveScene writes the current scene into a xml file
      */
     void saveScene();
-    
+
     /**
      * closeScene is called by de destructor but it can be called outside to reset the scene
      */
@@ -83,32 +84,32 @@ public:
      * @return Camera*
      */
 	Camera* createCamera();
-    
+
     /**
      * createMesh creates a mesh from file
      * @param std::string name is the filepath from assets folder to mesh file, is accepted .obj and md5mesh formats
      * @return Mesh*
      */
 	Mesh* createMesh(string name);
-    
+
     /**
      * createPlaneMesh creates a plane mesh of side 1, centered at (0,0,0) and aligned in x,y plane
      * @return Mesh*
      */
     Mesh* createPlaneMesh();
-    
+
     /**
      * createRectangleGUI returns a complete Rect for 2D graphics, with all screen size
      * @return RectGUI*
      */
 	RectGUI* createRectangleGUI();
-    
+
     /**
      * createRectangleBackground RectGUI that will be rendered at the end with depth buffer enabled
      * @return RectGUI*
      */
 	RectGUI* createRectangleBackground();
-    
+
     /**
      * createRectangleGUI returns a complete Rect for 2D graphics with custom position and size
      * @param float left
@@ -119,25 +120,26 @@ public:
      */
 	RectGUI* createRectangleGUI(float left, float top, float w, float h);
 	SliderGUI* createSliderGUI(float left, float top, float w, float h, int type);
-    
+	SliderGUI* createSliderBlockGUI(float left, float top, float w, float h, int type);
+
     /**
      * getRootNode returns the root node of the scene
      * @return Node*
      */
 	Node* getRootNode();
-    
+
     /**
      * createLight creates a light object
      * @return Light*
      */
 	Light* createLight();
-    
+
     /**
      * setAmbientLight of the scene
      * @param glm::vec3 ambient light in rgb format
      */
 	void setAmbientLight(glm::vec3 ambient);
-    
+
     /**
      * updateVariables is called before start rendering, it updates the nodes and gets the correct models, views and projections matrix
      */
@@ -147,33 +149,33 @@ public:
      * createShadowMap renders a depth texture in case of having the RTTDepth setted
      */
 	void createShadowMap();
-    
+
     /**
      * cleanBuffers cleans pixel, depth and stencil buffer
      */
 	void cleanBuffers();
-    
+
     /**
      * render makes all the needed calls to render the scene
      */
 	void render();
-    
+
     /**
      * renderGUI draws all the RectGUI objects
      */
 	void renderGUI();
-    
+
     /**
      * renderBackground renders the RectGUI from createRectangleBackground
      */
 	void renderBackground();
-    
+
     /**
      * setNodeToShowAxis shows the 3 axis on the node space
      * @param Node* nodeWithAxis to attach the mesh
      */
 	void setNodeToShowAxis(Node* nodeWithAxis);
-    
+
     /**
      * getRectTouch returns the RectGUI pointer or 0 in case of any gui touch
      * @param float x
@@ -181,7 +183,7 @@ public:
      * @return RectGUI* touched or 0
      */
 	RectGUI* getRectTouch(float x, float y);
-    
+
     /**
      * getIdObjectSelected returns the id of the object selected, it works with color picking, it have large cost because needs to stop to rasterize the scene, usese PickRTT class
      * @param float xClick
@@ -189,7 +191,7 @@ public:
      * @return int id
      */
 	int getIdObjectSelected(int xClick, int yClick);
-    
+
 	void setColorClean(glm::vec3 color);
  //   void cleanGUI();
  //   void cleanBackground();

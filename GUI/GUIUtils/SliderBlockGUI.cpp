@@ -23,6 +23,44 @@
 #include "SliderBlockGUI.h"
 
 void SliderBlockGUI::update(float xDiff, float yDiff){
+
+	if(xDiff == -1.0f){
+
+		assert(rects.size > 0);
+		RectGUI* nearestRect = rects[0];
+		float minLeft = abs(rects[0]->getLeft());
+
+		for(int i = 0; i < rects.size(); i++){
+			if(abs(rects[i]->getLeft()) < minLeft) {
+				nearestRect = rects[i];
+			}
+		}
+		xDiff = nearestRect->getLeft();
+		logInf("xDiff = %f", xDiff);
+
+		/*
+		glm::vec3 position = internalNode->getPosition();
+
+		assert(rects.size > 0);
+		glm::vec3 rectPosition = rects[0]->getPosition;
+		glm::vec3 diff = rectPosition - position;
+
+		float distance = dot(diff, diff);
+		float minDistance = distance;
+		RectGUI nearestRect = rects[0];
+
+		for(int i = 0; i < rects.size(); i++){
+			rectPosition = rects[i]->getPosition();
+			diff = rectPosition - position;
+			distance = dot(diff, diff);
+			if(distance < minDistance){
+				nearestRect = rects[i];
+			}
+		}
+		return;
+		*/
+	}
+
 	glm::vec3 position = internalNode->getPosition();
 	if(type == HORIZONTAL_SLIDER){
 		position.x = abs(position.x);

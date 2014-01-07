@@ -24,6 +24,7 @@
 #include "SceneLoader.h"
 #include "SceneSaver.h"
 #include "../globalData/GlobalData.h"
+#include "../GUI/GUIUtils/SliderBlockGUI.h"
 
 BasicSceneManager::BasicSceneManager(){
 	root = new Node();
@@ -77,7 +78,7 @@ void BasicSceneManager::initDebug(){
 
 void BasicSceneManager::closeScene(){
 	//borrem els mesh? ho deixaria per despres
-	
+
 	int i;
 	for(i = 0; i < meshVector.size(); i++){
 		meshVector[i] = 0;
@@ -153,7 +154,11 @@ SliderGUI* BasicSceneManager::createSliderGUI(float left, float top, float w, fl
 	return sliderResult;
 }
 
-
+SliderGUI* BasicSceneManager::createSliderBlockGUI(float left, float top, float w, float h, int type){
+	SliderGUI* sliderResult = new SliderBlockGUI(left, top, w, h, type);
+	guiSlider.push_back(sliderResult);
+	return sliderResult;
+}
 
 RectGUI* BasicSceneManager::createRectangleGUI(float left, float top, float w, float h){
 	Node* node = root->createChild();
@@ -201,9 +206,9 @@ void BasicSceneManager::sortMeshes(){
 void BasicSceneManager::createShadowMap(){
 	//if there are shadows we need to render it properly, with simple shaders
 	shadows = false;
-    
+
     Camera* cameraAux = getFirstCameraNotEnabled();// getFirstCameraEnabled();
-    
+
 	if(castShadow.size() != 0 && cameraAux != 0/* && currentLight != 0*/){
 		projectionLight = cameraAux->getProjectionMatrix();//getOrthogonalProjectionMatrix();
 
