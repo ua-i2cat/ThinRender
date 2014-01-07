@@ -17,35 +17,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Author:         Marc Fernandez Vanaclocha <marc.fernandez@i2cat.net>
+ *  Author:         Ignacio Contreras Pinilla <ignacio.contreras@i2cat.net>
  */
 
-#ifndef SLIDER_GUI_H
-#define SLIDER_GUI_H
+#ifndef SLIDER_BLOCK_GUI_H
+#define SLIDER_BLOCK_GUI_H
 
-#include "../Rect.h"
-#include "../../scene/Node.h"
-#include <vector>
+#include "SliderGUI.h"
 
-class SliderGUI {
+class SliderBlockGUI: public SliderGUI {
 public:
-	const static int HORIZONTAL_SLIDER = 0;
-	const static int VERTICAL_SLIDER = 1;
+	SliderBlockGUI(float left, float top, float width, float height, int type = HORIZONTAL_SLIDER) : SliderGUI(left, top, width, height, type){
 
-	SliderGUI(float left, float top, float width, float height, int type = HORIZONTAL_SLIDER);
-	~SliderGUI();
+	}
+	~SliderBlockGUI();
 
-	void includeRect(RectGUI* rect);
-	virtual void update(float xDiff, float yDiff);
-	void draw();
-	bool isInside(float x, float y);
-	RectGUI* click(float x, float y);
-protected:
-	std::vector<RectGUI*> rects;
-	Node* internalNode;
-	float left, top, width, height;
-	float minTranslation, maxTranslation;
-	int type;
-	glm::mat4 projMatrix;
+	void update(float xDiff, float yDiff);
 };
+
 #endif
