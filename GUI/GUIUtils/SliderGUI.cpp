@@ -29,8 +29,8 @@ SliderGUI::SliderGUI(float left, float top, float width, float height, int type)
 	this->top = top;
 	this->width = width;
 	this->height = height;
-	minTranslation = left;
-	maxTranslation = left;
+	minTranslation = 0.0f;
+	maxTranslation = 0.0f;
 	internalNode = GlobalData::getInstance()->scene->getRootNode()->createChild();
 	this->type = type;
 	projMatrix = glm::ortho(left, left+width, top-height, top, 0.0f, 10.0f);
@@ -50,8 +50,8 @@ void SliderGUI::includeRect(RectGUI* rect){
 		for(int i = 0; i < rects.size(); i++){
 			left += rects[i]->getWidth() + 10.0f;
 		}
-		rect->setPosition(left,rect->getTop());
-		maxTranslation = left + this->left;
+		rect->setPosition(left + this->left,rect->getTop());
+		maxTranslation = left;
 	}else{
 		float top = 0.0f;
 		for(int i = 0; i < rects.size(); i++){
