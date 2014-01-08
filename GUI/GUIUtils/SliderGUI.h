@@ -36,7 +36,7 @@ public:
 	~SliderGUI();
 
 	void includeRect(RectGUI* rect);
-	virtual void update(float xDiff, float yDiff);
+	virtual void update(float xDiff, float yDiff, bool input = true);
 	void draw();
 	bool isInside(float x, float y);
 	RectGUI* click(float x, float y);

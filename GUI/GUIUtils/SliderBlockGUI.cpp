@@ -22,48 +22,43 @@
 
 #include "SliderBlockGUI.h"
 
-void SliderBlockGUI::update(float xDiff, float yDiff){
+void SliderBlockGUI::update(float xDiff, float yDiff, bool input){
 
-	if(xDiff == -1.0f){
-		/*
+	if(!input){
+
 		assert(rects.size() > 0);
 
-		glm::vec3 position = internalNode->getPosition();
-		glm::vec3 rectPosition = rects[0]->getNode()->getPosition();
+		glm::vec3 position = glm::vec3(this->width*0.5f, 0.0f, 0.0f);
+		glm::vec3 internalNodePosition = internalNode->getPosition();
+		RectGUI* currentRect = rects[0];
+		glm::vec3 rectPosition = glm::vec3(currentRect->getLeft() + 0.5f*currentRect->getWidth() + internalNodePosition.x, 0.0f, 0.0f);
+		glm::vec3 diff = position - rectPosition;
+		float distance = glm::dot(diff, diff);
 
-		glm::vec3 diff = rectPosition - position;
-		float distance = dot(diff, diff);
+		logInf("SliderBlockGUI::update with no input - slider center at (%f, %f, %f)", position[0], position[1], position[2]);
+		logInf("SliderBlockGUI::update with no input - slider internal node at (%f, %f, %f)", internalNode->getPosition()[0], internalNode->getPosition()[1], internalNode->getPosition()[2]);
 
 		float minDistance = distance;
-		RectGUI* nearestRect = rects[0];
-
+		RectGUI* nearestRect = currentRect;
+		float nodeOffset = 0.0f;
+		float nodeOffsetAux = currentRect->getWidth() + 10.0f;
 		for(int i = 1; i < rects.size(); i++){
-			rectPosition = rects[i]->getNode()->getPosition();
-			diff = rectPosition - position;
-			distance = dot(diff, diff);
+			currentRect = rects[i];
+			rectPosition = glm::vec3(currentRect->getLeft() + 0.5f*currentRect->getWidth() + internalNodePosition.x, 0.0f, 0.0f);
+			diff = position - rectPosition;
+			distance = glm::dot(diff, diff);
 			if(distance < minDistance){
 				minDistance = distance;
 				nearestRect = rects[i];
+				nodeOffset = nodeOffsetAux;
+				logInf("minDistance for index %d", i);
 			}
-		}
-		*/
-
-		assert(rects.size() > 0);
-
-		glm::vec3 position = internalNode->getPosition();
-		float rectLeft = rects[0]->getLeft();
-		float minLeft = abs(rectLeft);
-		RectGUI* nearestRect = rects[0];
-
-		for(int i = 1; i < rects.size(); i++){
-			rectLeft = abs(rects[i]->getLeft());
-			if(rectLeft < minLeft){
-				minLeft = rectLeft;
-				nearestRect = rects[i];
-			}
+			nodeOffsetAux += currentRect->getWidth() + 10.0f;
 		}
 
-		internalNode->setPosition(glm::vec3(nearestRect->getLeft(), position[1], position[2]));
+		internalNode->setPosition(glm::vec3(0.5f*this->width - 0.5f*nearestRect->getWidth() - nodeOffset, internalNodePosition.y, internalNodePosition.z));
+		logInf("SliderBlockGUI::update with no input - final node position (%f, %f, %f)", internalNode->getPosition()[0], internalNode->getPosition()[1], internalNode->getPosition()[2]);
+		logInf("SliderBlockGUI::update with no input - this->width = %f - getWidth() = %f - nodeOffset = %f", this->width, nearestRect->getWidth(), nodeOffset);
 		return;
 	}
 

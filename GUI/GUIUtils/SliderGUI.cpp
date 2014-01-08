@@ -63,7 +63,7 @@ void SliderGUI::includeRect(RectGUI* rect){
 	rects.push_back(rect);
 }
 
-void SliderGUI::update(float xDiff, float yDiff){
+void SliderGUI::update(float xDiff, float yDiff, bool input){
 	glm::vec3 position = internalNode->getPosition();
 	if(type == HORIZONTAL_SLIDER){
 		position.x = abs(position.x);

@@ -32,7 +32,7 @@ public:
 	}
 	~SliderBlockGUI();
 
-	void update(float xDiff, float yDiff);
+	void update(float xDiff, float yDiff, bool input = true);
 };
 
 #endif
