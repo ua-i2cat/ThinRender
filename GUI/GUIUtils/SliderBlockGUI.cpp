@@ -18,9 +18,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Author:         Ignacio Contreras Pinilla <ignacio.contreras@i2cat.net>
+ *                  Marc Fernandez Vanaclocha <marc.fernandez@i2cat.net>
  */
 
 #include "SliderBlockGUI.h"
+#include "../../utils/Timer.h"
 
 void SliderBlockGUI::update(float xDiff, float yDiff, bool input){
 
@@ -31,12 +33,9 @@ void SliderBlockGUI::update(float xDiff, float yDiff, bool input){
 		glm::vec3 position = glm::vec3(this->width*0.5f, 0.0f, 0.0f);
 		glm::vec3 internalNodePosition = internalNode->getPosition();
 		RectGUI* currentRect = rects[0];
-		glm::vec3 rectPosition = glm::vec3(currentRect->getLeft() + 0.5f*currentRect->getWidth() + internalNodePosition.x, 0.0f, 0.0f);
+		glm::vec3 rectPosition = glm::vec3(currentRect->getLeft() + 0.5f*currentRect->getWidth() + internalNodePosition.x - this->left, 0.0f, 0.0f);
 		glm::vec3 diff = position - rectPosition;
 		float distance = glm::dot(diff, diff);
-
-		logInf("SliderBlockGUI::update with no input - slider center at (%f, %f, %f)", position[0], position[1], position[2]);
-		logInf("SliderBlockGUI::update with no input - slider internal node at (%f, %f, %f)", internalNode->getPosition()[0], internalNode->getPosition()[1], internalNode->getPosition()[2]);
 
 		float minDistance = distance;
 		RectGUI* nearestRect = currentRect;
@@ -44,21 +43,23 @@ void SliderBlockGUI::update(float xDiff, float yDiff, bool input){
 		float nodeOffsetAux = currentRect->getWidth() + 10.0f;
 		for(int i = 1; i < rects.size(); i++){
 			currentRect = rects[i];
-			rectPosition = glm::vec3(currentRect->getLeft() + 0.5f*currentRect->getWidth() + internalNodePosition.x, 0.0f, 0.0f);
+			rectPosition = glm::vec3(currentRect->getLeft() + 0.5f*currentRect->getWidth() + internalNodePosition.x - this->left, 0.0f, 0.0f);
 			diff = position - rectPosition;
 			distance = glm::dot(diff, diff);
 			if(distance < minDistance){
 				minDistance = distance;
 				nearestRect = rects[i];
 				nodeOffset = nodeOffsetAux;
-				logInf("minDistance for index %d", i);
 			}
 			nodeOffsetAux += currentRect->getWidth() + 10.0f;
 		}
-
-		internalNode->setPosition(glm::vec3(0.5f*this->width - 0.5f*nearestRect->getWidth() - nodeOffset, internalNodePosition.y, internalNodePosition.z));
-		logInf("SliderBlockGUI::update with no input - final node position (%f, %f, %f)", internalNode->getPosition()[0], internalNode->getPosition()[1], internalNode->getPosition()[2]);
-		logInf("SliderBlockGUI::update with no input - this->width = %f - getWidth() = %f - nodeOffset = %f", this->width, nearestRect->getWidth(), nodeOffset);
+        float maxSpeed = GlobalData::getInstance()->screenWidth * 0.9f;
+        float dist = maxSpeed * (float)Timer::getInstance()->getDeltaTime()/1000.0f;
+        glm::vec3 finalPosition = glm::vec3(0.5f*this->width - 0.5f*nearestRect->getWidth() - nodeOffset, internalNodePosition.y, internalNodePosition.z);
+        if(abs(finalPosition.x - internalNodePosition.x) > dist){
+            finalPosition.x = dist * Maths::signf(finalPosition.x - internalNodePosition.x) + internalNodePosition.x;
+        }
+        internalNode->setPosition(finalPosition);
 		return;
 	}
 
@@ -68,7 +69,6 @@ void SliderBlockGUI::update(float xDiff, float yDiff, bool input){
 		position.x -= xDiff;
 		if(position.x > maxTranslation) position.x = maxTranslation;
 		if(position.x < minTranslation) position.x = minTranslation;
-		//logInf("position.x: %f",position.x);
 		position.x = -position.x;
 	}else{
 		position.y = -abs(position.y);

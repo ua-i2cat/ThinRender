@@ -18,6 +18,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  *  Author:         Ignacio Contreras Pinilla <ignacio.contreras@i2cat.net>
+ *                  Marc Fernandez Vanaclocha <marc.fernandez@i2cat.net>
  */
 
 #ifndef SLIDER_BLOCK_GUI_H
