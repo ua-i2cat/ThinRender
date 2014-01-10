@@ -20,19 +20,33 @@
  *  Author:         Marc Fernandez Vanaclocha <marc.fernandez@i2cat.net>
  */
 
+#ifndef VIDEO_DECODER_H
+#define VIDEO_DECODER_H
+
 #include <OMXAL/OpenMAXAL.h>
 #include <OMXAL/OpenMAXAL_Android.h>
 #include <pthread.h>
+
+// we're streaming MPEG-2 transport stream data, operate on transport stream block size
+#define MPEG2_TS_PACKET_SIZE 188
+// number of MPEG-2 transport stream blocks per buffer, an arbitrary number
+#define PACKETS_PER_BUFFER 10
+// number of required interfaces for the MediaPlayer creation
+#define NB_MAXAL_INTERFACES 3 // XAAndroidBufferQueueItf, XAStreamInformationItf and XAPlayItf
+// number of buffers in our buffer queue, an arbitrary number
+#define NB_BUFFERS 8
+// determines how much memory we're dedicating to memory caching
+#define BUFFER_SIZE (PACKETS_PER_BUFFER*MPEG2_TS_PACKET_SIZE)
 
 /**
  * VideoDecoder gives the integration of different platforms to decode via hardware
  * This class gives also the option to set source, play, stop, pause and release the video
  * the destructor will shut down the openmax engine
  */
-class VideDecoder {
+class VideoDecoder {
 public:
-	VideDecoder(RectGUI* rect);
-	~VideDecoder();
+	VideoDecoder(RectGUI* rect);
+	~VideoDecoder();
 
 	void setSource(std::string fileName);
 	void releaseVideo();
@@ -42,6 +56,44 @@ public:
 
 	void updateTexture();
 private:
-	static XAObjectItf engineObject = NULL;
-	static XAEngineItf engineEngine = NULL;
+	static XAObjectItf engineObject;
+	static XAEngineItf engineEngine;
+
+	static XAObjectItf outputMixObject;
+
+	static XAObjectItf playerObj;
+	static XAPlayItf playerPlayItf;
+	static XAAndroidBufferQueueItf playerBQItf;
+	static XAStreamInformationItf playerStreamInfoItf;
+	static XAVolumeItf playerVolItf;
+
+	static ANativeWindow* theNativeWindow;
+
+	static char dataCache[BUFFER_SIZE * NB_BUFFERS];
+
+	// where we cache in memory the data to play
+	// note this memory is re-used by the buffer queue callback
+	static FILE *file;
+	// constant to identify a buffer context which is the end of the stream to decode
+	static const int kEosBufferCntxt = 1980; // a magic value we can compare against
+
+	static pthread_mutex_t mutex;
+	static pthread_cond_t cond;
+
+	static bool discontinuity;
+	static bool reachedEof;
+
+	static XAresult AndroidBufferQueueCallback(
+			XAAndroidBufferQueueItf caller, void *pCallbackContext, void *pBufferContext, void *pBufferData,
+			XAuint32 dataSize, XAuint32 dataUsed, const XAAndroidBufferItem *pItems, XAuint32 itemsLength
+		);
+	static void StreamChangeCallback(
+			XAStreamInformationItf caller, XAuint32 eventId, XAuint32 streamIndex,
+			void * pEventData, void * pContext
+		);
+	static bool enqueueInitialBuffers(bool discontinuity);
+	static bool createStreamingMediaPlayer();
+	void setPlayingStreamingMediaPlayer();
 };
+
+#endif
