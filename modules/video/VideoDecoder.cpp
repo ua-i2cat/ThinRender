@@ -447,3 +447,18 @@ VideoDecoder::~VideoDecoder() {
 void VideoDecoder::updateTexture(){
 	TextureWindow::updateTexture();
 }
+
+void VideoDecoder::pause(){
+	XAresult res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_PAUSED);
+    assert(XA_RESULT_SUCCESS == res);
+}
+
+void VideoDecoder::play(){
+	XAresult res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_PLAYING);
+    assert(XA_RESULT_SUCCESS == res);
+}
+
+void VideoDecoder::stop(){
+	XAresult res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_STOPPED);
+    assert(XA_RESULT_SUCCESS == res);
+}
