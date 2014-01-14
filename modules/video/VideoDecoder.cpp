@@ -55,6 +55,7 @@
 
 char VideoDecoder::dataCache[BUFFER_SIZE * NB_BUFFERS];
 const int VideoDecoder::kEosBufferCntxt;
+std::string VideoDecoder::sourcePath;
 
 // engine interfaces
 XAObjectItf VideoDecoder::engineObject = NULL;
@@ -227,6 +228,7 @@ void VideoDecoder::StreamChangeCallback(XAStreamInformationItf caller,
         break;
     }
 }
+
 // Enqueue the initial buffers, and optionally signal a discontinuity in the first buffer
 bool VideoDecoder::enqueueInitialBuffers(bool discontinuity)
 {
@@ -288,7 +290,7 @@ bool VideoDecoder::createStreamingMediaPlayer()
 {
     XAresult res;
     // convert Java string to UTF-8
-    std::string path = "/sdcard/NativeMedia.ts";
+    std::string path = sourcePath;
 
     // open the file to play
     file = fopen(path.c_str(), "rb");
@@ -394,7 +396,8 @@ void VideoDecoder::setPlayingStreamingMediaPlayer(){
     }
 }
 
-VideoDecoder::VideoDecoder(RectGUI* rect){
+VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
+	sourcePath = path;
 	GLuint textureId;
 	glGenTextures(1, &textureId);
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureId);

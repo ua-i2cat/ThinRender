@@ -27,6 +27,8 @@
 #include <OMXAL/OpenMAXAL_Android.h>
 #include <pthread.h>
 
+#include <string>
+
 // we're streaming MPEG-2 transport stream data, operate on transport stream block size
 #define MPEG2_TS_PACKET_SIZE 188
 // number of MPEG-2 transport stream blocks per buffer, an arbitrary number
@@ -45,7 +47,7 @@
  */
 class VideoDecoder {
 public:
-	VideoDecoder(RectGUI* rect);
+	VideoDecoder(RectGUI* rect, std::string path);
 	~VideoDecoder();
 
 	void setSource(std::string fileName);
@@ -56,6 +58,7 @@ public:
 
 	void updateTexture();
 private:
+	static std::string sourcePath;
 	static XAObjectItf engineObject;
 	static XAEngineItf engineEngine;
 
