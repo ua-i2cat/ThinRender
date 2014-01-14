@@ -71,7 +71,7 @@ extern "C"
 #endif
 
 JNIEXPORT void JNICALL
-Java_net_i2cat_videoproject_TextureSurfaceActivity_cacheJNIVars(JNIEnv *env, jobject jobj)
+Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_cacheJNIVars(JNIEnv *env, jobject jobj)
 {
 	env->GetJavaVM(&javaVM);
 	jclass cls = env->GetObjectClass(jobj);
@@ -80,7 +80,7 @@ Java_net_i2cat_videoproject_TextureSurfaceActivity_cacheJNIVars(JNIEnv *env, job
 }
 
 JNIEXPORT void JNICALL
-Java_net_i2cat_videoproject_TextureSurfaceActivity_setSurface(JNIEnv *env, jclass clazz, jobject surface)
+Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_setSurface(JNIEnv *env, jclass clazz, jobject surface)
 {
 	// obtain a native window from a Java surface
 	logInf("PUM A! %i", (int)surface);
