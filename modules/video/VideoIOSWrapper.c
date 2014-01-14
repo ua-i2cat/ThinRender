@@ -25,8 +25,14 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #include <pthread.h>
+
+#import <OpenAl/al.h>
+#import <OpenAl/alc.h>
+#include <AudioToolbox/AudioToolbox.h>
+
 pthread_mutex_t mutex;
 
+AudioQueueRef _playQueue = NULL;
 
 AVAssetReader* reader = NULL;
 CMTime previousFrameTime;
@@ -39,7 +45,13 @@ CVOpenGLESTextureCacheRef videoTextureCache;
 
 CVImageBufferRef movieFrame;
 
-bool loop = false;
+AVAssetReaderOutput *readerAudioTrackOutput = nil;
+int maxBuffers = 3;
+AudioQueueBufferRef audioQueueBuffer[3];
+int audioBuffer = 0;
+AudioQueueTimelineRef timeLine;
+
+bool loop = true;
 
 bool initReproduction = false;
 bool pauseReproduction = false;
@@ -54,6 +66,14 @@ CMSampleBufferRef lastSampleBufferRef = NULL;
         AVAssetReaderTrackOutput *readerVideoTrackOutput = [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:[[inputAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] outputSettings:outputSettings];
         readerVideoTrackOutput.alwaysCopiesSampleData = NO;
         [reader addOutput:readerVideoTrackOutput];
+        
+        NSArray *audioTracks = [inputAsset tracksWithMediaType:AVMediaTypeAudio];
+        AVAssetReaderTrackOutput *readerAudioTrackOutput = nil;
+        AVAssetTrack* audioTrack = [audioTracks objectAtIndex:0];
+        
+        readerAudioTrackOutput = [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:audioTrack outputSettings:nil];
+        readerAudioTrackOutput.alwaysCopiesSampleData = NO;
+        [reader addOutput:readerAudioTrackOutput];
     }
     
     void getVideoTextures(GLuint &luminance, GLuint &chrominance){
@@ -92,10 +112,101 @@ CMSampleBufferRef lastSampleBufferRef = NULL;
         }
         pthread_mutex_unlock(&mutex);
     }
+void audioCallback(void *                  inUserData,
+                   AudioQueueRef           inAQ,
+                   AudioQueueBufferRef     inCompleteAQBuffer) {
+    CMSampleBufferRef audioSampleBufferRef = [readerAudioTrackOutput copyNextSampleBuffer];
+    if (!audioSampleBufferRef){
+        logErr("read next audio frame output fail");
+        return;
+    }
+    
+    CMBlockBufferRef blockBufferRef;// = CMSampleBufferGetDataBuffer(audioSampleBufferRef);
+    AudioBufferList audioBufferList;
+    CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(audioSampleBufferRef, NULL, &audioBufferList, sizeof(audioBufferList), NULL, NULL, 0, &blockBufferRef);
+    if(audioBufferList.mNumberBuffers == 0) logErr("====================== mNumberBuffers = 0");
+    for( int i=0; i< audioBufferList.mNumberBuffers; i++ ){
+        if (audioBufferList.mBuffers[i].mData && inCompleteAQBuffer->mAudioData) {
+            memcpy(inCompleteAQBuffer->mAudioData, audioBufferList.mBuffers[i].mData, audioBufferList.mBuffers[i].mDataByteSize);
+            inCompleteAQBuffer->mAudioDataByteSize = audioBufferList.mBuffers[i].mDataByteSize;
+            AudioQueueEnqueueBuffer(_playQueue, inCompleteAQBuffer, 0, NULL);
+        }else{
+            CMSampleBufferInvalidate(audioSampleBufferRef);
+            CFRelease(audioSampleBufferRef);
+            return;
+        }
+    }
+    CFRelease(blockBufferRef);
+    CMSampleBufferInvalidate(audioSampleBufferRef);
+    CFRelease(audioSampleBufferRef);
+    return;
+}
+
+int counterAudioSamples = 0;
+    void readNextAudioSampleFromOutput(AVAssetReaderOutput * readerAudioTrackOutput){
+        if(counterAudioSamples >= maxBuffers) return;
+        
+        CMSampleBufferRef audioSampleBufferRef = [readerAudioTrackOutput copyNextSampleBuffer];
+        if (!audioSampleBufferRef){
+            logErr("read next audio frame output fail");
+            return;
+        }
+        
+        
+        AudioStreamBasicDescription inAudioStreamBasicDescription = *CMAudioFormatDescriptionGetStreamBasicDescription((CMAudioFormatDescriptionRef)CMSampleBufferGetFormatDescription(audioSampleBufferRef));
+        
+        OSStatus status;
+        if(_playQueue == NULL){
+            status = AudioQueueNewOutput(&inAudioStreamBasicDescription, audioCallback, NULL, NULL, NULL, 0, &_playQueue);
+            if(status != 0) logInf("--------------------AudioQueueNewOutput OSStatus error %i", (int) status);
+            
+            status = AudioQueuePrime(_playQueue, 0, NULL);
+            if(status != 0) logInf("--------------------AudioQueuePrime OSStatus error %i", (int) status);
+            
+            status = AudioQueueCreateTimeline(_playQueue, &timeLine);
+            if(status != 0) logInf("--------------------AudioQueuePrime OSStatus error %i", (int) status);
+        }
+        CMBlockBufferRef blockBufferRef;// = CMSampleBufferGetDataBuffer(audioSampleBufferRef);
+        AudioBufferList audioBufferList;
+        CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(audioSampleBufferRef, NULL, &audioBufferList, sizeof(audioBufferList), NULL, NULL, 0, &blockBufferRef);
+        
+        for( int i=0; i< audioBufferList.mNumberBuffers; i++ ){
+            
+            AudioBuffer audioBuffer = audioBufferList.mBuffers[i];
+            //AudioQueueBufferRef audioQueueBuffer;
+            status = AudioQueueAllocateBuffer(_playQueue, audioBuffer.mDataByteSize, &audioQueueBuffer[counterAudioSamples]);
+            
+            if (status == 0 && audioQueueBuffer[counterAudioSamples]->mAudioData) {
+                memcpy(audioQueueBuffer[counterAudioSamples]->mAudioData, audioBuffer.mData, audioBuffer.mDataByteSize);
+                audioQueueBuffer[counterAudioSamples]->mAudioDataByteSize = audioBuffer.mDataByteSize;
+            }else{
+                logInf("--------------------OSStatus error %i", (int) status);
+            }
+        }
+        counterAudioSamples++;
+        CFRelease(blockBufferRef);
+        CMSampleBufferInvalidate(audioSampleBufferRef);
+        CFRelease(audioSampleBufferRef);
+        if(counterAudioSamples == maxBuffers){
+            status = AudioQueueStart(_playQueue, NULL);
+            if(status != 0) logInf("--------------------AudioQueueStart OSStatus error %i", (int) status);
+            for(int n = 0; n < maxBuffers; n++){
+                AudioTimeStamp bufferStartTime;
+                AudioQueueGetCurrentTime(_playQueue, NULL, &bufferStartTime, NULL);
+            
+                status = AudioQueueEnqueueBuffer(_playQueue, audioQueueBuffer[n], 0, NULL);
+                if(status != 0) logInf("--------------------AudioQueueEnqueueBuffer OSStatus error %i", (int) status);
+            }
+
+        }
+        return;
+            
+    }
     void readNextVideoFrameFromOutput(AVAssetReaderOutput * readerVideoTrackOutput){
         CMSampleBufferRef sampleBufferRef = [readerVideoTrackOutput copyNextSampleBuffer];
         if (!sampleBufferRef){
             logErr("read next video frame output fail");
+            [reader cancelReading];
             return;
         }
         
@@ -131,18 +242,21 @@ CMSampleBufferRef lastSampleBufferRef = NULL;
         AVAssetReaderOutput *readerVideoTrackOutput = nil;
         
         for( AVAssetReaderOutput *output in reader.outputs){
+            if( [output.mediaType isEqualToString:AVMediaTypeAudio] ) {
+                readerAudioTrackOutput = output;
+            }
             if( [output.mediaType isEqualToString:AVMediaTypeVideo]){
                 readerVideoTrackOutput = output;
             }
         }
         
-        if ([reader startReading] == NO)
-        {
+        if ([reader startReading] == NO){
             logErr("VideoIOSWrapper process asset Error reading from file");
             return;
         }
         
         while (reader.status == AVAssetReaderStatusReading){
+            readNextAudioSampleFromOutput(readerAudioTrackOutput);
             readNextVideoFrameFromOutput(readerVideoTrackOutput);
         }
         
@@ -152,6 +266,7 @@ CMSampleBufferRef lastSampleBufferRef = NULL;
     }
     
     void startVideo(){
+        
         initReproduction = true;
         pauseReproduction = false;
         endReproduction = false;
@@ -164,7 +279,7 @@ CMSampleBufferRef lastSampleBufferRef = NULL;
         }
         previousFrameTime = kCMTimeZero;
         previousActualFrameTime = CFAbsoluteTimeGetCurrent();
-        NSURL *url = [[NSBundle mainBundle] URLForResource:@"sintel-1080-baseline" withExtension:@"mp4"];
+        NSURL *url = [[NSBundle mainBundle] URLForResource:@"sintel" withExtension:@"mov"];
         NSDictionary *inputOptions = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
         AVURLAsset *inputAsset = [[AVURLAsset alloc] initWithURL:url options:inputOptions];
         
@@ -179,6 +294,11 @@ CMSampleBufferRef lastSampleBufferRef = NULL;
                 while(loopCondition){
                     processAsset(inputAsset);
                     loopCondition = loop;
+                    AudioQueueReset (_playQueue);
+                    AudioQueueStop (_playQueue, YES);
+                    AudioQueueDispose (_playQueue, YES);
+                    _playQueue = NULL;
+                    counterAudioSamples = 0;
                 }
                 endReproduction = true;
                 initReproduction = false;
@@ -186,10 +306,13 @@ CMSampleBufferRef lastSampleBufferRef = NULL;
         
     }
 
+AudioTimeStamp* audioTimeStamp;
 bool playAction(){
     logInf("playAction");
     pauseReproduction = false;
-    
+    if(_playQueue != NULL){
+        AudioQueueStart(_playQueue, audioTimeStamp);
+    }
     if(!initReproduction){
         startVideo();
     }
@@ -198,6 +321,8 @@ bool playAction(){
 bool pauseAction(){
     logInf("pause action %i", endReproduction);
     pauseReproduction = true;
+    AudioQueueGetCurrentTime(_playQueue, timeLine, audioTimeStamp, NULL);
+    AudioQueuePause(_playQueue);
     return !endReproduction;
 }
 void stopAction(){
