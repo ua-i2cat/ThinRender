@@ -212,7 +212,7 @@ void BasicSceneManager::createShadowMap(){
 	if(castShadow.size() != 0 && cameraAux != 0/* && currentLight != 0*/){
 		projectionLight = cameraAux->getProjectionMatrix();//getOrthogonalProjectionMatrix();
 
-		Node* cameraNodeAux = cameraAux->getAttachedNode();
+		//Node* cameraNodeAux = cameraAux->getAttachedNode();
 		//trick of the trade
         //lightWorldPosition = cameraNodeAux->getHierarchyPosition();
 		//lightWorldDirection = cameraNodeAux->getWorldForwardVector();

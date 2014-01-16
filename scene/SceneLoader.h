@@ -102,7 +102,6 @@ namespace SceneLoader {
 		std::strcpy(tempBuffer, value.c_str());
 		int result = 0;
 		char* tempPointer = std::strtok(tempBuffer,"|");
-		int i = 0;
 		while(tempPointer!=0){
 			if(strncmp(tempPointer,"BACK_CULLING_MASK",17) == 0){
 				result = result | Mesh::BACK_CULLING_MASK;
