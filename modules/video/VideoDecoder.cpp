@@ -56,6 +56,7 @@
 char VideoDecoder::dataCache[BUFFER_SIZE * NB_BUFFERS];
 const int VideoDecoder::kEosBufferCntxt;
 std::string VideoDecoder::sourcePath;
+RectGUI* VideoDecoder::textureRect;
 
 // engine interfaces
 XAObjectItf VideoDecoder::engineObject = NULL;
@@ -396,6 +397,21 @@ void VideoDecoder::setPlayingStreamingMediaPlayer(){
     }
 }
 
+void VideoDecoder::initGUIButtons(){
+	float rectTop = textureRect->getTop();
+	float rectLeft = textureRect->getLeft();
+	float rectWidth = textureRect->getWidth();
+	float rectHeight = textureRect->getHeight();
+
+	logInf("rect{Top, Left, Width, Height} = (%f, %f, %f, %f)", rectTop, rectLeft, rectWidth, rectHeight);
+
+	RectGUI* playPauseButton = new RectGUI(
+			GlobalData::getInstance()->scene->getRootNode()->createChild(),
+			rectLeft, rectTop, rectWidth*0.1f, rectHeight*0.1f
+			);
+	playPauseButton->setTexture(TextureManager::getInstance()->getTexture("blueSquare.png"));
+}
+
 VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
 	sourcePath = path;
 	GLuint textureId;
@@ -407,6 +423,8 @@ VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 	theNativeWindow = TextureWindow::getANativeWindow(textureId);//texture->getTextureId());
+
+	textureRect = rect;
 
 	Shader* shader = new VideoPlaneShader();
 	rect->setShader(shader);

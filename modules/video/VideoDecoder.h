@@ -26,6 +26,7 @@
 #include <OMXAL/OpenMAXAL.h>
 #include <OMXAL/OpenMAXAL_Android.h>
 #include <pthread.h>
+#include <android/native_window_jni.h>
 
 #include <string>
 
@@ -57,7 +58,9 @@ public:
 	void stop();
 
 	void updateTexture();
+	void initGUIButtons();
 private:
+	static RectGUI* textureRect;
 	static std::string sourcePath;
 	static XAObjectItf engineObject;
 	static XAEngineItf engineEngine;
