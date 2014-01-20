@@ -87,6 +87,11 @@ public:
 	 * @return true if successfully updated, false otherwise
 	 */
 	bool updateEvent(int id, float newX, float newY);
+	/**
+	 * Search and updates an event using the id, used to avoid stange effects in Android
+	 * @return true if successfully updated, false otherwise
+	 */
+	bool updateEvent(int id);
     /**
      * updates an event to the end using the last position, this happens when a finger release the screen
      * @return true if successfully updated, false otherwise

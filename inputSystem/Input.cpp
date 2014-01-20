@@ -138,6 +138,17 @@ bool Input::updateEvent(int id, float newX, float newY){
     }
     return false;
 }
+//there are some problems with inputs in newer versions of android NDK, at last, if there isn't any n
+bool Input::updateEvent(int id){
+	for(std::vector<event>::iterator it = eventVector.begin(); it < eventVector.end(); it++){
+		if((*it).idEvent == id){
+			(*it).state = UPDATE_INPUT;
+			(*it).visited = false;
+            return true;
+		}
+	}
+    return false;
+}
 
 void Input::clearEvents(){
 	eventVector.clear();
@@ -158,7 +169,7 @@ bool Input::noActiveEvents(){
 std::vector<event> Input::getEventsNotLooked(){
     std::vector<event> eV;
     for(std::vector<event>::iterator it = eventVector.begin(); it < eventVector.end(); it++){
-        if((*it).visited == false && !(*it).flushed){
+    	if((*it).visited == false && !(*it).flushed){
             eV.push_back((*it));
             // Android only gives the difference between inputs and we're expected to
             // mantain the static events (i.e. two-finger zoom: we should preserve the
