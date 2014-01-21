@@ -56,6 +56,7 @@ public:
 	void play();
 	void pause();
 	void stop();
+	void setMute(bool enable);
 
 	void updateTexture();
 	void initGUIButtons();
