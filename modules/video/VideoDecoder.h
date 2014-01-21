@@ -57,6 +57,8 @@ public:
 	void pause();
 	void stop();
 	void setMute(bool enable);
+	bool getMute();
+	bool isStopped();
 
 	void updateTexture();
 	void initGUIButtons();
@@ -101,6 +103,8 @@ private:
 	static bool enqueueInitialBuffers(bool discontinuity);
 	static bool createStreamingMediaPlayer();
 	void setPlayingStreamingMediaPlayer();
+
+	void endCallback(XAPlayItf caller, void* context, XAuint32 playevent);
 };
 
 #endif

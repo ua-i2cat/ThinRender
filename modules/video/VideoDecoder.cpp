@@ -53,6 +53,16 @@
 #include "render/utils/TextureWindow.h"
 #include "VideoDecoder.h"
 
+VideoDecoder* instanceDecoder;
+
+extern "C" {
+	void endCallbackDecoder(XAPlayItf caller, void* context, XAuint32 playevent){
+		//if(playevent == XA_PLAYEVENT_HEADATEND){
+		instanceDecoder->stop();
+		//}
+	}
+}
+
 char VideoDecoder::dataCache[BUFFER_SIZE * NB_BUFFERS];
 const int VideoDecoder::kEosBufferCntxt;
 std::string VideoDecoder::sourcePath;
@@ -456,7 +466,17 @@ VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
     createStreamingMediaPlayer();
     setPlayingStreamingMediaPlayer();
     logInf("setted all stuff from openmax");
+	this->stop();  // We force the head to stay at the start of the video (pause will not suffice)
+
+	instanceDecoder = this;
+
+	res = (*playerPlayItf)->RegisterCallback(playerPlayItf, endCallbackDecoder, NULL);
+	assert(XA_RESULT_SUCCESS == res);
+
+	res = (*playerPlayItf)->SetCallbackEventsMask(playerPlayItf, XA_PLAYEVENT_HEADATEND);
+	assert(XA_RESULT_SUCCESS == res);
 }
+
 
 VideoDecoder::~VideoDecoder() {
 	TextureWindow::close();
@@ -485,7 +505,21 @@ void VideoDecoder::setMute(bool enable){
     assert(XA_RESULT_SUCCESS == res);
 }
 
+bool VideoDecoder::getMute(){
+	XAboolean mute;
+	XAresult res = (*playerVolItf)->GetMute(playerVolItf, &mute);
+	assert(XA_RESULT_SUCCESS == res);
+	return (mute == XA_BOOLEAN_TRUE);
+}
+
 void VideoDecoder::stop(){
 	XAresult res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_STOPPED);
     assert(XA_RESULT_SUCCESS == res);
+}
+
+bool VideoDecoder::isStopped(){
+	XAuint32 state;
+	XAresult res = (*playerPlayItf)->GetPlayState(playerPlayItf, &state);
+	assert(XA_RESULT_SUCCESS == res);
+	return (state == XA_PLAYSTATE_STOPPED);
 }
