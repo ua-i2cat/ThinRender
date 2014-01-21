@@ -188,12 +188,16 @@ void RectGUI::setColor(glm::vec4 color){
 	plane->shader->color = color;
 }
 
-void RectGUI::setText(std::string message, std::string typographyFile, int fontSize){
+void RectGUI::setText(std::string message, std::string typographyFile, int fontSize, int align, float offsetX, float offsetY){
 	textMessage = message;
 	text = TextManager::getInstance()->getText(typographyFile, fontSize);
 	float widthMessage = text->getWidthOfMessage(textMessage.c_str());
 	float heightMessage = text->getHeightOfMessage(textMessage.c_str());
-	text->setText(textMessage, width/2.0f - widthMessage/2.0f, GlobalData::getInstance()->screenHeight-height/2.0f-heightMessage/2.0f);
+	if(align == 0){
+		text->setText(textMessage, width/2.0f - widthMessage/2.0f + offsetX, GlobalData::getInstance()->screenHeight-height/2.0f-heightMessage/2.0f + offsetY);
+	}else{//LEFT ALIGN!!! :D
+		text->setText(textMessage, offsetX, GlobalData::getInstance()->screenHeight-height/2.0f-heightMessage/2.0f + offsetY);
+	}
 }
 
 void RectGUI::setBlockText(std::string message, std::string typographyFile, int fontSize, int align){

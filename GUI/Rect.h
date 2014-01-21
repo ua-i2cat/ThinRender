@@ -156,8 +156,11 @@ public:
      * @param std::string message to set at Text class
      * @param std::string typography file from assets path, the file format accepted are ttf
      * @param int fontSize
+     * @param int align: 0 center, 1 left (if you want others just make it, is easy) default value: center
+     * @param float offsetX: offset from rect once given the align center, default value: 0.0f
+     * @param float offsetY: offset from rect once given the align center, default value: 0.0f
      */
-	void setText(std::string message, std::string typographyFile, int fontSize);
+	void setText(std::string message, std::string typographyFile, int fontSize, int align = 0, float offsetX = 0.0f, float offsetY = 0.0f);
 	void setBlockText(std::string message, std::string typographyFile, int fontSize, int align = 0);
 
     /**
