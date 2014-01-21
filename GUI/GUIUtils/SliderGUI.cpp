@@ -44,18 +44,18 @@ SliderGUI::~SliderGUI(){
 	rects.clear();
 }
 
-void SliderGUI::includeRect(RectGUI* rect){
+void SliderGUI::includeRect(RectGUI* rect, float offset){
 	if(type == HORIZONTAL_SLIDER){
 		float left = 0.0f;
 		for(int i = 0; i < rects.size(); i++){
-			left += rects[i]->getWidth() + 10.0f;
+			left += rects[i]->getWidth() + offset;
 		}
 		rect->setPosition(left + this->left,rect->getTop());
 		maxTranslation = left;
 	}else{
 		float top = 0.0f;
 		for(int i = 0; i < rects.size(); i++){
-			top -= rects[i]->getHeight() + 10.0f;
+			top -= rects[i]->getHeight() + offset;
 		}
 		rect->setPosition(rect->getLeft(),this->top + top);
 		maxTranslation = height + top - rect->getHeight();

@@ -35,7 +35,7 @@ public:
 	SliderGUI(float left, float top, float width, float height, int type = HORIZONTAL_SLIDER);
 	~SliderGUI();
 
-	void includeRect(RectGUI* rect);
+	void includeRect(RectGUI* rect, float offset = 10.0f);
 	virtual void update(float xDiff, float yDiff, bool input = true);
 	void draw();
 	bool isInside(float x, float y);
