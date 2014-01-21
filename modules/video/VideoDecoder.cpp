@@ -476,6 +476,15 @@ void VideoDecoder::play(){
     assert(XA_RESULT_SUCCESS == res);
 }
 
+void VideoDecoder::setMute(bool enable){
+	if(enable){
+		XAresult res = (*playerVolItf)->SetMute(playerVolItf, XA_BOOLEAN_TRUE);
+	}else{
+		XAresult res = (*playerVolItf)->SetMute(playerVolItf, XA_BOOLEAN_FALSE);
+	}
+    assert(XA_RESULT_SUCCESS == res);
+}
+
 void VideoDecoder::stop(){
 	XAresult res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_STOPPED);
     assert(XA_RESULT_SUCCESS == res);
