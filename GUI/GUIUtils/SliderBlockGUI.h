@@ -34,6 +34,9 @@ public:
 	~SliderBlockGUI();
 
 	void update(float xDiff, float yDiff, bool input = true);
+	int getIndex();
+private:
+	int index;
 };
 
 #endif

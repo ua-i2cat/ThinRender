@@ -38,6 +38,7 @@ public:
 	void includeRect(RectGUI* rect, float offset = 10.0f);
 	void includeAtrezzoRect(RectGUI* rect, float offset = 10.0f, float atrezzoOffset = 0.0f);
 	virtual void update(float xDiff, float yDiff, bool input = true);
+	virtual int getIndex();
 	void draw();
 	bool isInside(float x, float y);
 	RectGUI* click(float x, float y);
@@ -50,6 +51,7 @@ protected:
 	float left, top, width, height;
 	float minTranslation, maxTranslation;
 	int type;
+	int index;
 	glm::mat4 projMatrix;
 	bool enabled;
 };

@@ -33,6 +33,7 @@ void SliderBlockGUI::update(float xDiff, float yDiff, bool input){
 		glm::vec3 position = glm::vec3(this->width*0.5f, 0.0f, 0.0f);
 		glm::vec3 internalNodePosition = internalNode->getPosition();
 		RectGUI* currentRect = rects[0];
+		this->index = 0;
 		glm::vec3 rectPosition = glm::vec3(currentRect->getLeft() + 0.5f*currentRect->getWidth() + internalNodePosition.x - this->left, 0.0f, 0.0f);
 		glm::vec3 diff = position - rectPosition;
 		float distance = glm::dot(diff, diff);
@@ -49,6 +50,7 @@ void SliderBlockGUI::update(float xDiff, float yDiff, bool input){
 			if(distance < minDistance){
 				minDistance = distance;
 				nearestRect = rects[i];
+				this->index = i;
 				nodeOffset = nodeOffsetAux;
 			}
 			nodeOffsetAux += currentRect->getWidth() + 10.0f;
@@ -78,6 +80,10 @@ void SliderBlockGUI::update(float xDiff, float yDiff, bool input){
 		position.y = -position.y;
 	}
 	internalNode->setPosition(position);
+}
+
+int SliderBlockGUI::getIndex(){
+	return this->index;
 }
 
 SliderBlockGUI::~SliderBlockGUI(){

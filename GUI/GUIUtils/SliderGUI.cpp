@@ -33,6 +33,7 @@ SliderGUI::SliderGUI(float left, float top, float width, float height, int type)
 	maxTranslation = 0.0f;
 	internalNode = GlobalData::getInstance()->scene->getRootNode()->createChild();
 	this->type = type;
+	this->index = 0;
 	projMatrix = glm::ortho(left, left+width, top-height, top, 0.0f, 10.0f);
 	enabled = true;
 }
@@ -103,6 +104,10 @@ void SliderGUI::update(float xDiff, float yDiff, bool input){
 		position.y = -position.y;
 	}
 	internalNode->setPosition(position);
+}
+
+int SliderGUI::getIndex(){
+	return this->index;
 }
 
 bool SliderGUI::isInside(float x, float y){
