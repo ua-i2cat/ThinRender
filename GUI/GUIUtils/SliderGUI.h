@@ -44,6 +44,7 @@ public:
 	RectGUI* click(float x, float y);
 
 	void setEnabled(bool enabled);
+	bool getEnabled();
 protected:
 	std::vector<RectGUI*> rects;
 	std::vector<RectGUI*> rectsAtrezzo;

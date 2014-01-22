@@ -130,6 +130,11 @@ RectGUI* SliderGUI::click(float x, float y){
 void SliderGUI::setEnabled(bool enabled){
 	this->enabled = enabled;
 }
+
+bool SliderGUI::getEnabled(){
+	return this->enabled;
+}
+
 void SliderGUI::draw(){
 	if(!enabled) return;
 	glViewport((int)left,(int)top-(int)height,(int)width,(int)height);
