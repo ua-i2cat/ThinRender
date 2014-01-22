@@ -66,6 +66,7 @@ const int VideoDecoder::kEosBufferCntxt;
 
 std::string VideoDecoder::sourcePath;
 RectGUI* VideoDecoder::textureRect;
+GLuint VideoDecoder::textureID;
 
 float VideoDecoder::originalWidth;
 float VideoDecoder::originalHeight;
@@ -413,15 +414,14 @@ void VideoDecoder::setPlayingStreamingMediaPlayer(){
 
 VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
 	sourcePath = path;
-	GLuint textureId;
-	glGenTextures(1, &textureId);
-	glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureId);
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureID);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	theNativeWindow = TextureWindow::getANativeWindow(textureId);//texture->getTextureId());
+	theNativeWindow = TextureWindow::getANativeWindow(textureID);//texture->getTextureId());
 
 	textureRect = rect;
 	originalWidth = rect->getWidth();
@@ -432,7 +432,7 @@ VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
 	Shader* shader = new VideoPlaneShader();
 	rect->setShader(shader);
 	rect->setTexture(TextureManager::getInstance()->getTexture("blueSquare.png"));
-	rect->setTexture(textureId);
+	rect->setTexture(textureID);
 
     XAresult res;
 
@@ -485,6 +485,7 @@ void VideoDecoder::pause(){
 }
 
 void VideoDecoder::play(){
+	textureRect->setTexture(textureID);
 	XAresult res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_PLAYING);
     assert(XA_RESULT_SUCCESS == res);
 }
@@ -515,6 +516,20 @@ bool VideoDecoder::isStopped(){
 	XAresult res = (*playerPlayItf)->GetPlayState(playerPlayItf, &state);
 	assert(XA_RESULT_SUCCESS == res);
 	return (state == XA_PLAYSTATE_STOPPED);
+}
+
+bool VideoDecoder::isPaused(){
+	XAuint32 state;
+	XAresult res = (*playerPlayItf)->GetPlayState(playerPlayItf, &state);
+	assert(XA_RESULT_SUCCESS == res);
+	return (state == XA_PLAYSTATE_PAUSED);
+}
+
+bool VideoDecoder::isPlaying(){
+	XAuint32 state;
+	XAresult res = (*playerPlayItf)->GetPlayState(playerPlayItf, &state);
+	assert(XA_RESULT_SUCCESS == res);
+	return (state == XA_PLAYSTATE_PLAYING);
 }
 
 void VideoDecoder::maximize(){

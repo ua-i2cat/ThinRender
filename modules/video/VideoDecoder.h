@@ -59,12 +59,19 @@ public:
 	void setMute(bool enable);
 	bool getMute();
 	bool isStopped();
+	bool isPaused();
+	bool isPlaying();
 
 	void maximize();
 	void restore();
 	void updateTexture();
+
+	void setSplash(std::string texturePath);
+	void setSplash();
 private:
 	static RectGUI* textureRect;
+	static GLuint textureID;
+
 	static float originalWidth;
 	static float originalHeight;
 	static float originalTop;
