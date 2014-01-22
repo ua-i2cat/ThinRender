@@ -60,10 +60,16 @@ public:
 	bool getMute();
 	bool isStopped();
 
+	void maximize();
+	void restore();
 	void updateTexture();
-	void initGUIButtons();
 private:
 	static RectGUI* textureRect;
+	static float originalWidth;
+	static float originalHeight;
+	static float originalTop;
+	static float originalLeft;
+
 	static std::string sourcePath;
 	static XAObjectItf engineObject;
 	static XAEngineItf engineEngine;
