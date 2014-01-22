@@ -34,6 +34,7 @@ SliderGUI::SliderGUI(float left, float top, float width, float height, int type)
 	internalNode = GlobalData::getInstance()->scene->getRootNode()->createChild();
 	this->type = type;
 	projMatrix = glm::ortho(left, left+width, top-height, top, 0.0f, 10.0f);
+	enabled = true;
 }
 
 SliderGUI::~SliderGUI(){
@@ -41,9 +42,31 @@ SliderGUI::~SliderGUI(){
 		delete rects[i];
 		rects[i] = 0;
 	}
+	for(int i = 0; i < rectsAtrezzo.size(); i++){
+		delete rectsAtrezzo[i];
+		rectsAtrezzo[i] = 0;
+	}
 	rects.clear();
+	rectsAtrezzo.clear();
 }
-
+void SliderGUI::includeAtrezzoRect(RectGUI* rect, float offset, float atrezzoOffset){
+	if(type == HORIZONTAL_SLIDER){
+		float left = 0.0f;
+		for(int i = 0; i < rects.size()-1; i++){
+			left += rects[i]->getWidth() + offset;
+		}
+		rect->setPosition(left + this->left + atrezzoOffset,rect->getTop());
+		maxTranslation = left;
+	}else{
+		float top = 0.0f;
+		for(int i = 0; i < rects.size()-1; i++){
+			top -= rects[i]->getHeight() + offset;
+		}
+		rect->setPosition(rect->getLeft(),this->top + top + atrezzoOffset);
+		maxTranslation = height + top - rect->getHeight();
+	}
+	rectsAtrezzo.push_back(rect);
+}
 void SliderGUI::includeRect(RectGUI* rect, float offset){
 	if(type == HORIZONTAL_SLIDER){
 		float left = 0.0f;
@@ -99,11 +122,18 @@ RectGUI* SliderGUI::click(float x, float y){
 	return 0;
 }
 
+void SliderGUI::setEnabled(bool enabled){
+	this->enabled = enabled;
+}
 void SliderGUI::draw(){
+	if(!enabled) return;
 	glViewport((int)left,(int)top-(int)height,(int)width,(int)height);
 	glm::mat4 resultMatrix = projMatrix*internalNode->getFullTransform();
 	for(int i = 0; i < rects.size(); i++){
 		rects[i]->draw(resultMatrix);
+	}
+	for(int i = 0; i < rectsAtrezzo.size(); i++){
+		rectsAtrezzo[i]->draw(resultMatrix);
 	}
 	glViewport(0,0,GlobalData::getInstance()->screenWidth,GlobalData::getInstance()->screenHeight);
 }
