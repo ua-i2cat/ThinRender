@@ -240,3 +240,7 @@ void RectGUI::setEnabled(bool enabled){
 bool RectGUI::getEnabled(){
 	return enabled;
 }
+
+void RectGUI::rotate(float radians){
+	this->node->rotate(glm::vec3(0.0f, 0.0f, 1.0f), radians);
+}

@@ -196,6 +196,8 @@ public:
     void setColor(glm::vec4 color);
     void setEnabled(bool enabled);
     bool getEnabled();
+
+	void rotate(float radians);
 private:
 	Mesh* plane;
 	Node* node;
