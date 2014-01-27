@@ -51,6 +51,7 @@ public:
     const static int HORIZONTAL_SCREEN = 1;
 
     std::stack<int> appSceneStack;
+
 private:
 	GlobalData(){
 		screenMode = HORIZONTAL_SCREEN;

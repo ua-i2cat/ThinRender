@@ -421,7 +421,7 @@ VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	theNativeWindow = TextureWindow::getANativeWindow(textureID);//texture->getTextureId());
+	theNativeWindow = getANativeWindow(textureID);//texture->getTextureId());
 
 	textureRect = rect;
 	originalWidth = rect->getWidth();
@@ -472,11 +472,15 @@ VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
 
 
 VideoDecoder::~VideoDecoder() {
-	TextureWindow::close();
+	logInf("Video decoder destructor, deleting textureId");
+	glDeleteTextures(1, &textureID);
+	logInf("Video decoder destructor, deleted textureId");
+	closeVideo();
+	logInf("VideoDecoder destructor ended");
 }
 
 void VideoDecoder::updateTexture(){
-	TextureWindow::updateTexture();
+	updateTextureVideo();
 }
 
 void VideoDecoder::pause(){
