@@ -23,7 +23,7 @@
 #include "CaptureCamera.h"
 #include "../../utils/TextureWindow.h"
 #include "../../shader/Shader.h"
-#include "../../shader/gui/VideoPlaneShader.h"
+#include "../../shader/gui/CameraPreviewPlaneShader.h"
 
 CaptureCamera::CaptureCamera(RectGUI* rect){
 	glGenTextures(1, &textureID);
@@ -34,7 +34,7 @@ CaptureCamera::CaptureCamera(RectGUI* rect){
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	setCameraTexturePreview(textureID);
 
-	Shader* shader = new VideoPlaneShader();
+	Shader* shader = new CameraPreviewPlaneShader();
 	rect->setShader(shader);
 	rect->setTexture(TextureManager::getInstance()->getTexture("blueSquare.png"));
 	rect->setTexture(textureID);
