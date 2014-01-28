@@ -96,7 +96,7 @@ Texture::~Texture(){
 int Texture::getNextPowerOf2(int value)
 {
 	int result = 1;
-	for (int i = 1; i < 12; ++i)
+	for (int i = 1; i < 13; ++i)
 	{
 		result = result << 1;
 		if (result >= value)
