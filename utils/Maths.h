@@ -28,6 +28,7 @@
 #include "glm/gtx/orthonormalize.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/norm.hpp"
+#include "glm/gtx/fast_square_root.hpp"
 #include "../utils/glm/gtc/type_precision.hpp"
 #include <cmath>
 
