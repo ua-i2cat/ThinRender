@@ -72,7 +72,7 @@ public:
     /**
      * saveScene writes the current scene into a xml file
      */
-    void saveScene();
+    void saveScene(std::string name = "");
 
     /**
      * closeScene is called by de destructor but it can be called outside to reset the scene

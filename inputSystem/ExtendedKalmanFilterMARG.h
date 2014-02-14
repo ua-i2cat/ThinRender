@@ -165,10 +165,10 @@
 		));
 
 		glm::vec4 jacobianResult = glm::vec4 (
+				accW.x * xAccDiff + accW.y * yAccDiff + accW.z * zAccDiff + magW.x * xMagDiff + magW.y * yMagDiff + magW.z * zMagDiff,
 				accX.x * xAccDiff + accX.y * yAccDiff + accX.z * zAccDiff + magX.x * xMagDiff + magX.y * yMagDiff + magX.z * zMagDiff,
 				accY.x * xAccDiff + accY.y * yAccDiff + accY.z * zAccDiff + magY.x * xMagDiff + magY.y * yMagDiff + magY.z * zMagDiff,
-				accZ.x * xAccDiff + accZ.y * yAccDiff + accZ.z * zAccDiff + magZ.x * xMagDiff + magZ.y * yMagDiff + magZ.z * zMagDiff,
-				accW.x * xAccDiff + accW.y * yAccDiff + accW.z * zAccDiff + magW.x * xMagDiff + magW.y * yMagDiff + magW.z * zMagDiff
+				accZ.x * xAccDiff + accZ.y * yAccDiff + accZ.z * zAccDiff + magZ.x * xMagDiff + magZ.y * yMagDiff + magZ.z * zMagDiff
 		);
 		jacobianResult = jacobianInverseTransposeMultiplication * jacobianResult;
 

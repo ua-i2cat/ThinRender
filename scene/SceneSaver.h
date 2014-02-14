@@ -149,7 +149,7 @@ namespace SceneSaver {
 		char* attributeValue;
 		for(int i = 0; i < parent->childs.size(); i++){
 			auxiliarChildNode = parent->childs.at(i);
-
+			//if(auxiliarChildNode->childs.size() == 0 && auxiliarChildNode->sceneObjects.size() == 0) continue;
 			attributeValue = doc.allocate_string(auxiliarChildNode->getName().c_str());
 			child = doc.allocate_node(node_element, "Node");
 			child->append_attribute(doc.allocate_attribute("name", attributeValue));
@@ -222,7 +222,31 @@ namespace SceneSaver {
 		// print_no_indenting is the only flag that print() knows about
 		//print(std::back_inserter(xml_no_indent), doc, print_no_indenting);
 		// xml_no_indent now contains non-indented XML
+		doc.clear();
         return true;
+	}
+	static bool serializeScene(BasicSceneManager* sceneReceiver, std::string fileName){
+		currentSecene = sceneReceiver;
+
+		// root node
+		xml_node<>* root = doc.allocate_node(node_element, "Scene");
+		root->append_attribute(doc.allocate_attribute("ambientLight", "0.2 0.2 0.2"));
+		doc.append_node(root);
+
+		logInf("sceneReceiver->getRootNode() childs size %i", sceneReceiver->getRootNode()->childs.size());
+		serializeNode(sceneReceiver->getRootNode(), root);
+
+		std::string xml_as_string = "";
+		// watch for name collisions here, print() is a very common function name!
+		print(std::back_inserter(xml_as_string), doc);
+
+		std::string name = "scene"+fileName+".xml";
+		logInf("saving scene in file %s", name.c_str());
+		logInf("xml_as_string length %i", xml_as_string.length());
+		FileSystem::getInstance()->writeFile(name, xml_as_string.c_str());
+		doc.clear();
+
+		return true;
 	}
 };
 

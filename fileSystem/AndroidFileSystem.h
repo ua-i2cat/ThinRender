@@ -50,6 +50,7 @@ public:
 	 * @return 0 if successfully added the file in the sd
 	 */
 	int writeFile(string filePath, const char* content);
+	int openExternalFile(string filePath);
 
 	AndroidFileSystem();
 	~AndroidFileSystem();

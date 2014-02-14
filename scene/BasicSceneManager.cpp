@@ -55,8 +55,11 @@ void BasicSceneManager::loadScene(){
 void BasicSceneManager::loadScene(std::string fileName){
 	SceneLoader::loadScene(this, fileName);
 }
-void BasicSceneManager::saveScene(){
-	SceneSaver::serializeScene(this);
+void BasicSceneManager::saveScene(std::string fileName){
+	if(fileName.compare("") == 0)
+		SceneSaver::serializeScene(this);
+	else
+		SceneSaver::serializeScene(this, fileName);
 }
 
 void BasicSceneManager::initAxisVectorMesh(){
@@ -77,9 +80,12 @@ void BasicSceneManager::initDebug(){
 }
 
 void BasicSceneManager::closeScene(){
-	//borrem els mesh? ho deixaria per despres
-
 	int i;
+	for(i = 0; i < root->childs.size(); i++){
+		delete root->childs[i];
+		root->childs[i] = 0;
+	}
+	root->childs.clear();
 	for(i = 0; i < meshVector.size(); i++){
 		meshVector[i] = 0;
 	}
@@ -130,6 +136,7 @@ Mesh* BasicSceneManager::createMesh(string name){
 
 Mesh* BasicSceneManager::createPlaneMesh(){
 	Mesh* result = MeshManager::getInstance()->getMeshPlane2D();
+	result->name = "generatedPlaneMesh";
 	meshVector.push_back(result);
 	return result;
 }

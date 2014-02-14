@@ -57,6 +57,42 @@ int AndroidFileSystem::openFile(string filePath){
 	return 0;
 }
 
+int AndroidFileSystem::openExternalFile(string filePath){
+	if(getFileSize(filePath) != -1){
+		return 1;//the file exist and is loaded
+	}
+	std::string path = dataPath+filePath;
+	FILE* fp;
+	fp = fopen(path.c_str(), "r");
+	if(fp == 0){
+		logErr("AndroidFileSystem::openExternalFile unable to open asset %s", path.c_str());
+		fclose(fp);
+		return -1;
+	}
+	fseek(fp, 0, SEEK_END);
+	unsigned long fileSize = ftell(fp);
+	rewind(fp);
+
+	char* buffer = (char*) malloc(fileSize+1);
+	unsigned long readResult = fread(buffer, sizeof(char), fileSize, fp);
+
+	if(readResult != fileSize){
+		logErr("something bad happens, read result != file size");
+		return -1;
+	}
+	buffer[fileSize] = '\0';
+
+	FileStruct* fileStruct = new FileStruct((int)fileSize+1);
+
+	memcpy(fileStruct->data, buffer, fileSize+1);
+	fileMap[filePath] = fileStruct;
+
+	free(buffer);
+	fclose(fp);
+
+	return 0;
+
+}
 int AndroidFileSystem::writeFile(string filePath, const char* content){
 	FILE *fp;
 	int index;

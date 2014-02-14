@@ -215,7 +215,11 @@ namespace SceneLoader {
 			value = attribute->value();
 			logInf("mesh attribute %s value %s", atributeName.c_str(), value.c_str());
 			if(atributeName.compare("name")==0){
-				aux = currentSecene->createMesh(value);
+				if(value.compare("generatedPlaneMesh") == 0){
+					aux = currentSecene->createPlaneMesh();
+				}else{
+					aux = currentSecene->createMesh(value);
+				}
 				aux->name = value;
 				sceneNode->attachSceneObject(aux);
 			}
@@ -362,6 +366,7 @@ namespace SceneLoader {
 		doc.parse<0>(FileSystem::getInstance()->getFileData(file));
 		recursive(doc.first_node(), sceneReceiver->getRootNode());
 		FileSystem::getInstance()->destroyFileData(file);
+		doc.clear();
         return true;
 	}
 };

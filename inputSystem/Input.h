@@ -44,6 +44,7 @@ struct event{
  */
 class Input {
 public:
+	glm::quat deviceOrientation;
 	const static int BEGIN_INPUT = 0;
 	const static int END_INPUT = 1;
 	const static int UPDATE_INPUT = -1;
