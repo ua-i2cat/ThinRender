@@ -152,7 +152,6 @@ namespace SceneLoader {
 			atributeName = attribute->name();
 			value = attribute->value();
 			if(atributeName.compare("name")==0){
-				logInf("parse node name %s",value.c_str());
 				destSceneNode->setName(value);
 			}
 			else if(atributeName.compare("id")==0){
@@ -164,7 +163,6 @@ namespace SceneLoader {
 			}
 			else if(atributeName.compare("scale")==0){
 				glm::vec3 scale = extractVec3(value);
-				logInf("scale value %s, result %f %f %f", value.c_str(), scale.x, scale.y, scale.z);
 				destSceneNode->setScale(scale);
 			}
 			else if(atributeName.compare("orientation")==0){
@@ -185,10 +183,8 @@ namespace SceneLoader {
 			}
 			else if(atributeName.compare("lookAt")==0){
 				glm::vec3 destinationLookAt = extractVec3(value);
-				logInf("scene node name %s, look at %f, %f, %f", destSceneNode->getName().c_str(), destinationLookAt.x, destinationLookAt.y, destinationLookAt.z);
 				destSceneNode->lookAt(destinationLookAt);
 				glm::vec3 forward = destSceneNode->getForwardVector();
-				logErr("and forward vector %f %f %f", forward.x, forward.y,forward.z);
 			}
 			else if(atributeName.compare("showAxis")==0){
 				 if(value.compare("true")==0){
@@ -213,7 +209,6 @@ namespace SceneLoader {
 		for (xml_attribute<> *attribute = nodeXML->first_attribute(); attribute; attribute = attribute->next_attribute()) {
 			atributeName = attribute->name();
 			value = attribute->value();
-			logInf("mesh attribute %s value %s", atributeName.c_str(), value.c_str());
 			if(atributeName.compare("name")==0){
 				if(value.compare("generatedPlaneMesh") == 0){
 					aux = currentSecene->createPlaneMesh();
@@ -252,7 +247,6 @@ namespace SceneLoader {
 		Camera* aux = currentSecene->createCamera();
 		aux->setAspectRatio(1.0f*GlobalData::getInstance()->screenWidth/GlobalData::getInstance()->screenHeight);
 		sceneNode->attachSceneObject(aux);
-		logInf("new camera, scene node name %s", sceneNode->getName().c_str());
 
 		string atributeName;
 		string value;
@@ -362,6 +356,7 @@ namespace SceneLoader {
             return false;
         }
 		currentSecene = sceneReceiver;
+
 		xml_document<> doc;
 		doc.parse<0>(FileSystem::getInstance()->getFileData(file));
 		recursive(doc.first_node(), sceneReceiver->getRootNode());
