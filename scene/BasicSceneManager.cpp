@@ -42,10 +42,10 @@ BasicSceneManager::BasicSceneManager(){
 }
 
 BasicSceneManager::~BasicSceneManager(){
+	closeScene();
     delete root;
     delete depthRTT;
     delete pickRTT;
-	closeScene();
 }
 
 void BasicSceneManager::loadScene(){

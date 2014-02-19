@@ -99,6 +99,11 @@ void Input::newEvent(float x,float y){
     lastID++;
 }
 void Input::newEvent(int id, float x,float y){
+	for(std::vector<event>::iterator it = eventVector.begin(); it < eventVector.end(); it++){
+		if((*it).idEvent == id){
+			return;
+		}
+	}
     event e = {x,y,x,y,id,BEGIN_INPUT,true,false, false};
     eventVector.push_back(e);
 }
