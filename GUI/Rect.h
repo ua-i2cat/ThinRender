@@ -33,6 +33,7 @@
 #include "../globalData/GlobalData.h"
 #include "../log/Log.h"
 #include "Text.h"
+#include "GUIObject.h"
 #include <string>
 
 /**
@@ -43,7 +44,7 @@
  *  -Texture
  *  -Text
  */
-class  RectGUI {
+class  RectGUI : public GUIObject {
 public:
     /**
      * Constructor all params comes from top left (1.0, 0.0) to bottom right (0.0, 1.0)
@@ -121,7 +122,7 @@ public:
     /**
      * draw method call the different render methods for the rectangle and text
      */
-	void draw();
+	virtual void draw();
     /**
      * draw method call the different render methods for the rectangle and text
      */

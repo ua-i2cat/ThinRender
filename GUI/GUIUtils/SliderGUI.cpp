@@ -25,6 +25,8 @@
 #include "../../log/Log.h"
 
 SliderGUI::SliderGUI(float left, float top, float width, float height, int type){
+	guiObjectType = SLIDER_OBJECT;
+
 	this->left = left;
 	this->top = top;
 	this->width = width;

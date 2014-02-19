@@ -40,6 +40,7 @@ class SliderGUI;
 #include "RTT/PickRTT.h"
 #include "../GUI/Rect.h"
 #include "../GUI/GUIUtils/SliderGUI.h"
+#include "../GUI/GUIObject.h"
 
 #include <string>
 #include <vector>
@@ -224,8 +225,9 @@ private:
 	priority_queue<Mesh*> withoutAlpha;
 	priority_queue<Mesh*> withAlpha;
 	priority_queue<Mesh*> castShadow;
-	vector<RectGUI*> guiRect;
-	vector<SliderGUI*> guiSlider;
+	//vector<RectGUI*> guiRect;
+	//vector<SliderGUI*> guiSlider;
+	vector<GUIObject*> guiObjects;
 	RectGUI* guiBackground;
 
 	glm::vec3 ambientLight;

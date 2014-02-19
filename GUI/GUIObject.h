@@ -17,26 +17,24 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Author:         Ignacio Contreras Pinilla <ignacio.contreras@i2cat.net>
- *                  Marc Fernandez Vanaclocha <marc.fernandez@i2cat.net>
+ *  Author:         Marc Fernandez Vanaclocha <marc.fernandez@i2cat.net>
  */
 
-#ifndef SLIDER_BLOCK_GUI_H
-#define SLIDER_BLOCK_GUI_H
+#ifndef GUIOBJECT_H
+#define GUIOBJECT_H
 
-#include "SliderGUI.h"
-
-class SliderBlockGUI: public SliderGUI {
+class GUIObject {
 public:
-	SliderBlockGUI(float left, float top, float width, float height, int type = HORIZONTAL_SLIDER) : SliderGUI(left, top, width, height, type){
-		guiObjectType = SLIDER_BLOCK_OBJECT;
+	~GUIObject() {
 	}
-	~SliderBlockGUI();
-
-	void update(float xDiff, float yDiff, bool input = true);
-	int getIndex();
-private:
-	int index;
+	virtual void draw() = 0;
+	int getType(){
+		return guiObjectType;
+	}
+	const static int RECT_OBJECT = 0;
+	const static int SLIDER_OBJECT = 1;
+	const static int SLIDER_BLOCK_OBJECT = 2;
+protected:
+	int guiObjectType;
 };
-
 #endif

@@ -26,8 +26,9 @@
 #include "../Rect.h"
 #include "../../scene/Node.h"
 #include <vector>
+#include "../GUIObject.h"
 
-class SliderGUI {
+class SliderGUI : public GUIObject{
 public:
 	const static int HORIZONTAL_SLIDER = 0;
 	const static int VERTICAL_SLIDER = 1;
@@ -39,7 +40,7 @@ public:
 	void includeAtrezzoRect(RectGUI* rect, float offset = 10.0f, float atrezzoOffset = 0.0f);
 	virtual void update(float xDiff, float yDiff, bool input = true);
 	virtual int getIndex();
-	void draw();
+	virtual void draw();
 	bool isInside(float x, float y);
 	RectGUI* click(float x, float y);
 

@@ -89,7 +89,17 @@ void BasicSceneManager::closeScene(){
 	for(i = 0; i < meshVector.size(); i++){
 		meshVector[i] = 0;
 	}
-	for(i = 0; i < guiRect.size(); i++){
+	for(i = 0; i < guiObjects.size(); i++){
+		if(guiObjects.at(i)->getType() == GUIObject::RECT_OBJECT){
+			delete ((RectGUI*)guiObjects[i]);
+		}else if(guiObjects.at(i)->getType() == GUIObject::SLIDER_OBJECT){
+			delete ((SliderGUI*)guiObjects[i]);
+		}else {
+			delete ((SliderBlockGUI*)guiObjects[i]);
+		}
+		guiObjects[i] = 0;
+	}
+/*	for(i = 0; i < guiRect.size(); i++){
 		delete guiRect[i];
 		guiRect[i] = 0;
 	}
@@ -97,13 +107,14 @@ void BasicSceneManager::closeScene(){
 	for(i = 0; i < guiSlider.size(); i++){
 		delete guiSlider[i];
 		guiSlider[i] = 0;
-	}
+	}*/
 	//Removes all elements from the vector (which are destroyed), leaving the container with a size of 0.
 	meshVector.clear();
 	cameraVector.clear();
 	lightVector.clear();
-	guiRect.clear();
-	guiSlider.clear();
+	//guiRect.clear();
+	//guiSlider.clear();
+	guiObjects.clear();
     if(guiBackground != 0)
         delete guiBackground;
     guiBackground = 0;
@@ -151,26 +162,30 @@ RectGUI* BasicSceneManager::createRectangleBackground(){
 RectGUI* BasicSceneManager::createRectangleGUI(){
 	Node* node = root->createChild();
 	RectGUI* rectResult = new RectGUI(node, 0.0f,1.0f,1.0f, 1.0f);
-	guiRect.push_back(rectResult);
+	//guiRect.push_back(rectResult);
+	guiObjects.push_back(rectResult);
 	return rectResult;
 }
 
 SliderGUI* BasicSceneManager::createSliderGUI(float left, float top, float w, float h, int type){
 	SliderGUI* sliderResult = new SliderGUI(left, top, w, h, type);
-	guiSlider.push_back(sliderResult);
+	//guiSlider.push_back(sliderResult);
+	guiObjects.push_back(sliderResult);
 	return sliderResult;
 }
 
 SliderGUI* BasicSceneManager::createSliderBlockGUI(float left, float top, float w, float h, int type){
 	SliderGUI* sliderResult = new SliderBlockGUI(left, top, w, h, type);
-	guiSlider.push_back(sliderResult);
+	//guiSlider.push_back(sliderResult);
+	guiObjects.push_back(sliderResult);
 	return sliderResult;
 }
 
 RectGUI* BasicSceneManager::createRectangleGUI(float left, float top, float w, float h){
 	Node* node = root->createChild();
 	RectGUI* rectResult = new RectGUI(node, left, top, w, h);
-	guiRect.push_back(rectResult);
+	//guiRect.push_back(rectResult);
+	guiObjects.push_back(rectResult);
 	return rectResult;
 }
 
@@ -342,12 +357,15 @@ void BasicSceneManager::renderGUI(){
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	for (int i = 0; i < guiObjects.size(); i++){
+		guiObjects.at(i)->draw();
+	}/*
 	for (int i = 0; i < guiRect.size(); i++){
 		guiRect.at(i)->draw();
 	}
 	for (int i = 0; i < guiSlider.size(); i++){
 		guiSlider.at(i)->draw();
-	}
+	}*/
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
@@ -380,8 +398,9 @@ Light* BasicSceneManager::getFirstLightEnabled(){
 
 RectGUI* BasicSceneManager::getRectTouch(float x, float y){
 	RectGUI* result = 0;
-	for(int i = 0; i < guiRect.size(); i++){
-		result = guiRect.at(i);
+	for(int i = 0; i < guiObjects.size(); i++){
+		if(guiObjects.at(i)->getType() != GUIObject::RECT_OBJECT) continue;
+		result = (RectGUI*)guiObjects.at(i);
 		if(result->isInside(x, y))
 			return result;
 	}

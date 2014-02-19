@@ -25,6 +25,8 @@
 #include "TextManager.h"
 
 RectGUI::RectGUI(float top, float left, float width, float height, Node* nodeRect){
+	guiObjectType = RECT_OBJECT;
+
 	plane = MeshManager::getInstance()->getMeshPlane2D(0.0f, float(GlobalData::getInstance()->screenHeight), width, height);
 	plane->shader->color = glm::vec4(0.0f,0.0f,0.0f,1.0f);
 	plane->options = Mesh::GUI_MASK;
@@ -40,6 +42,8 @@ RectGUI::RectGUI(float top, float left, float width, float height, Node* nodeRec
 }
 
 RectGUI::RectGUI(Node* nodeRect, float left, float top, float w, float h){
+	guiObjectType = RECT_OBJECT;
+
 	plane = MeshManager::getInstance()->getMeshPlane2D(0.0f, float(GlobalData::getInstance()->screenHeight), w, h);
 	plane->shader->color = glm::vec4(0.0f,0.0f,0.0f,1.0f);
 	plane->options = Mesh::GUI_MASK;
