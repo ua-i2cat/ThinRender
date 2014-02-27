@@ -307,11 +307,20 @@ bool VideoDecoder::createStreamingMediaPlayer()
     XAresult res;
     // convert Java string to UTF-8
     std::string path = sourcePath;
+	std::string diskPath = "/sdcard/renderScenes/" + path;
+	std::string assetPath = "videos/" + path;
 
     // open the file to play
-    file = fopen(path.c_str(), "rb");
+    file = fopen(diskPath.c_str(), "rb");
+	if(file == NULL){
+		FileSystem::getInstance()->openFile(assetPath);
+		(AndroidFileSystem *)(FileSystem::getInstance())->writeFile(path, FileSystem::getInstance()->getFileData(assetPath));
+		FileSystem::getInstance()->destroyFileData(assetPath);
+	}
+
+    file = fopen(diskPath.c_str(), "rb");
     if (file == NULL) {
-    	logErr("fail open! %s", path.c_str());
+    	logErr("VideoDecoder::createStreamingMediaPlayer HARD FAIL: fail open! %s", diskPath.c_str());
     	return false;
     }
 
