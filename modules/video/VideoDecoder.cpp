@@ -472,11 +472,14 @@ VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
 
 
 VideoDecoder::~VideoDecoder() {
-	logInf("Video decoder destructor, deleting textureId");
 	glDeleteTextures(1, &textureID);
-	logInf("Video decoder destructor, deleted textureId");
+
+	// OpenMAX AL destruction
+	(*playerObj)->Destroy(playerObj);
+	(*outputMixObject)->Destroy(outputMixObject);
+	(*engineObject)->Destroy(engineObject);
+
 	closeVideo();
-	logInf("VideoDecoder destructor ended");
 }
 
 void VideoDecoder::updateTexture(){
