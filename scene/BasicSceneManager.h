@@ -95,9 +95,10 @@ public:
 
     /**
      * createPlaneMesh creates a plane mesh of side 1, centered at (0,0,0) and aligned in x,y plane
+     * @param Shader* if wants to set your own shader from scratch
      * @return Mesh*
      */
-    Mesh* createPlaneMesh();
+    Mesh* createPlaneMesh(Shader* shader = 0);
 
     /**
      * createRectangleGUI returns a complete Rect for 2D graphics, with all screen size

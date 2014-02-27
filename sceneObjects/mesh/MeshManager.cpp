@@ -111,8 +111,10 @@ Mesh* MeshManager::getMesh(string name){
 }
 
 //normalized between 0.0f to 1.0f
-Mesh* MeshManager::getMeshPlane2D(float left, float top, float width, float height){
-	Shader* shader = new SimplePlaneShader();
+Mesh* MeshManager::getMeshPlane2D(float left, float top, float width, float height, Shader* shader){
+	if(shader == 0){
+		shader = new SimplePlaneShader();
+	}
 	Mesh* resultPlane = new Mesh(shader, getNewId());
 	SubMesh* subMesh = new SubMesh(0);
 	subMesh->vertices.push_back(glm::vec3(left + width, 	top, 0.0f));
@@ -135,8 +137,10 @@ Mesh* MeshManager::getMeshPlane2D(float left, float top, float width, float heig
 	return resultPlane;
 }
 
-Mesh* MeshManager::getMeshPlane2D(){
-	Shader* shader = new SimplePlaneShader();
+Mesh* MeshManager::getMeshPlane2D(Shader* shader){
+	if(shader == 0){
+		shader = new SimplePlaneShader();
+	}
 	Mesh* resultPlane = new Mesh(shader, getNewId());
 	SubMesh* subMesh = new SubMesh(0);
 

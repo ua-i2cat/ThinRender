@@ -59,6 +59,14 @@ TextureManager::~TextureManager(){
     }
 	textureMap.clear();
 }
+void TextureManager::deleteAllNotMarkedTextures(){
+	for(map<string, Texture*>::iterator it = textureMap.begin(); it != textureMap.end(); ++it){
+		if((it->second)->markedNotToErase()) continue;
+		delete (it->second);
+		(it->second) = 0;
+		textureMap.erase (it);
+	}
+}
 
 Texture* TextureManager::getTexture(std::string name){
 	std::map<std::string, Texture*>::iterator it;

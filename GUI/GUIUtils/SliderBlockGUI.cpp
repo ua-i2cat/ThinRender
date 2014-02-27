@@ -86,6 +86,14 @@ int SliderBlockGUI::getIndex(){
 	return this->index;
 }
 
+RectGUI* SliderBlockGUI::getCurrentRect(){
+	return rects[this->getIndex()];
+}
+
+RectGUI* SliderBlockGUI::getRect(int i){
+	return rects[i];
+}
+
 SliderBlockGUI::~SliderBlockGUI(){
 	for(int i = 0; i < rects.size(); i++){
 		delete rects[i];

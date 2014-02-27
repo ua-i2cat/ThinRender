@@ -30,11 +30,14 @@ class SliderBlockGUI: public SliderGUI {
 public:
 	SliderBlockGUI(float left, float top, float width, float height, int type = HORIZONTAL_SLIDER) : SliderGUI(left, top, width, height, type){
 		guiObjectType = SLIDER_BLOCK_OBJECT;
+		index = 0;
 	}
 	~SliderBlockGUI();
 
 	void update(float xDiff, float yDiff, bool input = true);
 	int getIndex();
+	RectGUI* getCurrentRect();
+	RectGUI* getRect(int i);
 private:
 	int index;
 };

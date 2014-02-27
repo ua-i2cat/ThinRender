@@ -94,6 +94,13 @@ public:
 	int getYSquare(){
 		return ySquare;
 	}
+
+	void setEraseProtection(bool protection){
+		eraseProtection = protection;
+	}
+	bool markedNotToErase(){
+		return eraseProtection;
+	}
 private:
 	GLuint textureId;
 	GLint uniformTexture;
@@ -103,5 +110,6 @@ private:
 	int widthOriginal, heightOriginal;
 	int xSquare, ySquare;
 	GLenum format;
+	bool eraseProtection;
 };
 #endif

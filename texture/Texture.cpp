@@ -25,6 +25,7 @@
 #include "../log/Log.h"
 
 Texture::Texture(Image* image){
+	eraseProtection = false;
 	xRatio = 1.0f;
 	yRatio = 1.0f;
 	nonPowerOfTwo = false;

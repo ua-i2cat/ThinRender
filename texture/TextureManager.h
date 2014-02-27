@@ -56,6 +56,11 @@ public:
      * @return Texture*
      */
 	Texture* getTexture(string name);
+	/**
+	 * deleteAllNotMarkedTextures
+	 * deletes all the gpu textures that aren't marked, free instance will erase all
+	 */
+	void deleteAllNotMarkedTextures();
 private:
 	map<string, Texture*> textureMap;
 	TextureManager();

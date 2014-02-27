@@ -145,8 +145,8 @@ Mesh* BasicSceneManager::createMesh(string name){
 	return result;
 }
 
-Mesh* BasicSceneManager::createPlaneMesh(){
-	Mesh* result = MeshManager::getInstance()->getMeshPlane2D();
+Mesh* BasicSceneManager::createPlaneMesh(Shader* shader){
+	Mesh* result = MeshManager::getInstance()->getMeshPlane2D(shader);
 	result->name = "generatedPlaneMesh";
 	meshVector.push_back(result);
 	return result;

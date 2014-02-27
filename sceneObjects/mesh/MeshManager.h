@@ -49,14 +49,16 @@ public:
      * @param float top
      * @param float width
      * @param float height
+     * @param Shader* optional to set your own shader
      * @return Mesh*
      */
-	Mesh* getMeshPlane2D(float left, float top, float width, float height);
+	Mesh* getMeshPlane2D(float left, float top, float width, float height, Shader* shader = 0);
     /**
      * getMeshPlane2D returns a plane with full screen size
+     * @param Shader* optional to set your own shader
      * @return Mesh*
      */
-	Mesh* getMeshPlane2D();
+	Mesh* getMeshPlane2D(Shader* shader = 0);
 
 private:
 	unsigned int getNewId();
