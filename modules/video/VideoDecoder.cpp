@@ -308,13 +308,17 @@ bool VideoDecoder::createStreamingMediaPlayer()
     // convert Java string to UTF-8
     std::string path = sourcePath;
 	std::string diskPath = "/sdcard/renderScenes/" + path;
-	std::string assetPath = "videos/" + path;
+	std::string assetPath = "multimedia/" + path;
 
     // open the file to play
     file = fopen(diskPath.c_str(), "rb");
 	if(file == NULL){
 		FileSystem::getInstance()->openFile(assetPath);
-		(AndroidFileSystem *)(FileSystem::getInstance())->writeFile(path, FileSystem::getInstance()->getFileData(assetPath));
+		//another approach, this works!
+		FILE * pFile;
+		pFile = fopen (diskPath.c_str(), "wb");
+		fwrite (FileSystem::getInstance()->getFileData(assetPath) , sizeof(char), FileSystem::getInstance()->getFileSize(assetPath) - 1, pFile);
+		fclose (pFile);
 		FileSystem::getInstance()->destroyFileData(assetPath);
 	}
 

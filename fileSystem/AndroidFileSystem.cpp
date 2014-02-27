@@ -52,7 +52,6 @@ int AndroidFileSystem::openFile(string filePath){
 
 	fileStruct->data[fileLength] = '\0';
 	fileMap[filePath] = fileStruct;
-
 	AAsset_close(asset);
 	return 0;
 }
@@ -98,7 +97,7 @@ int AndroidFileSystem::writeFile(string filePath, const char* content){
 	int index;
 	std::string path = dataPath+filePath;
 	fp = fopen(path.c_str(),"w"); /* open for writing */
-	fprintf(fp,"%s", content);
+	int bytes = fprintf(fp,"%s", content);
 	fclose(fp); /* close the file before ending program */
 	return 0;
 }

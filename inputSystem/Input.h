@@ -116,7 +116,13 @@ public:
      * @return a vector with the new events from the previous call
      */
 	std::vector<event> getEventsNotLooked();
+
+	/*only call it once*/
+	bool backButtonPressed();
+	void setBackButtonPressed();
 private:
+	//only for android!
+	bool backButton;
 	Input();
 	~Input();
 	static Input* instance;

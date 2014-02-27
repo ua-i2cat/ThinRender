@@ -38,6 +38,7 @@ void Input::freeInstance(){
 }
 
 Input::Input(){
+	backButton = false;
     lastID = 0;
 }
 
@@ -156,6 +157,7 @@ bool Input::updateEvent(int id){
 }
 
 void Input::clearEvents(){
+	backButton = false;
 	eventVector.clear();
 }
 
@@ -188,4 +190,14 @@ std::vector<event> Input::getEventsNotLooked(){
         }
     }
     return eV;
+}
+
+bool Input::backButtonPressed(){
+	bool result = backButton;
+	backButton = false;
+	return result;
+}
+
+void Input::setBackButtonPressed(){
+	backButton = true;
 }
