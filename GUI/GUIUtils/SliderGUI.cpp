@@ -107,7 +107,16 @@ void SliderGUI::update(float xDiff, float yDiff, bool input){
 	}
 	internalNode->setPosition(position);
 }
+float SliderGUI::getPercentage(){
+	glm::vec3 position = internalNode->getPosition();
+	//only vertical now
+	float percentage = position.y / (-maxTranslation);
 
+	if(maxTranslation > 0.0f || rects.size() == 0){
+		return -1.0f;
+	}
+	return percentage;
+}
 int SliderGUI::getIndex(){
 	return this->index;
 }

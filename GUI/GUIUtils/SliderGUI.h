@@ -46,6 +46,8 @@ public:
 
 	void setEnabled(bool enabled);
 	bool getEnabled();
+
+	float getPercentage();
 protected:
 	std::vector<RectGUI*> rects;
 	std::vector<RectGUI*> rectsAtrezzo;

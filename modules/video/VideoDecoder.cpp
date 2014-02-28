@@ -307,8 +307,10 @@ bool VideoDecoder::createStreamingMediaPlayer()
     XAresult res;
     // convert Java string to UTF-8
     std::string path = sourcePath;
+    unsigned pos = path.find("/");
+    path = path.substr(pos);
 	std::string diskPath = "/sdcard/renderScenes/" + path;
-	std::string assetPath = "multimedia/" + path;
+	std::string assetPath = sourcePath;
 
     // open the file to play
     file = fopen(diskPath.c_str(), "rb");

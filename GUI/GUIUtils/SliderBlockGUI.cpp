@@ -62,6 +62,19 @@ void SliderBlockGUI::update(float xDiff, float yDiff, bool input){
             finalPosition.x = dist * Maths::signf(finalPosition.x - internalNodePosition.x) + internalNodePosition.x;
         }
         internalNode->setPosition(finalPosition);
+        if(type == HORIZONTAL_SLIDER){
+        	if(index == 0 && minTranslation == 0.0f){
+        		//logInf("type horizontal slider block, index 0");
+        		//logInf("actual min translation = %f current position = %f", minTranslation, finalPosition.x);
+        		minTranslation = -finalPosition.x;
+        	}
+        	if(index == rects.size()-1){
+        		maxTranslation = -finalPosition.x;
+        	}
+        }else{
+        	if(finalPosition.y < maxTranslation) maxTranslation = finalPosition.y;
+			if(finalPosition.y > minTranslation) minTranslation = finalPosition.y;
+        }
 		return;
 	}
 
@@ -70,8 +83,8 @@ void SliderBlockGUI::update(float xDiff, float yDiff, bool input){
 		position.x = abs(position.x);
 		position.x -= xDiff;
 		if(position.x > maxTranslation) position.x = maxTranslation;
-		if(position.x < minTranslation) position.x = minTranslation;
 		position.x = -position.x;
+		if(abs(position.x) <= abs(minTranslation)) position.x = abs(minTranslation);
 	}else{
 		position.y = -abs(position.y);
 		position.y += yDiff;
