@@ -46,6 +46,7 @@ AudioPlayer::AudioPlayer(std::string filePath) {
     int fileDescriptor = FileSystem::getInstance()->getFileDescriptor(filePath, &start, &length);
     createAssetAudioPlayer(fileDescriptor, start, length);
     playerCount++;
+	playing = false;
 }
 
 AudioPlayer::~AudioPlayer() {
@@ -62,15 +63,38 @@ AudioPlayer::~AudioPlayer() {
 
 bool AudioPlayer::play() {
     setPlayingAssetAudioPlayer(true);
+	playing = true;
 }
 
 bool AudioPlayer::pause() {
     setPlayingAssetAudioPlayer(false);
-
+	playing = false;
 }
 
 bool AudioPlayer::stop() {
     setPlayingAssetAudioPlayer(false);
+	playing = false;
+}
+
+bool AudioPlayer::isPlaying() {
+	return playing;
+
+	SLresult result;
+	SLuint32 state;
+
+	if(NULL == fdPlayerObject){
+		return false;
+	}
+
+	result = (*fdPlayerObject)->GetState(fdPlayerObject, &state);
+	assert(SL_RESULT_SUCCESS == result);
+
+	if(SL_PLAYSTATE_PLAYING == state){
+		logInf("playing");
+		return true;
+	}else{
+		return false;
+	}
 }
 
 
@@ -142,8 +166,8 @@ bool AudioPlayer::createAssetAudioPlayer(int fileDescriptor, long start, long le
     result = (*fdPlayerObject)->GetInterface(fdPlayerObject, SL_IID_VOLUME, &fdPlayerVolume);
     assert(SL_RESULT_SUCCESS == result);
 
-    // enable whole file looping
-    result = (*fdPlayerSeek)->SetLoop(fdPlayerSeek, SL_BOOLEAN_TRUE, 0, SL_TIME_UNKNOWN);
+    // disable whole file looping
+    result = (*fdPlayerSeek)->SetLoop(fdPlayerSeek, SL_BOOLEAN_FALSE, 0, SL_TIME_UNKNOWN);
     assert(SL_RESULT_SUCCESS == result);
 
     return true;

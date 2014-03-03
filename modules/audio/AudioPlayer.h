@@ -41,6 +41,7 @@ public:
 	bool play();
 	bool pause();
 	bool stop(); // TODO: implement stop
+	bool isPlaying();
 
 private:
     static int playerCount;
@@ -61,6 +62,8 @@ private:
 
 	static bool createEngine();
     static void destroyEngine();
+
+	bool playing;
 };
 
 #endif
