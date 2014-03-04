@@ -42,6 +42,7 @@ public:
 	bool pause();
 	bool stop(); // TODO: implement stop
 	bool isPlaying();
+	void setEnded();
 
 private:
     static int playerCount;

@@ -30,12 +30,20 @@ SLObjectItf AudioPlayer::engineObject = NULL;
 SLEngineItf AudioPlayer::engineEngine = NULL;
 SLObjectItf AudioPlayer::outputMixObject = NULL;
 
+AudioPlayer* instancePlayer;
+extern "C" {
+	void endCallbackPlayer(SLPlayItf caller, void* context, SLuint32 playevent){
+		instancePlayer->setEnded();
+		instancePlayer->stop();
+	}
+}
+
 AudioPlayer::AudioPlayer(std::string filePath) {
-    SLObjectItf fdPlayerObject = NULL;
-    SLPlayItf fdPlayerPlay = NULL;
-    SLSeekItf fdPlayerSeek = NULL;
-    SLMuteSoloItf fdPlayerMuteSolo = NULL;
-    SLVolumeItf fdPlayerVolume = NULL;
+    fdPlayerObject = NULL;
+    fdPlayerPlay = NULL;
+    fdPlayerSeek = NULL;
+    fdPlayerMuteSolo = NULL;
+    fdPlayerVolume = NULL;
 
     if (engineObject == NULL) {
         createEngine();
@@ -47,6 +55,14 @@ AudioPlayer::AudioPlayer(std::string filePath) {
     createAssetAudioPlayer(fileDescriptor, start, length);
     playerCount++;
 	playing = false;
+
+	instancePlayer = this;
+
+	SLresult res = (*fdPlayerPlay)->RegisterCallback(fdPlayerPlay, endCallbackPlayer, NULL);
+	assert(SL_RESULT_SUCCESS == res);
+
+	res = (*fdPlayerPlay)->SetCallbackEventsMask(fdPlayerPlay, SL_PLAYEVENT_HEADATEND);
+	assert(SL_RESULT_SUCCESS == res);
 }
 
 AudioPlayer::~AudioPlayer() {
@@ -78,25 +94,11 @@ bool AudioPlayer::stop() {
 
 bool AudioPlayer::isPlaying() {
 	return playing;
-
-	SLresult result;
-	SLuint32 state;
-
-	if(NULL == fdPlayerObject){
-		return false;
-	}
-
-	result = (*fdPlayerObject)->GetState(fdPlayerObject, &state);
-	assert(SL_RESULT_SUCCESS == result);
-
-	if(SL_PLAYSTATE_PLAYING == state){
-		logInf("playing");
-		return true;
-	}else{
-		return false;
-	}
 }
 
+void AudioPlayer::setEnded() {
+	playing = false;
+}
 
 // Private methods
 
