@@ -511,9 +511,6 @@ VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
 
 
 VideoDecoder::~VideoDecoder(){
-	XAresult res = (*playerPlayItf)->RegisterCallback(playerPlayItf, NULL, NULL);
-	assert(XA_RESULT_SUCCESS == res);
-
 	glDeleteTextures(1, &textureID);
 
 	// OpenMAX AL destruction
@@ -546,10 +543,7 @@ void VideoDecoder::pause(){
 void VideoDecoder::play(){
 	this->stop();
 
-	XAresult res = (*playerPlayItf)->RegisterCallback(playerPlayItf, endCallbackDecoder, NULL);
-    assert(XA_RESULT_SUCCESS == res);
-
-	res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_PLAYING);
+	XAresult res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_PLAYING);
     assert(XA_RESULT_SUCCESS == res);
 }
 
@@ -570,9 +564,7 @@ bool VideoDecoder::getMute(){
 }
 
 void VideoDecoder::stop(){
-	XAresult res = (*playerPlayItf)->RegisterCallback(playerPlayItf, NULL, NULL);
-	assert(XA_RESULT_SUCCESS == res);
-	res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_STOPPED);
+	XAresult res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_STOPPED);
     assert(XA_RESULT_SUCCESS == res);
 }
 
