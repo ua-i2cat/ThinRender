@@ -38,6 +38,49 @@ jmethodID methodUpdateCamera = 0;
 jmethodID stopCamera = 0;
 jmethodID stopVideo = 0;
 
+//gps methods...
+jmethodID shutdownGPSMethod = 0;
+jmethodID getLatitudeMethod = 0;
+jmethodID getLongitudeMethod = 0;
+jmethodID initGPSMethod = 0;
+
+extern double getLatitude(){
+	if(javaVM == 0)return 0.0;
+	if(getLatitudeMethod == 0){
+		javaVM->AttachCurrentThread(&env, 0);
+		getLatitudeMethod = env->GetMethodID(activityClass, "getLatitude", "()D");
+	}
+	return env->CallDoubleMethod(activityObj, getLatitudeMethod);
+}
+double getLongitude(){
+	if(javaVM == 0)return 0.0;
+	if(getLongitudeMethod == 0){
+		javaVM->AttachCurrentThread(&env, 0);
+		getLongitudeMethod = env->GetMethodID(activityClass, "getLongitude", "()D");
+	}
+	return env->CallDoubleMethod(activityObj, getLongitudeMethod);
+}
+
+void initGPS(){
+	if(javaVM == 0)return;
+	if(initGPSMethod == 0){
+		javaVM->AttachCurrentThread(&env, 0);
+		initGPSMethod = env->GetMethodID(activityClass, "initGPS", "()V");
+	}
+	env->CallVoidMethod(activityObj, initGPSMethod);
+}
+void shutDownGPS(){
+	if(javaVM == 0)return;
+		if(shutdownGPSMethod == 0){
+			javaVM->AttachCurrentThread(&env, 0);
+			shutdownGPSMethod = env->GetMethodID(activityClass, "shutDownGPS", "()V");
+		}
+		env->CallVoidMethod(activityObj, shutdownGPSMethod);
+		shutdownGPSMethod = 0;
+		getLatitudeMethod = 0;
+		getLongitudeMethod = 0;
+		initGPSMethod = 0;
+}
 void shutdownTextureWindow(){
 	if(javaVM == 0)return;
 	javaVM->AttachCurrentThread(&env, 0);

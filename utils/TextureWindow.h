@@ -32,6 +32,7 @@ extern "C"
 {
 #endif
 
+extern void initGPS();
 extern void shutdownTextureWindow();
 extern void closeVideo();
 extern void closeCamera();
@@ -39,6 +40,10 @@ extern void updateTextureVideo();
 extern void updateTextureCamera();
 extern ANativeWindow* getANativeWindow(int texture);
 extern bool setCameraTexturePreview(int texture);
+
+extern double getLatitude();
+extern double getLongitude();
+extern void shutDownGPS();
 
 extern JNIEXPORT void JNICALL
 Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_cacheJNIVars(JNIEnv *envParam, jobject jobj);
