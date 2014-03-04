@@ -57,6 +57,7 @@ VideoDecoder* instanceDecoder;
 
 extern "C" {
 	void endCallbackDecoder(XAPlayItf caller, void* context, XAuint32 playevent){
+		instanceDecoder->setEnded();
 		instanceDecoder->stop();
 	}
 }
@@ -428,6 +429,27 @@ void VideoDecoder::setPlayingStreamingMediaPlayer(){
 }
 
 VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
+
+	textureRect = NULL;
+	textureID = (GLuint)NULL;
+	originalWidth = 0.0;
+	originalHeight = 0.0;
+	originalTop = 0.0;
+	originalLeft = 0.0;
+	engineObject = NULL;
+	engineEngine = NULL;
+	outputMixObject = NULL;
+	playerObj = NULL;
+	playerPlayItf = NULL;
+	playerBQItf = NULL;
+	playerStreamInfoItf = NULL;
+	playerVolItf = NULL;
+	theNativeWindow = NULL;
+	file = NULL;
+	discontinuity = false;
+	reachedEof = false;
+
+	ended = false;
 	sourcePath = path;
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureID);
@@ -476,6 +498,8 @@ VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
     logInf("setted all stuff from openmax");
 	this->stop();  // We force the head to stay at the start of the video (pause will not suffice)
 
+	textureRect->setTexture(textureID);
+
 	instanceDecoder = this;
 
 	res = (*playerPlayItf)->RegisterCallback(playerPlayItf, endCallbackDecoder, NULL);
@@ -486,7 +510,10 @@ VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
 }
 
 
-VideoDecoder::~VideoDecoder() {
+VideoDecoder::~VideoDecoder(){
+	XAresult res = (*playerPlayItf)->RegisterCallback(playerPlayItf, NULL, NULL);
+	assert(XA_RESULT_SUCCESS == res);
+
 	glDeleteTextures(1, &textureID);
 
 	// OpenMAX AL destruction
@@ -495,6 +522,16 @@ VideoDecoder::~VideoDecoder() {
 	(*engineObject)->Destroy(engineObject);
 
 	closeVideo();
+}
+
+void VideoDecoder::setEnded(){
+	logInf("VideoDecoder::setEnded()!!!!");
+	ended = true;
+}
+
+bool VideoDecoder::isEnded(){
+	if(ended) logInf("ended = true");
+	return ended;
 }
 
 void VideoDecoder::updateTexture(){
@@ -507,8 +544,12 @@ void VideoDecoder::pause(){
 }
 
 void VideoDecoder::play(){
-	textureRect->setTexture(textureID);
-	XAresult res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_PLAYING);
+	this->stop();
+
+	XAresult res = (*playerPlayItf)->RegisterCallback(playerPlayItf, endCallbackDecoder, NULL);
+    assert(XA_RESULT_SUCCESS == res);
+
+	res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_PLAYING);
     assert(XA_RESULT_SUCCESS == res);
 }
 
@@ -529,7 +570,9 @@ bool VideoDecoder::getMute(){
 }
 
 void VideoDecoder::stop(){
-	XAresult res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_STOPPED);
+	XAresult res = (*playerPlayItf)->RegisterCallback(playerPlayItf, NULL, NULL);
+	assert(XA_RESULT_SUCCESS == res);
+	res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_STOPPED);
     assert(XA_RESULT_SUCCESS == res);
 }
 
