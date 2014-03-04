@@ -68,6 +68,9 @@ public:
 
 	void setSplash(std::string texturePath);
 	void setSplash();
+
+	void setEnded();
+	bool isEnded();
 private:
 	static RectGUI* textureRect;
 	static GLuint textureID;
@@ -116,6 +119,8 @@ private:
 	static bool enqueueInitialBuffers(bool discontinuity);
 	static bool createStreamingMediaPlayer();
 	void setPlayingStreamingMediaPlayer();
+
+	bool ended;
 
 	void endCallback(XAPlayItf caller, void* context, XAuint32 playevent);
 };
