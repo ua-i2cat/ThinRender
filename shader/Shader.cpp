@@ -108,7 +108,7 @@ GLuint Shader::createShader(const char* filename, GLenum type)
 		return 0;
 	}
 
-	logInf("filename shader: %s",filename);
+	//logInf("filename shader: %s",filename);
 	GLuint res = glCreateShader(type);
 	glShaderSource(res, 1, &source, NULL);
 

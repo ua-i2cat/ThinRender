@@ -97,7 +97,7 @@ public:
      */
 	void setText(std::string text, float x, float y);
 	/** IN PROGRESS */
-	void setBlockText(std::string text, float width, int align = 0);
+	void setBlockText(std::string text, float width, int align = 0, float xOffset = 0.0f, float yOffset = 0.0f);
 	uint8_t* calculatePointerEndLine(const char *text, float width);
 	float calculateLength(const char *start, const char *end);
 	int calculateNumWhiteSpaces(const char *start, const char *end);

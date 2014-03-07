@@ -162,7 +162,7 @@ public:
      * @param float offsetY: offset from rect once given the align center, default value: 0.0f
      */
 	void setText(std::string message, std::string typographyFile, int fontSize, int align = 0, float offsetX = 0.0f, float offsetY = 0.0f);
-	void setBlockText(std::string message, std::string typographyFile, int fontSize, int align = 0);
+	void setBlockText(std::string message, std::string typographyFile, int fontSize, int align = 0, float xOffset = 0.0f, float yOffset = 0.0f);
 
     /**
      * isInside calculates the AABB normalized

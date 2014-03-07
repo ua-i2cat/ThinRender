@@ -30,6 +30,7 @@ AndroidFileSystem::AndroidFileSystem(){
 }
 
 AndroidFileSystem::~AndroidFileSystem(){
+	logInf("android file system release");
 	release();
 }
 

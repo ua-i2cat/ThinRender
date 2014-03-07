@@ -62,12 +62,40 @@ double getLongitude(){
 }
 
 void initGPS(){
+	//return;
+	logInf("initGPS");
 	if(javaVM == 0)return;
-	if(initGPSMethod == 0){
-		javaVM->AttachCurrentThread(&env, 0);
-		initGPSMethod = env->GetMethodID(activityClass, "initGPS", "()V");
-	}
-	env->CallVoidMethod(activityObj, initGPSMethod);
+	javaVM->AttachCurrentThread(&env, 0);
+	if(initGPSMethod != 0){ return; }
+	initGPSMethod = env->GetMethodID(activityClass, "initGPS", "()V");//Ljava/lang/Object;
+	env->CallVoidMethod(activityObj, initGPSMethod, activityObj);
+	return;/*
+	logInf("initGPS1");
+	if(initGPSMethod != 0){ return; }
+
+	logInf("initGPS2");
+	javaVM->AttachCurrentThread(&env, 0);
+	logInf("initGPS3");
+	initGPSMethod = env->GetMethodID(activityClass, "initGPS", "(Ljava/lang/Object;)V");
+	if(initGPSMethod == 0) logErr("AL LORO EH!");
+
+	logInf("initGPS4");
+	//jobject jListenerObj;
+	jmethodID midGetSystemService = env->GetMethodID(activityClass,"getSystemService","(Ljava/lang/String;)Ljava/lang/Object;");
+	logInf("initGPS5");
+	jstring StringArg = env->NewStringUTF("location");//Context.LOCATION_SERVICE = "location"
+	jobject jSystemServiceObj = env->CallObjectMethod(activityObj,midGetSystemService,StringArg);//new GPSListener((LocationManager)this.getSystemService(Context.LOCATION_SERVICE));
+	logInf("initGPS6");
+	//jclass listenerClass = env->FindClass("net/i2cat/modernismemnactec/GPSListener");
+	//if(listenerClass == 0) logErr("FIND CLASS NULL!!!!!!!!");
+	//logInf("initGPS6.5");
+	//jmethodID midConstListener = env->GetMethodID(listenerClass, "<init>", "(Ljava/lang/Object;)V");
+	//logInf("initGPS7");
+	//jListenerObj = env->NewObject(listenerClass, midConstListener);
+	logInf("initGPS8");
+	if(jSystemServiceObj == 0) logErr("FIND CLASS NULL!!!!!!!!");
+	env->CallVoidMethod(activityObj, initGPSMethod, jSystemServiceObj);
+	logInf("initGPS9");*/
 }
 void shutDownGPS(){
 	if(javaVM == 0)return;

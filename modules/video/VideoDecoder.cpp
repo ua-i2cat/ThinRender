@@ -302,6 +302,9 @@ bool VideoDecoder::enqueueInitialBuffers(bool discontinuity)
 }
 
 
+#include <sys/stat.h>
+#include <errno.h>
+
 // create streaming media player
 bool VideoDecoder::createStreamingMediaPlayer()
 {
@@ -309,7 +312,7 @@ bool VideoDecoder::createStreamingMediaPlayer()
     // convert Java string to UTF-8
     std::string path = sourcePath;
     unsigned pos = path.find("/");
-    path = path.substr(pos);
+    path = path.substr(pos+1);
 	std::string diskPath = "/sdcard/renderScenes/" + path;
 	std::string assetPath = sourcePath;
 
@@ -320,6 +323,11 @@ bool VideoDecoder::createStreamingMediaPlayer()
 		//another approach, this works!
 		FILE * pFile;
 		pFile = fopen (diskPath.c_str(), "wb");
+		if(pFile == 0){
+			//mkdir fails, after looking the implementation we supose that is a problem of the sandbox and the duplication of kernel static variables
+			//and the strategy of not release all the memory from ram to speed up
+			logErr("you find a bug, have a nice crash :) (and stop fucking the sd!)");
+		}
 		fwrite (FileSystem::getInstance()->getFileData(assetPath) , sizeof(char), FileSystem::getInstance()->getFileSize(assetPath) - 1, pFile);
 		fclose (pFile);
 		FileSystem::getInstance()->destroyFileData(assetPath);
@@ -330,7 +338,7 @@ bool VideoDecoder::createStreamingMediaPlayer()
     	logErr("VideoDecoder::createStreamingMediaPlayer HARD FAIL: fail open! %s", diskPath.c_str());
     	return false;
     }
-
+    logInf("file opened!");
     // configure data source
     XADataLocator_AndroidBufferQueue loc_abq = { XA_DATALOCATOR_ANDROIDBUFFERQUEUE, NB_BUFFERS };
     XADataFormat_MIME format_mime = {

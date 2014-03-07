@@ -29,9 +29,7 @@ TextureShader::TextureShader(){
 	hasTangents = false;
 	hasBitangents = false;
 	hasUV = true;
-	logInf("TextureShader constructor");
 	loadShader("BasicTextureShader");
-	logInf("TextureShader constructor END");
 }
 
 

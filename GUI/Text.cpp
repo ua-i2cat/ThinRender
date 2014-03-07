@@ -290,10 +290,10 @@ uint8_t* Text::calculatePointerEndLine(const char *text, float width){
 
 //first only left alignment
 //align 0 left, 1 center, 2 justified
-void Text::setBlockText(std::string text, float width, int align){
+void Text::setBlockText(std::string text, float width, int align, float xOffset, float yOffset){
 	logInf("setBlockText width: %f", width);
-	float x = 0.0;
-	float y = GlobalData::getInstance()->screenHeight - maxHeight;
+	float x = 0.0f + xOffset;
+	float y = GlobalData::getInstance()->screenHeight - maxHeight + yOffset;
 
 	if(vbo != 0) glDeleteBuffers(1, &vbo);
 	glGenBuffers(1, &vbo);
@@ -320,15 +320,20 @@ void Text::setBlockText(std::string text, float width, int align){
 			whiteSpaceModificator = 1.0f;
 		}
 	}
+
+	if(align == 1){//center
+		p = (const uint8_t *)text.c_str();
+		x = (width - xOffset)/2.0f-calculateLength((const char *)p,(const char *)lineEnding)/2.0f + xOffset;
+	}
 	for(p = (const uint8_t *)text.c_str(); *p; p++){
 		if(p == lineEnding){
 			line--;
 			if(*p == '\\') p++;
 			p++;
-			lineEnding = calculatePointerEndLine((const char*)p, width);
-			x = 0.0f;
+			lineEnding = calculatePointerEndLine((const char*)p, width - xOffset);
+			x = 0.0f + xOffset;
 			if(align == 1){//center
-				x = width/2.0f-calculateLength((const char *)p,(const char *)lineEnding)/2.0f;
+				x = (width - xOffset)/2.0f-calculateLength((const char *)p,(const char *)lineEnding)/2.0f + xOffset;
 			}else if(align == 2){//justificat
 				float messageLength = calculateLength((const char *)p,(const char *)lineEnding);
 				float numWhiteSpaces = calculateNumWhiteSpaces((const char *)p,(const char *)lineEnding);

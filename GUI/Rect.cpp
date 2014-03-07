@@ -204,10 +204,10 @@ void RectGUI::setText(std::string message, std::string typographyFile, int fontS
 	}
 }
 
-void RectGUI::setBlockText(std::string message, std::string typographyFile, int fontSize, int align){
+void RectGUI::setBlockText(std::string message, std::string typographyFile, int fontSize, int align, float xOffset, float yOffset){
 	textMessage = message;
 	text = TextManager::getInstance()->getText(typographyFile, fontSize);
-	text->setBlockText(textMessage, width, align);
+	text->setBlockText(textMessage, width - xOffset, align, xOffset, yOffset);
 }
 
 void RectGUI::setProjectionMatrix(){
