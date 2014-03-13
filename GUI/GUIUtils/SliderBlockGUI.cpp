@@ -25,24 +25,23 @@
 #include "../../utils/Timer.h"
 
 void SliderBlockGUI::update(float xDiff, float yDiff, bool input){
-
 	if(!input){
 
 		assert(rects.size() > 0);
 
 		glm::vec3 position = glm::vec3(this->width*0.5f, 0.0f, 0.0f);
 		glm::vec3 internalNodePosition = internalNode->getPosition();
-		RectGUI* currentRect = rects[0];
+		RectGUI* currentRect;
 		this->index = 0;
-		glm::vec3 rectPosition = glm::vec3(currentRect->getLeft() + 0.5f*currentRect->getWidth() + internalNodePosition.x - this->left, 0.0f, 0.0f);
-		glm::vec3 diff = position - rectPosition;
-		float distance = glm::dot(diff, diff);
+		glm::vec3 rectPosition;
+		glm::vec3 diff;
+		float distance;
 
-		float minDistance = distance;
-		RectGUI* nearestRect = currentRect;
-		float nodeOffset = 0.0f;
-		float nodeOffsetAux = currentRect->getWidth() + 10.0f;
-		for(int i = 1; i < rects.size(); i++){
+		float minDistance = 10000000.0f;//max float value better
+		RectGUI* nearestRect = 0;
+		float nodeOffset = minTranslation;
+		float nodeOffsetAux = nodeOffset;
+		for(int i = 0; i < rects.size(); i++){
 			currentRect = rects[i];
 			rectPosition = glm::vec3(currentRect->getLeft() + 0.5f*currentRect->getWidth() + internalNodePosition.x - this->left, 0.0f, 0.0f);
 			diff = position - rectPosition;
@@ -52,39 +51,33 @@ void SliderBlockGUI::update(float xDiff, float yDiff, bool input){
 				nearestRect = rects[i];
 				this->index = i;
 				nodeOffset = nodeOffsetAux;
+				if(i>0){
+					nodeOffset += currentRect->getWidth()*0.5f;
+				}
 			}
-			nodeOffsetAux += currentRect->getWidth() + 10.0f;
+			if(i == 0){
+				nodeOffsetAux += currentRect->getWidth()*0.5f + 10.0f;
+			}else{
+				nodeOffsetAux += currentRect->getWidth() + 10.0f;
+			}
 		}
         float maxSpeed = GlobalData::getInstance()->screenWidth * 0.9f;
         float dist = maxSpeed * (float)Timer::getInstance()->getDeltaTime()/1000.0f;
-        glm::vec3 finalPosition = glm::vec3(0.5f*this->width - 0.5f*nearestRect->getWidth() - nodeOffset, internalNodePosition.y, internalNodePosition.z);
+        glm::vec3 finalPosition = glm::vec3(minTranslation -  nodeOffset, internalNodePosition.y, internalNodePosition.z);
         if(abs(finalPosition.x - internalNodePosition.x) > dist){
-            finalPosition.x = dist * Maths::signf(finalPosition.x - internalNodePosition.x) + internalNodePosition.x;
-        }
+			finalPosition.x = dist * Maths::signf(finalPosition.x - internalNodePosition.x) + internalNodePosition.x;
+		}
         internalNode->setPosition(finalPosition);
-        if(type == HORIZONTAL_SLIDER){
-        	if(index == 0 && minTranslation == 0.0f){
-        		//logInf("type horizontal slider block, index 0");
-        		//logInf("actual min translation = %f current position = %f", minTranslation, finalPosition.x);
-        		minTranslation = -finalPosition.x;
-        	}
-        	if(index == rects.size()-1){
-        		maxTranslation = -finalPosition.x;
-        	}
-        }else{
-        	if(finalPosition.y < maxTranslation) maxTranslation = finalPosition.y;
-			if(finalPosition.y > minTranslation) minTranslation = finalPosition.y;
-        }
 		return;
 	}
 
 	glm::vec3 position = internalNode->getPosition();
 	if(type == HORIZONTAL_SLIDER){
-		position.x = abs(position.x);
+		position.x = - position.x;
 		position.x -= xDiff;
 		if(position.x > maxTranslation) position.x = maxTranslation;
+		if(position.x < (minTranslation-0.5f*rects[0]->getWidth())) position.x = minTranslation-0.5f*rects[0]->getWidth();
 		position.x = -position.x;
-		if(abs(position.x) <= abs(minTranslation)) position.x = abs(minTranslation);
 	}else{
 		position.y = -abs(position.y);
 		position.y += yDiff;
@@ -95,6 +88,30 @@ void SliderBlockGUI::update(float xDiff, float yDiff, bool input){
 	internalNode->setPosition(position);
 }
 
+void SliderBlockGUI::includeRect(RectGUI* rect, float offset){
+	if(type == HORIZONTAL_SLIDER){
+		float left = this->width*0.5f;
+		if(rects.size() == 0){
+			left += -0.5f * rect->getWidth();
+			minTranslation = left;
+		}else{
+			left += -0.5f * rects[0]->getWidth();
+		}
+		for(int i = 0; i < rects.size(); i++){
+			left += rects[i]->getWidth() + offset;
+		}
+		rect->setPosition(left + this->left,rect->getTop());
+		maxTranslation = left;
+	}else{
+		float top = 0.0f;
+		for(int i = 0; i < rects.size(); i++){
+			top -= rects[i]->getHeight() + offset;
+		}
+		rect->setPosition(rect->getLeft(),this->top + top);
+		maxTranslation = height + top - rect->getHeight();
+	}
+	rects.push_back(rect);
+}
 int SliderBlockGUI::getIndex(){
 	return this->index;
 }

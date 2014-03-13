@@ -36,6 +36,7 @@ public:
 
 	void update(float xDiff, float yDiff, bool input = true);
 	int getIndex();
+	void includeRect(RectGUI* rect, float offset = 10.0f);
 	RectGUI* getCurrentRect();
 	RectGUI* getRect(int i);
 private:
