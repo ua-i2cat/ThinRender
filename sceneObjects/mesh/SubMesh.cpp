@@ -133,7 +133,7 @@ void SubMesh::render(Shader* shader){
 		glDrawElements(GL_TRIANGLES, size/sizeof(GLuint), GL_UNSIGNED_INT, 0);
 	}else{
 		/* Push each element in buffer_vertices to the vertex shader */
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArrays(GL_TRIANGLES, 0,vertices.size());
 	}
 
 	glDisableVertexAttribArray(shader->attributeCoord);
@@ -194,4 +194,5 @@ void SubMesh::generateVBO(){
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_elements);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(glm::i32vec3), &elements[0], GL_STATIC_DRAW);
 	}
+
 }

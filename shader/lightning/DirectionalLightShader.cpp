@@ -25,7 +25,8 @@
 DirectionalLightShader::DirectionalLightShader(){
 	texture = 0;
 	hasNormals = true;
-	hasUV = true;
+	//hasUV = true;
+	hasUV = false;
 	hasTangents = false;
 	hasBitangents = false;
 	loadShader("DirectionalLightShader");
@@ -44,12 +45,12 @@ void DirectionalLightShader::loadVars(){
 		logErr("Could not bind attribute %s\n", attributeName);
 		return;
 	}
-	attributeName = "Texcoord";
+	/*attributeName = "Texcoord";
 	attributeTexture = glGetAttribLocation(program, attributeName);
 	if (attributeTexture == -1) {
 		logErr("Could not bind attribute %s\n", attributeName);
 		return;
-	}
+	}*/
 
 	const char* uniformName;
 	uniformName = "ProjectionMatrix";
@@ -80,12 +81,12 @@ void DirectionalLightShader::loadVars(){
 	if (uniformLightAmbient == -1){
 		logErr("Could not bind uniform %s\n", uniformName);
 	}
-    
-    uniformName = "texture";
+
+   /* uniformName = "texture";
     uniformTexture = glGetUniformLocation(program, uniformName);
 	if (uniformTexture == -1){
 		logErr("Could not bind uniform %s\n", uniformName);
-	}
+	}*/
 
 }
 
@@ -98,9 +99,9 @@ void DirectionalLightShader::setVars(glm::mat4 projView, glm::mat4 model, glm::m
 	glUniform3f(uniformLightPosition, lightWorldPosition.x, lightWorldPosition.y, lightWorldPosition.z);
 	glUniform3f(uniformLightAmbient, light_ambient.x, light_ambient.y, light_ambient.z);
 
-	if(texture){
+	/*if(texture){
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture->getTextureId());
 		glUniform1i(uniformTexture, 0);
-	}
+	}*/
 }

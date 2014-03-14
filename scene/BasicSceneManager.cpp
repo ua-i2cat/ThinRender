@@ -145,6 +145,10 @@ Mesh* BasicSceneManager::createMesh(string name){
 	return result;
 }
 
+void BasicSceneManager::registerMesh(Mesh* externalMesh){
+	meshVector.push_back(externalMesh);
+}
+
 Mesh* BasicSceneManager::createPlaneMesh(Shader* shader){
 	Mesh* result = MeshManager::getInstance()->getMeshPlane2D(shader);
 	result->name = "generatedPlaneMesh";

@@ -93,6 +93,12 @@ public:
      */
 	Mesh* createMesh(string name);
 
+	/**
+	 * registerMesh if the programmer will create for his own the mesh, he needs to register it on the scene manager
+	 * @param Mesh* the valid pointer of the mesh
+	 */
+	void registerMesh(Mesh* externalMesh);
+
     /**
      * createPlaneMesh creates a plane mesh of side 1, centered at (0,0,0) and aligned in x,y plane
      * @param Shader* if wants to set your own shader from scratch
