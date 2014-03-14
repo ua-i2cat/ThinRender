@@ -43,7 +43,8 @@ public:
 #ifdef ANDROID_PLATFORM
 	struct android_app* app;
 #endif
-    int screenWidth, screenHeight;
+    int screenWidth, screenHeight, screenDPI;
+    bool isMobileDevice;
     BasicSceneManager* scene;
     std::string iOSPath;
     int screenMode;
@@ -55,6 +56,7 @@ public:
 private:
 	GlobalData(){
 		screenMode = HORIZONTAL_SCREEN;
+		isMobileDevice = true;
 	}
 	~GlobalData(){
 	}

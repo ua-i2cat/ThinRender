@@ -52,6 +52,9 @@ namespace Maths
     static inline float signf(const float & x){
         return x < 0.0f ? -1.0f : 1.0f;
     }
+    static inline float powTwo(const float & x){
+        return x*x;
+    }
 };
 
 #endif
