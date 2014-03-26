@@ -550,5 +550,22 @@ std::string Text::parseAndReplaceAccents(std::string text){
 		}
 	}
 
+	// Replace &#18;&#10; substrings with \n
+	const std::string search = "&#18;&#10;";
+	const std::string replace = "\n";
+
+	for(size_t pos = 0; ; pos += replace.length()) {
+		// Locate the substring to replace
+		pos = text.find( search, pos );
+
+		if(pos == string::npos){
+			break;
+		}
+
+		// Replace by erasing and inserting
+		text.erase(pos, search.length());
+		text.insert(pos, replace);
+	}
+
 	return text;
 }
