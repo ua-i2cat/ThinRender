@@ -541,6 +541,9 @@ std::string Text::parseAndReplaceAccents(std::string text){
 	replacements["¡"] = 161;
 	replacements["¿"] = 191;
 
+	replacements["\u201C"] = '"';
+	replacements["\u201D"] = '"';
+
 	for(map<std::string, int>::iterator it = replacements.begin(); it != replacements.end(); ++it){
 		size_t pos = text.find(it->first);
 		while (pos != std::string::npos){
