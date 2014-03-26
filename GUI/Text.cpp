@@ -292,6 +292,8 @@ uint8_t* Text::calculatePointerEndLine(const char *text, float width){
 //align 0 left, 1 center, 2 justified
 void Text::setBlockText(std::string text, float width, int align, float xOffset, float yOffset){
 	logInf("setBlockText width: %f", width);
+	const float maxWhiteSpaceModificator = 2.0f;
+	const float tooLargeWhiteSpaceModificator = 8.0f;
 	float x = 0.0f + xOffset;
 	float y = GlobalData::getInstance()->screenHeight - maxHeight + yOffset;
 
@@ -316,8 +318,11 @@ void Text::setBlockText(std::string text, float width, int align, float xOffset,
 		float advanceWhiteSpace = c[' '].ax;
 
 		whiteSpaceModificator = (width - messageLength + numWhiteSpaces*advanceWhiteSpace)/(numWhiteSpaces*advanceWhiteSpace);
-		if(whiteSpaceModificator >= 2.0f){
+
+		if(whiteSpaceModificator >= tooLargeWhiteSpaceModificator){
 			whiteSpaceModificator = 1.0f;
+		}else if(whiteSpaceModificator >= maxWhiteSpaceModificator){
+			whiteSpaceModificator = maxWhiteSpaceModificator;
 		}
 	}
 
@@ -340,8 +345,11 @@ void Text::setBlockText(std::string text, float width, int align, float xOffset,
 				float advanceWhiteSpace = c[' '].ax;
 
 				whiteSpaceModificator = (width - messageLength + numWhiteSpaces*advanceWhiteSpace)/(numWhiteSpaces*advanceWhiteSpace);
-				if(whiteSpaceModificator >= 2.0f){
+
+				if(whiteSpaceModificator >= tooLargeWhiteSpaceModificator){
 					whiteSpaceModificator = 1.0f;
+				}else if(whiteSpaceModificator >= maxWhiteSpaceModificator){
+					whiteSpaceModificator = maxWhiteSpaceModificator;
 				}
 			}
 		}
