@@ -22,6 +22,15 @@
 #include <stdint.h>
 #include "TextureWindow.h"
 
+//TODO: Quarkfly Refactor
+#include "../../modules/LocationManager.h"
+
+
+
+
+#ifdef ANDROID_PLATFORM
+
+
 
 #ifdef __cplusplus
 extern "C"
@@ -218,7 +227,27 @@ Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_setSurface(JNIEnv *env, 
 	// obtain a native window from a Java surface
 	_theNativeWindow = ANativeWindow_fromSurface(env, surface);
 }
-
+    
 #ifdef __cplusplus
 }
+#endif
+
+#else
+void initGPS(){
+    LocationManager::getInstance()->initGPS();
+};
+void shutdownTextureWindow(){};
+void closeVideo(){};
+void closeCamera(){};
+void updateTextureVideo(){};
+void updateTextureCamera(){};
+bool setCameraTexturePreview(int texture){return true;};
+
+double getLatitude(){
+    double lat = LocationManager::getInstance()->getLatitude();
+    logInf("LAT: %f",lat);
+    return lat;
+};
+double getLongitude(){return LocationManager::getInstance()->getLongitude();};
+void shutDownGPS(){ LocationManager::getInstance()->shutDownGPS(); };
 #endif

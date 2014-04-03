@@ -23,36 +23,58 @@
 #ifndef TEXTURE_WINDOW_H
 #define TEXTURE_WINDOW_H
 
+#include "../../log/Log.h"
+
+#ifdef ANDROID_PLATFORM
+
+//TODO: Quarkfly fix implementation
+
 #include <android/native_window_jni.h>
-#include "../log/Log.h"
 
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
-extern void initGPS();
-extern void shutdownTextureWindow();
-extern void closeVideo();
-extern void closeCamera();
-extern void updateTextureVideo();
-extern void updateTextureCamera();
-extern ANativeWindow* getANativeWindow(int texture);
-extern bool setCameraTexturePreview(int texture);
+    #ifdef __cplusplus
+    extern "C"
+    {
+    #endif
 
-extern double getLatitude();
-extern double getLongitude();
-extern void shutDownGPS();
+    extern void initGPS();
+    extern void shutdownTextureWindow();
+    extern void closeVideo();
+    extern void closeCamera();
+    extern void updateTextureVideo();
+    extern void updateTextureCamera();
+    extern ANativeWindow* getANativeWindow(int texture);
+    extern bool setCameraTexturePreview(int texture);
 
-extern JNIEXPORT void JNICALL
-Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_cacheJNIVars(JNIEnv *envParam, jobject jobj);
+    extern double getLatitude();
+    extern double getLongitude();
+    extern void shutDownGPS();
 
-extern JNIEXPORT void JNICALL
-Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_setSurface(JNIEnv *envParam, jclass clazz, jobject surface);
+    extern JNIEXPORT void JNICALL
+    Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_cacheJNIVars(JNIEnv *envParam, jobject jobj);
 
-#ifdef __cplusplus
-}
+    extern JNIEXPORT void JNICALL
+    Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_setSurface(JNIEnv *envParam, jclass clazz, jobject surface);
+
+    #ifdef __cplusplus
+    }
+    #endif
+
+#else 
+    void initGPS();
+    void shutdownTextureWindow();
+    void closeVideo();
+    void closeCamera();
+    void updateTextureVideo();
+    void updateTextureCamera();
+    bool setCameraTexturePreview(int texture);
+
+    double getLatitude();
+    double getLongitude();
+    void shutDownGPS();
+
+
 #endif
 
 #endif
