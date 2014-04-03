@@ -27,17 +27,20 @@
 
 CaptureCamera::CaptureCamera(RectGUI* rect){
 	glGenTextures(1, &textureID);
+    /*
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureID);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+     */
 	setCameraTexturePreview(textureID);
 
-	Shader* shader = new CameraPreviewPlaneShader();
+    //TODO: Quarkfly
+	/*Shader* shader = new CameraPreviewPlaneShader();
 	rect->setShader(shader);
 	rect->setTexture(TextureManager::getInstance()->getTexture("blueSquare.png"));
-	rect->setTexture(textureID);
+	rect->setTexture(textureID);*/
 }
 
 CaptureCamera::~CaptureCamera(){
