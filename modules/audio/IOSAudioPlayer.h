@@ -1,6 +1,6 @@
 /*
  *  thin render - Mobile render engine based on OpenGL ES 2.0
- *  Copyright (C) 2013  Fundació i2CAT, Internet i Innovació digital a Catalunya
+ *  Copyright (C) 2013  FundaciÃ› i2CAT, Internet i InnovaciÃ› digital a Catalunya
  *
  *  This file is part of thin render.
  *
@@ -17,41 +17,42 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Author:         Ignacio Contreras Pinilla <ignacio.contreras@i2cat.net>
+ *  Author:         Daniel Cabrera Benitez <dcabrera@quarkfly.com>
+ *  Author:         Antonio Quesada Frias <aquesada@quarkfly.com>
  */
 
-#ifndef AUDIO_PLAYER_H
-#define AUDIO_PLAYER_H
+#ifndef IOS_AUDIO_PLAYER_H
+#define IOS_AUDIO_PLAYER_H
 
-#include <sys/types.h>
-#include <string>
-#include "../../globalData/GlobalData.h"
+#include "AudioPlayer.h"
+#import <AVFoundation/AVFoundation.h>
 
-/**
- * Basic audio player class. Currently it only accepts one audio file per instance.
- */
-class AudioPlayer {
+@interface IOSAudioPlayerDelegate : NSObject <AVAudioPlayerDelegate>{
+    AVAudioPlayer   *audioPlayer;
+}
 
+@property (readonly) AVAudioPlayer *audioPlayer;
+
+- (id) initWithFile:(NSString *) path;
+- (BOOL) setPlaying:(BOOL) play;
+
+@end
+
+class IOSAudioPlayer: public AudioPlayer {
+    
 public:
-    virtual ~AudioPlayer(){};
-    static AudioPlayer* getInstance(std::string filePath);
-
-
-	 bool play();
-	 bool pause();
-	 bool stop();
-	 bool isPlaying();
-	 void setEnded();
+    IOSAudioPlayer(std::string filePath);
+    ~IOSAudioPlayer();
     
 private:
-    virtual bool setPlayingAssetAudioPlayer(bool isPlaying) = 0;
-
-protected:
-    static AudioPlayer* instancePlayer;
-	bool playing;
+ 
+    bool setPlayingAssetAudioPlayer(bool isPlaying);
     
-
+    IOSAudioPlayerDelegate *engineObject;
     
 };
+
+
+
 
 #endif

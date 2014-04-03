@@ -1,6 +1,6 @@
 /*
  *  thin render - Mobile render engine based on OpenGL ES 2.0
- *  Copyright (C) 2013  Fundació i2CAT, Internet i Innovació digital a Catalunya
+ *  Copyright (C) 2013  FundaciÃ› i2CAT, Internet i InnovaciÃ› digital a Catalunya
  *
  *  This file is part of thin render.
  *
@@ -20,36 +20,43 @@
  *  Author:         Ignacio Contreras Pinilla <ignacio.contreras@i2cat.net>
  */
 
-#ifndef AUDIO_PLAYER_H
-#define AUDIO_PLAYER_H
+#ifndef ANDROID_AUDIO_PLAYER_H
+#define ANDROID_AUDIO_PLAYER_H
 
-#include <sys/types.h>
-#include <string>
-#include "../../globalData/GlobalData.h"
-
+#include "AudioPlayer.h"
+#include <SLES/OpenSLES.h>
+#include <SLES/OpenSLES_Android.h>
+//TODO: Quarkfly
 /**
  * Basic audio player class. Currently it only accepts one audio file per instance.
  */
-class AudioPlayer {
-
+class AndroidAudioPlayer: public AudioPlayer {
+    
 public:
-    virtual ~AudioPlayer(){};
-    static AudioPlayer* getInstance(std::string filePath);
-
-
-	 bool play();
-	 bool pause();
-	 bool stop();
-	 bool isPlaying();
-	 void setEnded();
+    AndroidAudioPlayer(std::string filePath);
+    ~AndroidAudioPlayer();
     
 private:
-    virtual bool setPlayingAssetAudioPlayer(bool isPlaying) = 0;
-
-protected:
-    static AudioPlayer* instancePlayer;
-	bool playing;
     
+    static SLObjectItf engineObject;
+    static SLEngineItf engineEngine;
+    static SLObjectItf outputMixObject;
+    
+    SLObjectItf fdPlayerObject;
+    SLPlayItf fdPlayerPlay;
+    SLSeekItf fdPlayerSeek;
+    SLMuteSoloItf fdPlayerMuteSolo;
+    SLVolumeItf fdPlayerVolume;
+    
+    bool createAssetAudioPlayer(int fileDescriptor, long start, long length);
+    void destroyPlayer();
+    
+	static bool createEngine();
+    static void destroyEngine();
+    
+    static int playerCount;
+
+    bool setPlayingAssetAudioPlayer(bool isPlaying);
 
     
 };
