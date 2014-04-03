@@ -22,11 +22,14 @@
 
 #ifndef VIDEO_DECODER_H
 #define VIDEO_DECODER_H
-
+/*
 #include <OMXAL/OpenMAXAL.h>
 #include <OMXAL/OpenMAXAL_Android.h>
 #include <pthread.h>
 #include <android/native_window_jni.h>
+*/
+
+#include "../../GUI/Rect.h"
 
 #include <string>
 
@@ -72,6 +75,7 @@ public:
 	void setEnded();
 	bool isEnded();
 private:
+    /*
 	static RectGUI* textureRect;
 	static GLuint textureID;
 
@@ -123,6 +127,7 @@ private:
 	bool ended;
 
 	void endCallback(XAPlayItf caller, void* context, XAuint32 playevent);
+     */
 };
 
 #endif

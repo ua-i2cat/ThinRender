@@ -23,10 +23,10 @@
 
 #define EGL_EGLEXT_PROTOTYPES
 
-#include <jni.h>
+//#include <jni.h>
 #include <errno.h>
-#include <android/input.h>
-
+//#include <android/input.h>
+/*
 #include <GLES2/gl2.h>
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
@@ -51,17 +51,18 @@
 #include <string>
 
 #include "render/utils/TextureWindow.h"
+ */
 #include "VideoDecoder.h"
 
 VideoDecoder* instanceDecoder;
 
 extern "C" {
-	void endCallbackDecoder(XAPlayItf caller, void* context, XAuint32 playevent){
-		instanceDecoder->setEnded();
-		instanceDecoder->stop();
-	}
+	//void endCallbackDecoder(XAPlayItf caller, void* context, XAuint32 playevent){
+		//instanceDecoder->setEnded();
+		//instanceDecoder->stop();
+	//}
 }
-
+/*
 char VideoDecoder::dataCache[BUFFER_SIZE * NB_BUFFERS];
 const int VideoDecoder::kEosBufferCntxt;
 
@@ -103,7 +104,9 @@ pthread_cond_t VideoDecoder::cond = PTHREAD_COND_INITIALIZER;
 
 bool VideoDecoder::discontinuity = false;
 bool VideoDecoder::reachedEof = false;
+*/
 
+#if 0
 // AndroidBufferQueueItf callback to supply MPEG-2 TS packets to the media player
 XAresult VideoDecoder::AndroidBufferQueueCallback(
         XAAndroidBufferQueueItf caller,
@@ -203,7 +206,9 @@ exit:
     assert(0 == ok);
     return XA_RESULT_SUCCESS;
 }
+#endif
 
+#if 0
 // callback invoked whenever there is new or changed stream information
 void VideoDecoder::StreamChangeCallback(XAStreamInformationItf caller,
         XAuint32 eventId,
@@ -245,7 +250,9 @@ void VideoDecoder::StreamChangeCallback(XAStreamInformationItf caller,
         break;
     }
 }
+#endif
 
+#if 0
 // Enqueue the initial buffers, and optionally signal a discontinuity in the first buffer
 bool VideoDecoder::enqueueInitialBuffers(bool discontinuity)
 {
@@ -300,11 +307,12 @@ bool VideoDecoder::enqueueInitialBuffers(bool discontinuity)
 
     return true;
 }
-
+#endif
 
 #include <sys/stat.h>
 #include <errno.h>
 
+#if 0
 // create streaming media player
 bool VideoDecoder::createStreamingMediaPlayer()
 {
@@ -426,6 +434,9 @@ bool VideoDecoder::createStreamingMediaPlayer()
     return true;
 }
 
+#endif
+
+#if 0
 void VideoDecoder::setPlayingStreamingMediaPlayer(){
     XAresult res;
     // make sure the streaming media player was created
@@ -436,8 +447,10 @@ void VideoDecoder::setPlayingStreamingMediaPlayer(){
     }
 }
 
-VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
+#endif
 
+VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
+/*
 	textureRect = NULL;
 	textureID = (GLuint)NULL;
 	originalWidth = 0.0;
@@ -515,10 +528,12 @@ VideoDecoder::VideoDecoder(RectGUI* rect, std::string path){
 
 	res = (*playerPlayItf)->SetCallbackEventsMask(playerPlayItf, XA_PLAYEVENT_HEADATEND);
 	assert(XA_RESULT_SUCCESS == res);
+ */
 }
 
 
 VideoDecoder::~VideoDecoder(){
+    /*
 	glDeleteTextures(1, &textureID);
 
 	// OpenMAX AL destruction
@@ -527,87 +542,117 @@ VideoDecoder::~VideoDecoder(){
 	(*engineObject)->Destroy(engineObject);
 
 	closeVideo();
+     */
 }
 
 void VideoDecoder::setEnded(){
-	logInf("VideoDecoder::setEnded()!!!!");
-	ended = true;
+	//logInf("VideoDecoder::setEnded()!!!!");
+	//ended = true;
 }
 
 bool VideoDecoder::isEnded(){
-	if(ended) logInf("ended = true");
-	return ended;
+	//if(ended) logInf("ended = true");
+	//return ended;
+    return true;
 }
 
 void VideoDecoder::updateTexture(){
-	updateTextureVideo();
+	//updateTextureVideo();
 }
 
 void VideoDecoder::pause(){
+    /*
 	XAresult res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_PAUSED);
     assert(XA_RESULT_SUCCESS == res);
+     */
 }
 
 void VideoDecoder::play(){
+    /*
 	this->stop();
 
 	XAresult res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_PLAYING);
     assert(XA_RESULT_SUCCESS == res);
+     */
 }
 
 void VideoDecoder::setMute(bool enable){
+    /*
 	if(enable){
 		XAresult res = (*playerVolItf)->SetMute(playerVolItf, XA_BOOLEAN_TRUE);
 	}else{
 		XAresult res = (*playerVolItf)->SetMute(playerVolItf, XA_BOOLEAN_FALSE);
 	}
     assert(XA_RESULT_SUCCESS == res);
+     */
 }
 
 bool VideoDecoder::getMute(){
+    /*
 	XAboolean mute;
 	XAresult res = (*playerVolItf)->GetMute(playerVolItf, &mute);
 	assert(XA_RESULT_SUCCESS == res);
 	return (mute == XA_BOOLEAN_TRUE);
+     */
+    return true;
+
 }
 
 void VideoDecoder::stop(){
+    /*
 	XAresult res = (*playerPlayItf)->SetPlayState(playerPlayItf, XA_PLAYSTATE_STOPPED);
     assert(XA_RESULT_SUCCESS == res);
+     */
 }
 
 bool VideoDecoder::isStopped(){
+    /*
 	XAuint32 state;
 	XAresult res = (*playerPlayItf)->GetPlayState(playerPlayItf, &state);
 	assert(XA_RESULT_SUCCESS == res);
 	return (state == XA_PLAYSTATE_STOPPED);
+     */
+    return true;
+
 }
 
 bool VideoDecoder::isPaused(){
+    /*
 	XAuint32 state;
 	XAresult res = (*playerPlayItf)->GetPlayState(playerPlayItf, &state);
 	assert(XA_RESULT_SUCCESS == res);
 	return (state == XA_PLAYSTATE_PAUSED);
+     */
+    return true;
+
 }
 
 bool VideoDecoder::isPlaying(){
+    /*
 	XAuint32 state;
 	XAresult res = (*playerPlayItf)->GetPlayState(playerPlayItf, &state);
 	assert(XA_RESULT_SUCCESS == res);
 	return (state == XA_PLAYSTATE_PLAYING);
+     */
+    return true;
+
 }
 
 void VideoDecoder::maximize(){
+    /*
 	textureRect->rotate(-Maths::PI*0.5f);
 	float w = GlobalData::getInstance()->screenWidth;
 	float h = GlobalData::getInstance()->screenHeight;
 	textureRect->setWidthAndHeight(w, h);
 	textureRect->setPosition(0.0f, 0.0f);
+     */
 }
 
 void VideoDecoder::restore(){
+    /*
 	textureRect->rotate(Maths::PI*0.5f);
 	textureRect->setWidth(originalWidth);
 	textureRect->setHeight(originalHeight);
 	textureRect->setPosition(originalLeft, originalTop);
+     */
 }
