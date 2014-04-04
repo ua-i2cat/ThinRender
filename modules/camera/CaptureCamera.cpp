@@ -25,15 +25,17 @@
 #include "../../shader/Shader.h"
 #include "../../shader/gui/CameraPreviewPlaneShader.h"
 
+#ifdef IOS_PLATFORM
+#define GL_TEXTURE_EXTERNAL_OES GL_TEXTURE_2D
+#endif
+
 CaptureCamera::CaptureCamera(RectGUI* rect){
 	glGenTextures(1, &textureID);
-    /*
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureID);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-     */
 	setCameraTexturePreview(textureID);
 
     //TODO: Quarkfly
