@@ -31,6 +31,7 @@ IOSLocationManager::IOSLocationManager(){
 
 IOSLocationManager::~IOSLocationManager(){
     shutDownGPS();
+    instanceLocation = NULL;
     locationObject = NULL;
 }
 

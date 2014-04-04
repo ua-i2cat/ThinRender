@@ -38,11 +38,10 @@ CaptureCamera::CaptureCamera(RectGUI* rect){
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	setCameraTexturePreview(textureID);
 
-    //TODO: Quarkfly
-	/*Shader* shader = new CameraPreviewPlaneShader();
+	Shader* shader = new CameraPreviewPlaneShader();
 	rect->setShader(shader);
 	rect->setTexture(TextureManager::getInstance()->getTexture("blueSquare.png"));
-	rect->setTexture(textureID);*/
+	rect->setTexture(textureID);
 }
 
 CaptureCamera::~CaptureCamera(){

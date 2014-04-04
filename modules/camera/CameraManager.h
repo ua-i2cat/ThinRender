@@ -21,42 +21,26 @@
  *  Author:         Antonio Quesada Frias <aquesada@quarkfly.com>
  */
 
-#ifndef IOS_MOTION_MANAGER_H
-#define IOS_MOTION_MANAGER_H
+#ifndef CAMERA_MANAGER_H
+#define CAMERA_MANAGER_H
 
-#include "MotionManager.h"
+class CameraManager{
 
-#import <CoreMotion/CoreMotion.h>
-
-@class IOSMotionManagerDelegate;
-
-#define REFRESH_FREQUENCY 10.0 // Update at REFRESH_FREQUENCY Hz
-
-class IOSMotionManager: public MotionManager {
-    
 public:
-    IOSMotionManager();
-    ~IOSMotionManager();
+    virtual ~CameraManager(){}
+    static CameraManager* getInstance();
+
     
-    void initMotion();
-    void shutDownMotion();
-    
-    //void setPosition(double latitude, double longitude);
-    
-private:
-    
-    IOSMotionManagerDelegate *motionObject;
-    
+    virtual void shutdownTextureWindow() = 0;
+    virtual void closeVideo() = 0;
+    virtual void closeCamera() = 0;
+    virtual void updateTextureVideo() = 0;
+    virtual void updateTextureCamera() = 0;
+    virtual bool setCameraTexturePreview(int texture) = 0;
+
+protected:
+    static CameraManager* instanceCamera;
+
 };
-
-@interface IOSMotionManagerDelegate : NSObject
-- (id) init:(IOSMotionManager *) mm;
-- (void) startUpdateMotion;
-- (void) stopUpdateMotion;
-
-
-@end
-
-
 
 #endif

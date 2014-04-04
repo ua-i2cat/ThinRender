@@ -21,42 +21,27 @@
  *  Author:         Antonio Quesada Frias <aquesada@quarkfly.com>
  */
 
-#ifndef IOS_MOTION_MANAGER_H
-#define IOS_MOTION_MANAGER_H
-
-#include "MotionManager.h"
-
-#import <CoreMotion/CoreMotion.h>
-
-@class IOSMotionManagerDelegate;
-
-#define REFRESH_FREQUENCY 10.0 // Update at REFRESH_FREQUENCY Hz
-
-class IOSMotionManager: public MotionManager {
-    
-public:
-    IOSMotionManager();
-    ~IOSMotionManager();
-    
-    void initMotion();
-    void shutDownMotion();
-    
-    //void setPosition(double latitude, double longitude);
-    
-private:
-    
-    IOSMotionManagerDelegate *motionObject;
-    
-};
-
-@interface IOSMotionManagerDelegate : NSObject
-- (id) init:(IOSMotionManager *) mm;
-- (void) startUpdateMotion;
-- (void) stopUpdateMotion;
+#include "CameraManager.h"
 
 
-@end
-
-
-
+#ifdef ANDROID_PLATFORM
+#include "AndroidCameraManager.h"
+#else
+#include "IOSCameraManager.h"
 #endif
+
+CameraManager* CameraManager::instanceCamera = NULL;
+
+CameraManager* CameraManager::getInstance() {
+    
+    if (!instanceCamera){
+#ifdef ANDROID_PLATFORM
+        instanceCamera = new AndroidCameraManager();
+#else
+        instanceCamera = new IOSCameraManager();
+#endif
+    }
+    return instanceCamera;
+}
+
+    

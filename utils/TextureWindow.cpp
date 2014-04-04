@@ -24,6 +24,7 @@
 
 //TODO: Quarkfly Refactor
 #include "../modules/sensors/LocationManager.h"
+#include "../modules/camera/CameraManager.h"
 
 
 
@@ -236,17 +237,14 @@ Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_setSurface(JNIEnv *env, 
 void initGPS(){
     LocationManager::getInstance()->initGPS();
 };
-void shutdownTextureWindow(){};
-void closeVideo(){};
-void closeCamera(){};
-void updateTextureVideo(){};
-void updateTextureCamera(){};
-bool setCameraTexturePreview(int texture){return true;};
+void shutdownTextureWindow(){CameraManager::getInstance()->shutdownTextureWindow();};
+void closeVideo(){CameraManager::getInstance()->closeVideo();};
+void closeCamera(){CameraManager::getInstance()->closeCamera();};
+void updateTextureVideo(){CameraManager::getInstance()->updateTextureVideo();};
+void updateTextureCamera(){CameraManager::getInstance()->updateTextureCamera();};
+bool setCameraTexturePreview(int texture){return CameraManager::getInstance()->setCameraTexturePreview(texture);};
 
-double getLatitude(){
-    double lat = LocationManager::getInstance()->getLatitude();
-    return lat;
-};
+double getLatitude(){return LocationManager::getInstance()->getLatitude();};
 double getLongitude(){return LocationManager::getInstance()->getLongitude();};
 void shutDownGPS(){ LocationManager::getInstance()->shutDownGPS(); };
 #endif

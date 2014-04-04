@@ -21,38 +21,47 @@
  *  Author:         Antonio Quesada Frias <aquesada@quarkfly.com>
  */
 
-#ifndef IOS_MOTION_MANAGER_H
-#define IOS_MOTION_MANAGER_H
+#ifndef IOS_CAMERA_MANAGER_H
+#define IOS_CAMERA_MANAGER_H
 
-#include "MotionManager.h"
+#include "CameraManager.h"
 
-#import <CoreMotion/CoreMotion.h>
+#import <AVFoundation/AVFoundation.h>
+@class IOSCameraManagerDelegate;
 
-@class IOSMotionManagerDelegate;
-
-#define REFRESH_FREQUENCY 10.0 // Update at REFRESH_FREQUENCY Hz
-
-class IOSMotionManager: public MotionManager {
+class IOSCameraManager: public CameraManager {
     
 public:
-    IOSMotionManager();
-    ~IOSMotionManager();
+    IOSCameraManager();
+    ~IOSCameraManager();
     
-    void initMotion();
-    void shutDownMotion();
-    
-    //void setPosition(double latitude, double longitude);
-    
+    void shutdownTextureWindow();
+    void closeVideo();
+    void closeCamera();
+    void updateTextureVideo();
+    void updateTextureCamera();
+    bool setCameraTexturePreview(int texture);
+
 private:
     
-    IOSMotionManagerDelegate *motionObject;
+    IOSCameraManagerDelegate *cameraObject;
     
 };
 
-@interface IOSMotionManagerDelegate : NSObject
-- (id) init:(IOSMotionManager *) mm;
-- (void) startUpdateMotion;
-- (void) stopUpdateMotion;
+@interface IOSCameraManagerDelegate : NSObject <AVCaptureAudioDataOutputSampleBufferDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>{
+
+    AVCaptureVideoPreviewLayer *videoPreviewLayer;
+	AVCaptureSession *captureSession;
+	AVCaptureDeviceInput *videoInput;
+	AVCaptureVideoDataOutput *videoOutput;
+
+}
+- (id) init:(IOSCameraManager *) cm;
+
+- (void) startCameraCapturing;
+- (void) stopCameraCapturing;
+
+
 
 
 @end

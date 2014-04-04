@@ -31,15 +31,16 @@ IOSMotionManager::IOSMotionManager(){
 
 IOSMotionManager::~IOSMotionManager(){
     shutDownMotion();
+    instanceMotion = NULL;
     motionObject = NULL;
 }
 
 void IOSMotionManager::initMotion(){
-    //[locationObject startUpdatePosition];
+    [motionObject startUpdateMotion];
 }
 
 void IOSMotionManager::shutDownMotion(){
-    //[locationObject stopUpdatePosition];
+    [motionObject stopUpdateMotion];
 }
 
 
@@ -112,26 +113,6 @@ CMDeviceMotionHandler dmHandler;
 
 }
 
-
-/*
- - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
-    NSLog(@">Did Update Position");
-    locationObject->setPosition(newLocation.coordinate.latitude, newLocation.coordinate.longitude);
-    
-}
-
-//FIXME: What to do with these errors
-- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
-    if(error.code == kCLErrorDenied) {
-        NSLog(@"Error locating position. Stoping locating position");
-        [locationManager stopUpdatingLocation];
-    } else if(error.code == kCLErrorLocationUnknown) {
-        // retry
-    } else {
-        NSLog(@"Error locating position");
-    }
-}
-*/
 
 //Automatic reference counting mode. Release not needed
 
