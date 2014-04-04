@@ -23,7 +23,7 @@
 #include "TextureWindow.h"
 
 //TODO: Quarkfly Refactor
-#include "../../modules/LocationManager.h"
+#include "../modules/sensors/LocationManager.h"
 
 
 

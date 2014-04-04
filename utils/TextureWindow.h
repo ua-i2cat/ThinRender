@@ -23,7 +23,7 @@
 #ifndef TEXTURE_WINDOW_H
 #define TEXTURE_WINDOW_H
 
-#include "../../log/Log.h"
+#include "../log/Log.h"
 
 #ifdef ANDROID_PLATFORM
 
