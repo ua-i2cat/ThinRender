@@ -245,7 +245,6 @@ bool setCameraTexturePreview(int texture){return true;};
 
 double getLatitude(){
     double lat = LocationManager::getInstance()->getLatitude();
-    logInf("LAT: %f",lat);
     return lat;
 };
 double getLongitude(){return LocationManager::getInstance()->getLongitude();};
