@@ -20,12 +20,10 @@
  *  Author:         Daniel Cabrera Benitez <dcabrera@quarkfly.com>
  *  Author:         Antonio Quesada Frias <aquesada@quarkfly.com>
  */
-
 #include "AndroidLocationManager.h"
 
 
 AndroidLocationManager::AndroidLocationManager(){
-    javaVM = 0;
         
     //gps methods...
     shutdownGPSMethod = 0;
@@ -42,39 +40,47 @@ AndroidLocationManager::~AndroidLocationManager(){
 
 
 double AndroidLocationManager::getLatitude(){
-    if(javaVM == 0)return 0.0;
+    GlobalData *ginstance = GlobalData::getInstance();
+
+    if(ginstance->jenv.javaVM == 0)return 0.0;
     if(getLatitudeMethod == 0){
-        javaVM->AttachCurrentThread(&env, 0);
-        getLatitudeMethod = env->GetMethodID(activityClass, "getLatitude", "()D");
+        ginstance->jenv.javaVM->AttachCurrentThread(&(ginstance->jenv.env), 0);
+        getLatitudeMethod =  (ginstance->jenv.env)->GetMethodID(ginstance->jenv.activityClass, "getLatitude", "()D");
     }
-    return env->CallDoubleMethod(activityObj, getLatitudeMethod);
+    return  (ginstance->jenv.env)->CallDoubleMethod(ginstance->jenv.activityObj, getLatitudeMethod);
 }
 double AndroidLocationManager::getLongitude(){
-    if(javaVM == 0)return 0.0;
+    GlobalData *ginstance = GlobalData::getInstance();
+
+    if(ginstance->jenv.javaVM == 0)return 0.0;
     if(getLongitudeMethod == 0){
-        javaVM->AttachCurrentThread(&env, 0);
-        getLongitudeMethod = env->GetMethodID(activityClass, "getLongitude", "()D");
+        ginstance->jenv.javaVM->AttachCurrentThread(&(ginstance->jenv.env), 0);
+        getLongitudeMethod =  (ginstance->jenv.env)->GetMethodID(ginstance->jenv.activityClass, "getLongitude", "()D");
     }
-    return env->CallDoubleMethod(activityObj, getLongitudeMethod);
+    return  (ginstance->jenv.env)->CallDoubleMethod(ginstance->jenv.activityObj, getLongitudeMethod);
 }
 
 void AndroidLocationManager::initGPS(){
-    logInf("initGPS");
-    if(javaVM == 0)return;
-    javaVM->AttachCurrentThread(&env, 0);
+    GlobalData *ginstance = GlobalData::getInstance();
+
+    logInf("initGPS Android ----");
+    if(ginstance->jenv.javaVM == 0)return;
+    ginstance->jenv.javaVM->AttachCurrentThread(&(ginstance->jenv.env), 0);
     if(initGPSMethod != 0){ return; }
-    initGPSMethod = env->GetMethodID(activityClass, "initGPS", "()V");//Ljava/lang/Object;
-    env->CallVoidMethod(activityObj, initGPSMethod, activityObj);
+    initGPSMethod =  (ginstance->jenv.env)->GetMethodID(ginstance->jenv.activityClass, "initGPS", "()V");//Ljava/lang/Object;
+    (ginstance->jenv.env)->CallVoidMethod(ginstance->jenv.activityObj, initGPSMethod, ginstance->jenv.activityObj);
     return;
 }
 
 void AndroidLocationManager::shutDownGPS(){
-    if(javaVM == 0)return;
+    GlobalData *ginstance = GlobalData::getInstance();
+
+    if(ginstance->jenv.javaVM == 0)return;
     if(shutdownGPSMethod == 0){
-        javaVM->AttachCurrentThread(&env, 0);
-        shutdownGPSMethod = env->GetMethodID(activityClass, "shutDownGPS", "()V");
+        ginstance->jenv.javaVM->AttachCurrentThread(&(ginstance->jenv.env), 0);
+        shutdownGPSMethod =  (ginstance->jenv.env)->GetMethodID(ginstance->jenv.activityClass, "shutDownGPS", "()V");
     }
-    env->CallVoidMethod(activityObj, shutdownGPSMethod);
+    (ginstance->jenv.env)->CallVoidMethod(ginstance->jenv.activityObj, shutdownGPSMethod);
     shutdownGPSMethod = 0;
     getLatitudeMethod = 0;
     getLongitudeMethod = 0;

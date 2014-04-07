@@ -36,21 +36,16 @@ public:
     
     void initGPS();
     void shutDownGPS();
-    
+    double getLatitude();
+    double getLongitude();
+   
     
 private:
-    
-    JavaVM* javaVM = 0;
-    jclass activityClass;
-    JNIEnv *env;
-    jobject activityObj;
-    ANativeWindow* _theNativeWindow;
-    
-    //gps methods...
-    jmethodID shutdownGPSMethod = 0;
-    jmethodID getLatitudeMethod = 0;
-    jmethodID getLongitudeMethod = 0;
-    jmethodID initGPSMethod = 0;
+
+    jmethodID shutdownGPSMethod;
+    jmethodID getLatitudeMethod;
+    jmethodID getLongitudeMethod;
+    jmethodID initGPSMethod;
 
     
 };

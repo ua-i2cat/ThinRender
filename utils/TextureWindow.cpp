@@ -213,20 +213,25 @@ bool setCameraTexturePreview(int texture) {
 JNIEXPORT void JNICALL
 Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_cacheJNIVars(JNIEnv *envParam, jobject jobj)
 {
-	envParam->GetJavaVM(&javaVM);
+    GlobalData *ginstance = GlobalData::getInstance();
+    logInf("Init JNI");
+	envParam->GetJavaVM(&(ginstance->jenv.javaVM));
+	javaVM =ginstance->jenv.javaVM;
 	jclass cls = envParam->GetObjectClass(jobj);
-	activityClass = (jclass) envParam->NewGlobalRef(cls);
-	activityObj = envParam->NewGlobalRef(jobj);
-	javaVM->AttachCurrentThread(&envParam, 0);
-	env = envParam;
+	activityClass = ginstance->jenv.activityClass = (jclass) envParam->NewGlobalRef(cls);
+	activityObj = ginstance->jenv.activityObj = envParam->NewGlobalRef(jobj);
+	(ginstance->jenv.javaVM)->AttachCurrentThread(&envParam, 0);
+	env = ginstance->jenv.env = envParam;
 	logInf("==========================CACHE JNI VARS!");
 }
 
 JNIEXPORT void JNICALL
 Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_setSurface(JNIEnv *env, jclass clazz, jobject surface)
 {
+    GlobalData *ginstance = GlobalData::getInstance();
+
 	// obtain a native window from a Java surface
-	_theNativeWindow = ANativeWindow_fromSurface(env, surface);
+    _theNativeWindow = ginstance->jenv._theNativeWindow = ANativeWindow_fromSurface(env, surface);
 }
     
 #ifdef __cplusplus
@@ -234,9 +239,7 @@ Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_setSurface(JNIEnv *env, 
 #endif
 
 #else
-void initGPS(){
-    LocationManager::getInstance()->initGPS();
-};
+
 void shutdownTextureWindow(){CameraManager::getInstance()->shutdownTextureWindow();};
 void closeVideo(){CameraManager::getInstance()->closeVideo();};
 void closeCamera(){CameraManager::getInstance()->closeCamera();};
@@ -244,7 +247,13 @@ void updateTextureVideo(){CameraManager::getInstance()->updateTextureVideo();};
 void updateTextureCamera(){CameraManager::getInstance()->updateTextureCamera();};
 bool setCameraTexturePreview(int texture){return CameraManager::getInstance()->setCameraTexturePreview(texture);};
 
-double getLatitude(){return LocationManager::getInstance()->getLatitude();};
-double getLongitude(){return LocationManager::getInstance()->getLongitude();};
-void shutDownGPS(){ LocationManager::getInstance()->shutDownGPS(); };
 #endif
+
+void initGPS(){LocationManager::getInstance()->initGPS();};
+double getLatitude(){return LocationManager::getInstance()->getLatitude();};
+double getLongitude(){
+	double lon = LocationManager::getInstance()->getLongitude();
+	logInf("Longitude -android = %f", lon);
+};
+void shutDownGPS(){ LocationManager::getInstance()->shutDownGPS(); };
+

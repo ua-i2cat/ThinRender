@@ -28,6 +28,9 @@ class BasicSceneManager;
 #include "../scene/BasicSceneManager.h"
 #include <string>
 #include <stack>
+#ifdef ANDROID_PLATFORM
+#include <android/native_window_jni.h>
+#endif
 
 /**
  * Class to manage global parameters, used to share OS data to the project, uses Singleton pattern
@@ -41,7 +44,17 @@ public:
 		return instance;
 	}
 #ifdef ANDROID_PLATFORM
+    struct java_env {
+        JavaVM* javaVM;
+		jclass activityClass;
+		JNIEnv *env;
+		jobject activityObj;
+		ANativeWindow* _theNativeWindow;
+	} ;
+	
+    
 	struct android_app* app;
+	struct java_env jenv;
 #endif
     int screenWidth, screenHeight, screenDPI;
     bool isMobileDevice;
