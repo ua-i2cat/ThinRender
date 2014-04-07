@@ -41,7 +41,6 @@ public:
     void updateTextureVideo();
     void updateTextureCamera();
     bool setCameraTexturePreview(int texture);
-
 private:
     
     IOSCameraManagerDelegate *cameraObject;
@@ -49,17 +48,20 @@ private:
 };
 
 @interface IOSCameraManagerDelegate : NSObject <AVCaptureAudioDataOutputSampleBufferDelegate, AVCaptureVideoDataOutputSampleBufferDelegate>{
-
     AVCaptureVideoPreviewLayer *videoPreviewLayer;
 	AVCaptureSession *captureSession;
 	AVCaptureDeviceInput *videoInput;
 	AVCaptureVideoDataOutput *videoOutput;
+    
 
 }
 - (id) init:(IOSCameraManager *) cm;
 
 - (void) startCameraCapturing;
 - (void) stopCameraCapturing;
+- (void) drawPixelBuffer;
+- (void) updatePixelBuffer:(int) texId;
+
 
 
 

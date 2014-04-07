@@ -22,6 +22,8 @@
  */
 
 #include "IOSMotionManager.h"
+#include "../../inputSystem/Input.h"
+#include "../../inputSystem/IMU.h"
 
 IOSMotionManager::IOSMotionManager(){
     
@@ -50,7 +52,7 @@ void IOSMotionManager::shutDownMotion(){
 CMMotionManager *motionManager;
 IOSMotionManager *motionObject;
 
-NSOperationQueue *queue;
+NSOperationQueue *opqueue;
 CMDeviceMotionHandler dmHandler;
 
 - (id) init:(IOSMotionManager *) mm
@@ -66,22 +68,23 @@ CMDeviceMotionHandler dmHandler;
             CMAttitude * anAttitude = deviceMotion.attitude;
             CMQuaternion quaternion = anAttitude.quaternion;
             
-            NSNumber * x = [NSNumber numberWithFloat:quaternion.x];
-            NSNumber * y = [NSNumber numberWithFloat:quaternion.y];
-            NSNumber * z = [NSNumber numberWithFloat:quaternion.z];
-            NSNumber * w = [NSNumber numberWithFloat:quaternion.w];
+            /*IMU::MadgwickAHRSupdate(deviceMotion.rotationRate.x, deviceMotion.rotationRate.y, deviceMotion.rotationRate.z, deviceMotion.userAcceleration.x, deviceMotion.userAcceleration.y, deviceMotion.userAcceleration.z, deviceMotion.magneticField.field.x,deviceMotion.magneticField.field.y, deviceMotion.magneticField.field.z);
+            glm::quat imuOrientation = (glm::quat(IMU::q0, IMU::q1, IMU::q2, IMU::q3));
+            */
             
-            //TODO: Quarkfly Send data to the parent
-
+            glm::quat imuOrientation = (glm::quat(quaternion.w, quaternion.x,quaternion.y, quaternion.z));
+			
+			Input::getInstance()->deviceOrientation = imuOrientation;
+  
             // Checking if some errors occured
             if (error) {
                 NSLog(@"Could not start/continue Device Motion Updates with error:\n%@",error);
                 // Restart the motion manager in case of error
                 [motionManager stopDeviceMotionUpdates];
                 motionManager = nil;
-                queue = nil;
+                opqueue = nil;
                 if (!motionManager) motionManager = [[CMMotionManager alloc] init];
-                if (!queue) queue = [[NSOperationQueue alloc] init];
+                if (!opqueue) opqueue = [[NSOperationQueue alloc] init];
                 [self startUpdateMotion];
                 
                 return;
@@ -99,8 +102,8 @@ CMDeviceMotionHandler dmHandler;
     
     if (motionManager.deviceMotionAvailable) { //Checks gyroscope AND accelerometer avalalability
         
-        queue = [NSOperationQueue currentQueue];
-        [motionManager startDeviceMotionUpdatesToQueue:queue
+        opqueue = [NSOperationQueue currentQueue];
+        [motionManager startDeviceMotionUpdatesToQueue:opqueue
                                            withHandler:dmHandler];
     }
     

@@ -50,7 +50,7 @@ public:
 		JNIEnv *env;
 		jobject activityObj;
 		ANativeWindow* _theNativeWindow;
-	} ;
+	};
 	
     
 	struct android_app* app;

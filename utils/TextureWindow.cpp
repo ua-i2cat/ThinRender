@@ -48,77 +48,6 @@ jmethodID methodUpdateCamera = 0;
 jmethodID stopCamera = 0;
 jmethodID stopVideo = 0;
 
-//gps methods...
-jmethodID shutdownGPSMethod = 0;
-jmethodID getLatitudeMethod = 0;
-jmethodID getLongitudeMethod = 0;
-jmethodID initGPSMethod = 0;
-/*
-extern double getLatitude(){
-	if(javaVM == 0)return 0.0;
-	if(getLatitudeMethod == 0){
-		javaVM->AttachCurrentThread(&env, 0);
-		getLatitudeMethod = env->GetMethodID(activityClass, "getLatitude", "()D");
-	}
-	return env->CallDoubleMethod(activityObj, getLatitudeMethod);
-}
-double getLongitude(){
-	if(javaVM == 0)return 0.0;
-	if(getLongitudeMethod == 0){
-		javaVM->AttachCurrentThread(&env, 0);
-		getLongitudeMethod = env->GetMethodID(activityClass, "getLongitude", "()D");
-	}
-	return env->CallDoubleMethod(activityObj, getLongitudeMethod);
-}*/
-
-/*void initGPS(){
-	//return;
-	logInf("initGPS");
-	if(javaVM == 0)return;
-	javaVM->AttachCurrentThread(&env, 0);
-	if(initGPSMethod != 0){ return; }
-	initGPSMethod = env->GetMethodID(activityClass, "initGPS", "()V");//Ljava/lang/Object;
-	env->CallVoidMethod(activityObj, initGPSMethod, activityObj);
-	return;/*
-	logInf("initGPS1");
-	if(initGPSMethod != 0){ return; }
-
-	logInf("initGPS2");
-	javaVM->AttachCurrentThread(&env, 0);
-	logInf("initGPS3");
-	initGPSMethod = env->GetMethodID(activityClass, "initGPS", "(Ljava/lang/Object;)V");
-	if(initGPSMethod == 0) logErr("AL LORO EH!");
-
-	logInf("initGPS4");
-	//jobject jListenerObj;
-	jmethodID midGetSystemService = env->GetMethodID(activityClass,"getSystemService","(Ljava/lang/String;)Ljava/lang/Object;");
-	logInf("initGPS5");
-	jstring StringArg = env->NewStringUTF("location");//Context.LOCATION_SERVICE = "location"
-	jobject jSystemServiceObj = env->CallObjectMethod(activityObj,midGetSystemService,StringArg);//new GPSListener((LocationManager)this.getSystemService(Context.LOCATION_SERVICE));
-	logInf("initGPS6");
-	//jclass listenerClass = env->FindClass("net/i2cat/modernismemnactec/GPSListener");
-	//if(listenerClass == 0) logErr("FIND CLASS NULL!!!!!!!!");
-	//logInf("initGPS6.5");
-	//jmethodID midConstListener = env->GetMethodID(listenerClass, "<init>", "(Ljava/lang/Object;)V");
-	//logInf("initGPS7");
-	//jListenerObj = env->NewObject(listenerClass, midConstListener);
-	logInf("initGPS8");
-	if(jSystemServiceObj == 0) logErr("FIND CLASS NULL!!!!!!!!");
-	env->CallVoidMethod(activityObj, initGPSMethod, jSystemServiceObj);
-	logInf("initGPS9");
-}*/
-/*void shutDownGPS(){
-	if(javaVM == 0)return;
-		if(shutdownGPSMethod == 0){
-			javaVM->AttachCurrentThread(&env, 0);
-			shutdownGPSMethod = env->GetMethodID(activityClass, "shutDownGPS", "()V");
-		}
-		env->CallVoidMethod(activityObj, shutdownGPSMethod);
-		shutdownGPSMethod = 0;
-		getLatitudeMethod = 0;
-		getLongitudeMethod = 0;
-		initGPSMethod = 0;
-}*/
 void shutdownTextureWindow(){
 	if(javaVM == 0)return;
 	javaVM->AttachCurrentThread(&env, 0);
@@ -245,7 +174,11 @@ void closeVideo(){CameraManager::getInstance()->closeVideo();};
 void closeCamera(){CameraManager::getInstance()->closeCamera();};
 void updateTextureVideo(){CameraManager::getInstance()->updateTextureVideo();};
 void updateTextureCamera(){CameraManager::getInstance()->updateTextureCamera();};
-bool setCameraTexturePreview(int texture){return CameraManager::getInstance()->setCameraTexturePreview(texture);};
+bool setCameraTexturePreview(int texture){
+    
+  
+    
+    return CameraManager::getInstance()->setCameraTexturePreview(texture);};
 
 #endif
 
@@ -254,6 +187,7 @@ double getLatitude(){return LocationManager::getInstance()->getLatitude();};
 double getLongitude(){
 	double lon = LocationManager::getInstance()->getLongitude();
 	logInf("Longitude -android = %f", lon);
+    return lon;
 };
 void shutDownGPS(){ LocationManager::getInstance()->shutDownGPS(); };
 
