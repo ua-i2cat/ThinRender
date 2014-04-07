@@ -26,6 +26,8 @@
 #ifndef LOCATION_MANAGER_H
 #define LOCATION_MANAGER_H
 
+#include "../../globalData/GlobalData.h"
+
 class LocationManager {
     
 public:

@@ -26,6 +26,9 @@
 #ifndef MOTION_MANAGER_H
 #define MOTION_MANAGER_H
 
+#include "../../globalData/GlobalData.h"
+
+
 class MotionManager {
     
 public:
