@@ -21,28 +21,40 @@
  *  Author:         Antonio Quesada Frias <aquesada@quarkfly.com>
  */
 
+#ifndef ANDROID_LOCATION_MANAGER_H
+#define ANDROID_LOCATION_MANAGER_H
+
+#include "LocationManager.h"
+#include <android/native_window_jni.h>
 
 
-#ifndef LOCATION_MANAGER_H
-#define LOCATION_MANAGER_H
-
-class LocationManager {
+class AndroidLocationManager: public LocationManager {
     
 public:
-    virtual ~LocationManager(){};
-    static LocationManager* getInstance();
+    AndroidLocationManager();
+    ~AndroidLocationManager();
     
-    virtual void initGPS() = 0;
-    virtual void shutDownGPS() = 0;
+    void initGPS();
+    void shutDownGPS();
+    
+    
+private:
+    
+    JavaVM* javaVM = 0;
+    jclass activityClass;
+    JNIEnv *env;
+    jobject activityObj;
+    ANativeWindow* _theNativeWindow;
+    
+    //gps methods...
+    jmethodID shutdownGPSMethod = 0;
+    jmethodID getLatitudeMethod = 0;
+    jmethodID getLongitudeMethod = 0;
+    jmethodID initGPSMethod = 0;
 
-    virtual double getLatitude() = 0;
-    virtual double getLongitude() = 0;
-      
-        
-protected:
- 
-    static LocationManager* instanceLocation;
-    
     
 };
-#endif 
+
+
+
+#endif

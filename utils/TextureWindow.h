@@ -38,7 +38,7 @@
     {
     #endif
 
-    extern void initGPS();
+    //extern void initGPS();
     extern void shutdownTextureWindow();
     extern void closeVideo();
     extern void closeCamera();
@@ -47,9 +47,9 @@
     extern ANativeWindow* getANativeWindow(int texture);
     extern bool setCameraTexturePreview(int texture);
 
-    extern double getLatitude();
-    extern double getLongitude();
-    extern void shutDownGPS();
+   // extern double getLatitude();
+   // extern double getLongitude();
+   // extern void shutDownGPS();
 
     extern JNIEXPORT void JNICALL
     Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_cacheJNIVars(JNIEnv *envParam, jobject jobj);
@@ -62,7 +62,7 @@
     #endif
 
 #else 
-    void initGPS();
+
     void shutdownTextureWindow();
     void closeVideo();
     void closeCamera();
@@ -70,11 +70,11 @@
     void updateTextureCamera();
     bool setCameraTexturePreview(int texture);
 
+#endif
+    void initGPS();
     double getLatitude();
     double getLongitude();
     void shutDownGPS();
 
-
-#endif
 
 #endif

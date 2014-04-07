@@ -39,11 +39,13 @@ public:
     void shutDownGPS();
     
     void setPosition(double latitude, double longitude);
-    
-private:
-    
+    double getLatitude();
+    double getLongitude();
+
+private:    
     IOSLocationManagerDelegate *locationObject;
-    
+    double latitude = 0.0;
+    double longitude = 0.0;
 };
 
 @interface IOSLocationManagerDelegate : NSObject <CLLocationManagerDelegate>

@@ -44,10 +44,3 @@ LocationManager* LocationManager::getInstance() {
     
     return instanceLocation;
 }
-
-double LocationManager::getLatitude(){
-    return latitude;
-}
-double LocationManager::getLongitude(){
-    return longitude;
-}

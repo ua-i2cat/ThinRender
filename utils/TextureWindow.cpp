@@ -53,7 +53,7 @@ jmethodID shutdownGPSMethod = 0;
 jmethodID getLatitudeMethod = 0;
 jmethodID getLongitudeMethod = 0;
 jmethodID initGPSMethod = 0;
-
+/*
 extern double getLatitude(){
 	if(javaVM == 0)return 0.0;
 	if(getLatitudeMethod == 0){
@@ -69,9 +69,9 @@ double getLongitude(){
 		getLongitudeMethod = env->GetMethodID(activityClass, "getLongitude", "()D");
 	}
 	return env->CallDoubleMethod(activityObj, getLongitudeMethod);
-}
+}*/
 
-void initGPS(){
+/*void initGPS(){
 	//return;
 	logInf("initGPS");
 	if(javaVM == 0)return;
@@ -105,9 +105,9 @@ void initGPS(){
 	logInf("initGPS8");
 	if(jSystemServiceObj == 0) logErr("FIND CLASS NULL!!!!!!!!");
 	env->CallVoidMethod(activityObj, initGPSMethod, jSystemServiceObj);
-	logInf("initGPS9");*/
-}
-void shutDownGPS(){
+	logInf("initGPS9");
+}*/
+/*void shutDownGPS(){
 	if(javaVM == 0)return;
 		if(shutdownGPSMethod == 0){
 			javaVM->AttachCurrentThread(&env, 0);
@@ -118,7 +118,7 @@ void shutDownGPS(){
 		getLatitudeMethod = 0;
 		getLongitudeMethod = 0;
 		initGPSMethod = 0;
-}
+}*/
 void shutdownTextureWindow(){
 	if(javaVM == 0)return;
 	javaVM->AttachCurrentThread(&env, 0);

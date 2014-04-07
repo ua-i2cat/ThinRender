@@ -49,6 +49,16 @@ void IOSLocationManager::setPosition(double lat, double lon){
     longitude = lon;
 }
 
+
+double IOSLocationManager::getLatitude(){
+    return latitude;
+}
+double IOSLocationManager::getLongitude(){
+    return longitude;
+}
+
+
+
 @implementation IOSLocationManagerDelegate
 
 CLLocationManager *locationManager;
@@ -95,6 +105,7 @@ IOSLocationManager *locationObject;
         NSLog(@"Error locating position");
     }
 }
+
 
 
 //Automatic reference counting mode. Release not needed
