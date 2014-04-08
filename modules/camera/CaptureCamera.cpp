@@ -24,10 +24,13 @@
 #include "../../utils/TextureWindow.h"
 #include "../../shader/Shader.h"
 #include "../../shader/gui/CameraPreviewPlaneShader.h"
+#include "CameraManager.h"
 
 #ifdef IOS_PLATFORM
 #define GL_TEXTURE_EXTERNAL_OES GL_TEXTURE_2D
 #endif
+
+
 
 CaptureCamera::CaptureCamera(RectGUI* rect){
 	glGenTextures(1, &textureID);
@@ -38,10 +41,16 @@ CaptureCamera::CaptureCamera(RectGUI* rect){
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	setCameraTexturePreview(textureID);
 
-	/*Shader* shader = new CameraPreviewPlaneShader();
+//    rectp = rect;
+    
+    
+    
+	Shader* shader = new CameraPreviewPlaneShader();
 	rect->setShader(shader);
 	rect->setTexture(TextureManager::getInstance()->getTexture("blueSquare.png"));
-	rect->setTexture(textureID);*/
+    rect->setTexture(textureID);
+  //  setCameraTexturePreview(textureID);
+
 }
 
 CaptureCamera::~CaptureCamera(){
@@ -53,5 +62,9 @@ CaptureCamera::~CaptureCamera(){
 }
 
 void CaptureCamera::cameraUpdatePreview(){
+    
 	updateTextureCamera();
+    //textureID = CameraManager::getInstance()->getTextureId();
+    //rectp->setTexture(textureID);
+
 }

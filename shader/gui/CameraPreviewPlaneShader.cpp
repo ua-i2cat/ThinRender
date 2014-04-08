@@ -50,21 +50,28 @@ void CameraPreviewPlaneShader::loadVars(){
 		logErr("Could not bind attribute %s\n", attributeName);
 		attributeTexture = 0;
 	}
+    
     const char* uniformName;
 #ifdef IOS_PLATFORM
-    uniformName = "luminanceTexture";
+    uniformName = "SamplerY";
 	uniformLuminanceTexture = glGetUniformLocation(program, uniformName);
 	if (uniformLuminanceTexture == -1) {
 		logErr("Could not bind uniform %s\n", uniformName);
 		return;
 	}
+    glUniform1i(uniformLuminanceTexture, 0);
+
     
-    uniformName = "chrominanceTexture";
+    
+  /*  uniformName = "SamplerUV";
 	uniformChrominanceTexture = glGetUniformLocation(program, uniformName);
 	if (uniformChrominanceTexture == -1) {
 		logErr("Could not bind uniform %s\n", uniformName);
 		return;
 	}
+    glUniform1i(uniformChrominanceTexture, 1);
+*/
+    
 #else
 	uniformName = "texture";
 	uniformTexture = glGetUniformLocation(program, uniformName);
@@ -98,19 +105,28 @@ void CameraPreviewPlaneShader::setVars(glm::mat4 projView, glm::mat4 model, glm:
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture->getTextureId());
     glUniform1i(uniformTexture, 0);
 #else
+    glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture->getTextureId());
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glUniform1i(uniformLuminanceTexture, 0);
+  //  glUniform1i(uniformTexture, 0);
+
+    
+/*
     GLuint luminanceTexture, chrominanceTexture;
     getVideoTextures(luminanceTexture, chrominanceTexture);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, luminanceTexture);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glUniform1i(uniformLuminanceTexture, 0);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, chrominanceTexture);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glUniform1i(uniformChrominanceTexture, 1);
     releaseVideoCache();
+ */
+    
 #endif
     
 

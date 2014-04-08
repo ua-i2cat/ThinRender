@@ -23,10 +23,15 @@
 
 #include "IOSCameraManager.h"
 #import <CoreVideo/CVPixelBuffer.h>
+#include "../../controllerEGL/ContextControllerEAGL.h"
+//#import <CoreVideo/CVOpenGLESTextureCache.h>
+
+GLuint textureId;
+
 
 IOSCameraManager::IOSCameraManager(){
     cameraObject = [[IOSCameraManagerDelegate alloc] init:this];
-    [cameraObject startCameraCapturing];
+   
     //pixelBuffer =
     //CVPixelBufferCreate(NULL, 480, 640, kCVPixelFormatType_32BGRA, nil, &pixelBuffer);
 }
@@ -52,6 +57,8 @@ void IOSCameraManager::updateTextureVideo(){
 void IOSCameraManager::updateTextureCamera(){
    //[cameraObject drawPixelBuffer];
    // [cameraObject updatePiuxelBuffer:textureId];
+    
+    [cameraObject setNextFrame:YES];
 }
 
 bool IOSCameraManager::setCameraTexturePreview(int texture){
@@ -63,10 +70,22 @@ bool IOSCameraManager::setCameraTexturePreview(int texture){
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferWidth, bufferHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(pixelBuffer));
 
  */
-    [cameraObject updatePixelBuffer:texture];
-    [cameraObject drawPixelBuffer];
+   // [cameraObject updatePixelBuffer:texture];
+    //[cameraObject drawPixelBuffer];
+    textureId = texture;
+    [cameraObject setTextureId:textureId];
+     [cameraObject startCameraCapturing];
     return true;
 }
+
+void IOSCameraManager::setTextureId(GLuint tid){
+    textureId = tid;
+}
+
+GLuint IOSCameraManager::getTextureId(){
+    return textureId;
+}
+
 
 IOSCameraManager::~IOSCameraManager(){
     [cameraObject stopCameraCapturing];
@@ -79,9 +98,7 @@ IOSCameraManager::~IOSCameraManager(){
 @implementation IOSCameraManagerDelegate
 IOSCameraManager *cameraManager;
 CVImageBufferRef pixelBuffer;
-int textureId;
 CVOpenGLESTextureCacheRef videoTextureCache2;
-EAGLContext* oglContext;
 GLuint frameBufferHandle;
 
 
@@ -96,14 +113,8 @@ GLuint frameBufferHandle;
                 backCamera = device;
             }
         }
-        oglContext = [EAGLContext currentContext];
         
-        glDisable(GL_DEPTH_TEST);
-        
-        glGenFramebuffers(1, &frameBufferHandle);
-        glBindFramebuffer(GL_FRAMEBUFFER, frameBufferHandle);
-
-        // Create the capture session
+          // Create the capture session
         captureSession = [[AVCaptureSession alloc] init];
         
         // Add the video input
@@ -113,10 +124,17 @@ GLuint frameBufferHandle;
         {
             [captureSession addInput:videoInput];
         }
-        //CVPixelBufferCreate(NULL, GlobalData::getInstance()->screenWidth, GlobalData::getInstance()->screenHeight, kCVPixelFormatType_32BGRA, nil, &pixelBuffer);
         // Add the video frame output
         videoOutput = [[AVCaptureVideoDataOutput alloc] init];
         [videoOutput setAlwaysDiscardsLateVideoFrames:YES];
+        
+        
+        CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, ContextControllerEAGL::getInstance()->context, NULL, &videoTextureCache2);
+        if(err){
+            logErr("ERROR CREATING CVOpenGLESTextureCache!!! %d", err);
+        }
+
+        
         
         // Use RGB frames instead of YUV to ease color processing
         [videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
@@ -158,6 +176,17 @@ GLuint frameBufferHandle;
 
 }
 
+-(void) setNextFrame:(BOOL) next
+{
+    nextFrame = next;
+}
+
+-(void) setTextureId:(int) texture
+{
+    textureId = texture;
+}
+
+
 - (void) stopCameraCapturing{
     
     if (![captureSession isRunning])
@@ -168,45 +197,98 @@ GLuint frameBufferHandle;
 
 #pragma mark -
 #pragma mark AVCaptureVideoDataOutputSampleBufferDelegate
-#define GL_TEXTURE_EXTERNAL_OES GL_TEXTURE_2D 
-
-
-
--(void) updatePixelBuffer:(int) texId
-{
-    textureId = texId;
-}
-
-
-- (void) drawPixelBuffer
-{
-   // CVPixelBufferLockBaseAddress(pixelBuffer, 0);
-   // dispatch_async(dispatch_get_main_queue(), ^{
-        CVPixelBufferLockBaseAddress(pixelBuffer, 0);
-
-    CVImageBufferRef pixelBuffer2 = pixelBuffer;
-        
-    glBindTexture(GL_TEXTURE_2D, textureId);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    int bufferHeight = CVPixelBufferGetHeight(pixelBuffer2);
-	int bufferWidth = CVPixelBufferGetWidth(pixelBuffer2);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, bufferWidth, bufferHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(pixelBuffer2));
-	glBindTexture(GL_TEXTURE_2D, 0);
-    glEnable(GL_TEXTURE_2D);
-    CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
-   // });
-}
+#define GL_TEXTURE_EXTERNAL_OES GL_TEXTURE_2D
+CVOpenGLESTextureRef _lumaTexture;
+CVOpenGLESTextureRef _chromaTexture;
+BOOL nextFrame;
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
+    
+    CVReturn err;
+	CVImageBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     CVPixelBufferLockBaseAddress(pixelBuffer, 0);
-    pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+
+    size_t width = CVPixelBufferGetWidth(pixelBuffer);
+    size_t height = CVPixelBufferGetHeight(pixelBuffer);
+    size_t _textureWidth = width;
+    size_t _textureHeight = height;
     
+    // CVOpenGLESTextureCacheCreateTextureFromImage will create GLES texture
+    // optimally from CVImageBufferRef.
+
+    _lumaTexture = NULL;
+   /* _chromaTexture = NULL;*/
+    if(!nextFrame) return;
+    nextFrame = NO;
+ 
+    /*CVOpenGLESTextureCacheFlush(videoTextureCache2, 0);
+
+    
+    
+    
+    // Y-plane
+   // glActiveTexture(GL_TEXTURE0);
+    err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
+                                                       videoTextureCache2,
+                                                       pixelBuffer,
+                                                       NULL,
+                                                       GL_TEXTURE_2D,
+                                                       GL_RGBA,
+                                                       _textureWidth,
+                                                       _textureHeight,
+                                                       GL_BGRA,
+                                                       GL_UNSIGNED_BYTE,
+                                                       0,
+                                                       &_lumaTexture);
+    if (err)
+    {
+        NSLog(@"Error at CVOpenGLESTextureCacheCreateTextureFromImage %d", err);
+    }
+    
+    */
+    //glGenTextures(1, &textureId);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// This is necessary for non-power-of-two textures
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	
+	// Using BGRA extension to pull in video frame data directly
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(pixelBuffer));
+    
+    
+   // glBindTexture(CVOpenGLESTextureGetTarget(_lumaTexture), CVOpenGLESTextureGetName(_lumaTexture));
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+ /*   // UV-plane
+    glActiveTexture(GL_TEXTURE1);
+    err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
+                                                       videoTextureCache2,
+                                                       pixelBuffer,
+                                                       NULL,
+                                                       GL_TEXTURE_2D,
+                                                       GL_RG_EXT,
+                                                       _textureWidth/2,
+                                                       _textureHeight/2,
+                                                       GL_RG_EXT,
+                                                       GL_UNSIGNED_BYTE,
+                                                       1,
+                                                       &_chromaTexture);
+    if (err)
+    {
+        NSLog(@"Error at CVOpenGLESTextureCacheCreateTextureFromImage %d", err);
+    }
+    
+    glBindTexture(CVOpenGLESTextureGetTarget(_chromaTexture), CVOpenGLESTextureGetName(_chromaTexture));
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);*/
+    
+    cameraManager->setTextureId(textureId);
+
     CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
-    
 
 }
 

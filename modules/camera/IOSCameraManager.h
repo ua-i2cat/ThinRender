@@ -41,6 +41,12 @@ public:
     void updateTextureVideo();
     void updateTextureCamera();
     bool setCameraTexturePreview(int texture);
+    
+    
+    void setTextureId(GLuint tid);
+    
+    GLuint getTextureId();
+    
 private:
     
     IOSCameraManagerDelegate *cameraObject;
@@ -61,6 +67,9 @@ private:
 - (void) stopCameraCapturing;
 - (void) drawPixelBuffer;
 - (void) updatePixelBuffer:(int) texId;
+- (void) setNextFrame:(BOOL) next;
+-(void) setTextureId:(int) texture;
+
 
 
 

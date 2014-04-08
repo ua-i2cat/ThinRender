@@ -32,6 +32,7 @@
 	void cameraUpdatePreview();
 private:
 	GLuint textureID;
+     RectGUI* rectp;
  };
  
  #endif
