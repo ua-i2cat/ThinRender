@@ -1,14 +1,52 @@
-//
-//  IOSVideoDecoder.h
-//  ModernismeMNACTEC
-//
-//  Created by Daniel Cabrera on 09/04/14.
-//  Copyright (c) 2014 i2CAT. All rights reserved.
-//
+/*
+ *  thin render - Mobile render engine based on OpenGL ES 2.0
+ *  Copyright (C) 2013  FundaciÛ i2CAT, Internet i InnovaciÛ digital a Catalunya
+ *
+ *  This file is part of thin render.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Author:         Marc Fernandez Vanaclocha <marc.fernandez@i2cat.net>
+ */
 
-#ifndef __ModernismeMNACTEC__IOSVideoDecoder__
-#define __ModernismeMNACTEC__IOSVideoDecoder__
+#ifndef IOS_VIDEO_DECODER_H
+#define IOS_VIDEO_DECODER_H
 
-#include <iostream>
+#include "VideoDecoder.h"
 
-#endif /* defined(__ModernismeMNACTEC__IOSVideoDecoder__) */
+
+class IOSVideoDecoder:public VideoDecoder {
+public:
+	IOSVideoDecoder(RectGUI* rect, std::string path);
+	~IOSVideoDecoder();
+    
+	void setSource(std::string fileName);
+	void releaseVideo();
+	void play();
+	void pause();
+	void stop();
+	void setMute(bool enable);
+	bool getMute();
+	bool isStopped();
+	bool isPaused();
+	bool isPlaying();
+    
+	void setSplash(std::string texturePath);
+	void setSplash();
+    
+private:
+
+};
+
+#endif

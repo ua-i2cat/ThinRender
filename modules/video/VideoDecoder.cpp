@@ -8,6 +8,7 @@
 
 #include "VideoDecoder.h"
 
+#include "../../utils/TextureWindow.h"
 
 #ifdef ANDROID_PLATFORM
 #include "AndroidVideoDecoder.h"
@@ -27,11 +28,11 @@ VideoDecoder* VideoDecoder::getInstance(RectGUI* rect, std::string path) {
 #endif
     }
     
-    return instanceLocation;
+    return instanceVideo;
 }
 
 void VideoDecoder::setEnded(){
-	logInf("AndroidVideoDecoder::setEnded()!!!!");
+	logInf("VideoDecoder::setEnded()!!!!");
 	ended = true;
 }
 

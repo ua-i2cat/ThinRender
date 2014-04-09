@@ -527,6 +527,7 @@ AndroidVideoDecoder::~AndroidVideoDecoder(){
 	(*engineObject)->Destroy(engineObject);
     
 	closeVideo();
+    instanceVideo = NULL;
 }
 
 

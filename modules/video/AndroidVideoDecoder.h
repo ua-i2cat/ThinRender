@@ -23,6 +23,8 @@
 #ifndef ANDROID_VIDEO_DECODER_H
 #define ANDROID_VIDEO_DECODER_H
 
+#include "VideoDecoder.h"
+
 #include <OMXAL/OpenMAXAL.h>
 #include <OMXAL/OpenMAXAL_Android.h>
 #include <pthread.h>
@@ -46,7 +48,7 @@
  * This class gives also the option to set source, play, stop, pause and release the video
  * the destructor will shut down the openmax engine
  */
-class AndroidVideoDecoder {
+class AndroidVideoDecoder:public VideoDecoder {
 public:
 	AndroidVideoDecoder(RectGUI* rect, std::string path);
 	~AndroidVideoDecoder();

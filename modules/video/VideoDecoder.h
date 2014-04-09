@@ -31,7 +31,7 @@
 class VideoDecoder {
 public:
 	static VideoDecoder* getInstance(RectGUI* rect, std::string path);
-	~VideoDecoder(){};
+	virtual ~VideoDecoder(){};
     
 	virtual void setSource(std::string fileName) = 0;
 	virtual void releaseVideo() = 0;
@@ -59,7 +59,7 @@ public:
 
 
 protected:
-    static VideoDecoder* videoInstance;
+    static VideoDecoder* instanceVideo;
     
     RectGUI* textureRect;
     GLuint textureID;
