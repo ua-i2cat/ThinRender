@@ -33,16 +33,10 @@ public:
     virtual ~CameraManager(){}
     static CameraManager* getInstance();
 
-    
-    virtual void shutdownTextureWindow() = 0;
-    virtual void closeVideo() = 0;
     virtual void closeCamera() = 0;
-    virtual void updateTextureVideo() = 0;
     virtual void updateTextureCamera() = 0;
     virtual bool setCameraTexturePreview(int texture) = 0;
-    virtual void setTextureId(GLuint tid) = 0;
-    
-    virtual GLuint getTextureId() = 0;
+   
 protected:
     static CameraManager* instanceCamera;
 

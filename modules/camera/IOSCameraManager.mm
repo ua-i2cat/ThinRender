@@ -36,22 +36,8 @@ IOSCameraManager::IOSCameraManager(){
     //CVPixelBufferCreate(NULL, 480, 640, kCVPixelFormatType_32BGRA, nil, &pixelBuffer);
 }
 
-
-void IOSCameraManager::shutdownTextureWindow(){
-  //  pixelBuffer = 0;
-}
-
-void IOSCameraManager::closeVideo(){
-    //pixelBuffer = 0;
-}
-
 void IOSCameraManager::closeCamera(){
     //pixelBuffer = 0;
-}
-
-void IOSCameraManager::updateTextureVideo(){
-    
-   // pixelBuffer = 0;
 }
 
 void IOSCameraManager::updateTextureCamera(){

@@ -21,27 +21,26 @@
  *  Author:         Antonio Quesada Frias <aquesada@quarkfly.com>
  */
 
+#ifndef ANDROID_CAMERA_MANAGER_H
+#define ANDROID_CAMERA_MANAGER_H
+
+#include "CameraManager.h"
+#include <android/native_window_jni.h>
 
 
-#ifndef MOTION_MANAGER_H
-#define MOTION_MANAGER_H
-
-#include "../../globalData/GlobalData.h"
-
-
-class MotionManager {
+class AndroidCameraManager: public CameraManager {
     
 public:
-    virtual ~MotionManager(){};
-    static MotionManager* getInstance();
+    AndroidCameraManager();
+    ~AndroidCameraManager();
     
-    virtual void initMotion() = 0;
-    virtual void shutDownMotion() = 0;
+    void closeCamera();
+    void updateTextureCamera();
+    bool setCameraTexturePreview(int texture);
     
-protected:
-
-    static MotionManager* instanceMotion;
-    
+private:
+    jmethodID methodUpdateCamera;
+    jmethodID stopCamera;
     
 };
 #endif

@@ -41,11 +41,11 @@
     //extern void initGPS();
     extern void shutdownTextureWindow();
     extern void closeVideo();
-    extern void closeCamera();
+    //extern void closeCamera();
     extern void updateTextureVideo();
-    extern void updateTextureCamera();
+    //extern void updateTextureCamera();
     extern ANativeWindow* getANativeWindow(int texture);
-    extern bool setCameraTexturePreview(int texture);
+    //extern bool setCameraTexturePreview(int texture);
 
    // extern double getLatitude();
    // extern double getLongitude();
@@ -61,20 +61,15 @@
     }
     #endif
 
-#else 
-
+#else
     void shutdownTextureWindow();
     void closeVideo();
-    void closeCamera();
     void updateTextureVideo();
-    void updateTextureCamera();
-    bool setCameraTexturePreview(int texture);
-
 #endif
     void initGPS();
     double getLatitude();
     double getLongitude();
-    void shutDownGPS();
-
-
+    void shutDownGPS();void updateTextureCamera();
+    bool setCameraTexturePreview(int texture);
+    void closeCamera();
 #endif

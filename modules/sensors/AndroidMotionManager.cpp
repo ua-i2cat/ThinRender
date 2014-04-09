@@ -21,27 +21,19 @@
  *  Author:         Antonio Quesada Frias <aquesada@quarkfly.com>
  */
 
+#include "AndroidMotionManager.h"
 
 
-#ifndef MOTION_MANAGER_H
-#define MOTION_MANAGER_H
+AndroidMotionManager::AndroidMotionManager(){
+}
 
-#include "../../globalData/GlobalData.h"
+AndroidMotionManager::~AndroidMotionManager(){
+}
 
+void AndroidMotionManager::initMotion(){
+   
+}
 
-class MotionManager {
+void AndroidMotionManager::shutDownMotion(){
     
-public:
-    virtual ~MotionManager(){};
-    static MotionManager* getInstance();
-    
-    virtual void initMotion() = 0;
-    virtual void shutDownMotion() = 0;
-    
-protected:
-
-    static MotionManager* instanceMotion;
-    
-    
-};
-#endif
+}

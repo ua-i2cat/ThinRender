@@ -26,8 +26,7 @@
 #import <AVFoundation/AVFoundation.h>
 #include <pthread.h>
 
-#import <OpenAl/al.h>
-#import <OpenAl/alc.h>
+
 #include <AudioToolbox/AudioToolbox.h>
 
 pthread_mutex_t mutex;

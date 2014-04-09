@@ -44,8 +44,7 @@ JNIEnv *env;
 jobject activityObj;
 ANativeWindow* _theNativeWindow;
 jmethodID methodUpdateVideo = 0;
-jmethodID methodUpdateCamera = 0;
-jmethodID stopCamera = 0;
+
 jmethodID stopVideo = 0;
 
 void shutdownTextureWindow(){
@@ -169,25 +168,17 @@ Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_setSurface(JNIEnv *env, 
 
 #else
 
-void shutdownTextureWindow(){CameraManager::getInstance()->shutdownTextureWindow();};
-void closeVideo(){CameraManager::getInstance()->closeVideo();};
-void closeCamera(){CameraManager::getInstance()->closeCamera();};
-void updateTextureVideo(){CameraManager::getInstance()->updateTextureVideo();};
-void updateTextureCamera(){CameraManager::getInstance()->updateTextureCamera();};
-bool setCameraTexturePreview(int texture){
-    
-  
-    
-    return CameraManager::getInstance()->setCameraTexturePreview(texture);};
+void shutdownTextureWindow(){/*CameraManager::getInstance()->shutdownTextureWindow();*/};
+void closeVideo(){/*CameraManager::getInstance()->closeVideo();*/};
+void updateTextureVideo(){/*CameraManager::getInstance()->updateTextureVideo();*/};
 
 #endif
 
 void initGPS(){LocationManager::getInstance()->initGPS();};
 double getLatitude(){return LocationManager::getInstance()->getLatitude();};
-double getLongitude(){
-	double lon = LocationManager::getInstance()->getLongitude();
-	logInf("Longitude -android = %f", lon);
-    return lon;
-};
-void shutDownGPS(){ LocationManager::getInstance()->shutDownGPS(); };
+double getLongitude(){return LocationManager::getInstance()->getLongitude();};
+void shutDownGPS(){ LocationManager::getInstance()->shutDownGPS();};
+void updateTextureCamera(){CameraManager::getInstance()->updateTextureCamera();};
+bool setCameraTexturePreview(int texture){return CameraManager::getInstance()->setCameraTexturePreview(texture);};
+void closeCamera(){CameraManager::getInstance()->closeCamera();};
 

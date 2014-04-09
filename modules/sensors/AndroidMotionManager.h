@@ -23,25 +23,21 @@
 
 
 
-#ifndef MOTION_MANAGER_H
-#define MOTION_MANAGER_H
+#ifndef ANDROID_MOTION_MANAGER_H
+#define ANDROID_MOTION_MANAGER_H
 
-#include "../../globalData/GlobalData.h"
+#include "MotionManager.h"
 
 
-class MotionManager {
+class AndroidMotionManager: public MotionManager {
     
 public:
-    virtual ~MotionManager(){};
-    static MotionManager* getInstance();
+    AndroidMotionManager();
+    ~AndroidMotionManager();
     
-    virtual void initMotion() = 0;
-    virtual void shutDownMotion() = 0;
+    void initMotion();
+    void shutDownMotion();
     
-protected:
 
-    static MotionManager* instanceMotion;
-    
-    
 };
 #endif
