@@ -67,20 +67,20 @@ void closeVideo(){
 	env->CallVoidMethod(activityObj, stopVideo);
 }
 
-void closeCamera(){
+/*void closeCamera(){
 	if(javaVM == 0)return;
 	logInf("closeCamera");
 	javaVM->AttachCurrentThread(&env, 0);
 	env->CallVoidMethod(activityObj, stopCamera);
-}
+}*/
 
 void updateTextureVideo(){
 	env->CallVoidMethod(activityObj, methodUpdateVideo);
 }
 
-void updateTextureCamera(){
+/*void updateTextureCamera(){
 	env->CallVoidMethod(activityObj, methodUpdateCamera);
-}
+}*/
 
 ANativeWindow* getANativeWindow(int texture) {
 	logInf("getANativeWindow START!");
@@ -111,7 +111,7 @@ ANativeWindow* getANativeWindow(int texture) {
 	return _theNativeWindow;
 }
 
-bool setCameraTexturePreview(int texture) {
+/*bool setCameraTexturePreview(int texture) {
 	logInf("setCameraTexturePreview");
 	if (javaVM == 0) {
 		logErr("TextureSurface::setCameraTexturePreview Error: javaVM is NULL");
@@ -136,7 +136,7 @@ bool setCameraTexturePreview(int texture) {
 	}
 	env->CallVoidMethod(activityObj, method, texture);
 	return true;
-}
+}*/
 
 JNIEXPORT void JNICALL
 Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_cacheJNIVars(JNIEnv *envParam, jobject jobj)
