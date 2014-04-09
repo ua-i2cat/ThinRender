@@ -1,6 +1,6 @@
 /*
  *  thin render - Mobile render engine based on OpenGL ES 2.0
- *  Copyright (C) 2013  Fundació i2CAT, Internet i Innovació digital a Catalunya
+ *  Copyright (C) 2013  FundaciÃ› i2CAT, Internet i InnovaciÃ› digital a Catalunya
  *
  *  This file is part of thin render.
  *
@@ -22,112 +22,59 @@
 
 #ifndef VIDEO_DECODER_H
 #define VIDEO_DECODER_H
-/*
-#include <OMXAL/OpenMAXAL.h>
-#include <OMXAL/OpenMAXAL_Android.h>
-#include <pthread.h>
-#include <android/native_window_jni.h>
-*/
 
-#include "../../GUI/Rect.h"
 
 #include <string>
+#include "../../globalData/GlobalData.h"
+#include "../../log/Log.h"
 
-// we're streaming MPEG-2 transport stream data, operate on transport stream block size
-#define MPEG2_TS_PACKET_SIZE 188
-// number of MPEG-2 transport stream blocks per buffer, an arbitrary number
-#define PACKETS_PER_BUFFER 10
-// number of required interfaces for the MediaPlayer creation
-#define NB_MAXAL_INTERFACES 3 // XAAndroidBufferQueueItf, XAStreamInformationItf and XAPlayItf
-// number of buffers in our buffer queue, an arbitrary number
-#define NB_BUFFERS 8
-// determines how much memory we're dedicating to memory caching
-#define BUFFER_SIZE (PACKETS_PER_BUFFER*MPEG2_TS_PACKET_SIZE)
-
-/**
- * VideoDecoder gives the integration of different platforms to decode via hardware
- * This class gives also the option to set source, play, stop, pause and release the video
- * the destructor will shut down the openmax engine
- */
 class VideoDecoder {
 public:
-	VideoDecoder(RectGUI* rect, std::string path);
-	~VideoDecoder();
+	static VideoDecoder* getInstance(RectGUI* rect, std::string path);
+	~VideoDecoder(){};
+    
+	virtual void setSource(std::string fileName) = 0;
+	virtual void releaseVideo() = 0;
+	virtual void play() = 0;
+	virtual void pause() = 0;
+	virtual void stop() = 0;
+	virtual void setMute(bool enable) = 0;
+	virtual bool getMute() = 0;
+	virtual bool isStopped() = 0;
+	virtual bool isPaused() = 0;
+	virtual bool isPlaying() = 0;
+    
 
-	void setSource(std::string fileName);
-	void releaseVideo();
-	void play();
-	void pause();
-	void stop();
-	void setMute(bool enable);
-	bool getMute();
-	bool isStopped();
-	bool isPaused();
-	bool isPlaying();
-
-	void maximize();
+    
+	virtual void setSplash(std::string texturePath) = 0;
+	virtual void setSplash() = 0;
+    
+    
+    void maximize();
 	void restore();
 	void updateTexture();
+    
+    void setEnded();
+    bool isEnded();
 
-	void setSplash(std::string texturePath);
-	void setSplash();
 
-	void setEnded();
-	bool isEnded();
-private:
-    /*
-	static RectGUI* textureRect;
-	static GLuint textureID;
+protected:
+    static VideoDecoder* videoInstance;
+    
+    RectGUI* textureRect;
+    GLuint textureID;
+    
+    float originalWidth;
+	float originalHeight;
+	float originalTop;
+	float originalLeft;
+    
+    std::string sourcePath;
+    
+    bool ended;
 
-	static float originalWidth;
-	static float originalHeight;
-	static float originalTop;
-	static float originalLeft;
+    
 
-	static std::string sourcePath;
-	static XAObjectItf engineObject;
-	static XAEngineItf engineEngine;
-
-	static XAObjectItf outputMixObject;
-
-	static XAObjectItf playerObj;
-	static XAPlayItf playerPlayItf;
-	static XAAndroidBufferQueueItf playerBQItf;
-	static XAStreamInformationItf playerStreamInfoItf;
-	static XAVolumeItf playerVolItf;
-
-	static ANativeWindow* theNativeWindow;
-
-	static char dataCache[BUFFER_SIZE * NB_BUFFERS];
-
-	// where we cache in memory the data to play
-	// note this memory is re-used by the buffer queue callback
-	static FILE *file;
-	// constant to identify a buffer context which is the end of the stream to decode
-	static const int kEosBufferCntxt = 1980; // a magic value we can compare against
-
-	static pthread_mutex_t mutex;
-	static pthread_cond_t cond;
-
-	static bool discontinuity;
-	static bool reachedEof;
-
-	static XAresult AndroidBufferQueueCallback(
-			XAAndroidBufferQueueItf caller, void *pCallbackContext, void *pBufferContext, void *pBufferData,
-			XAuint32 dataSize, XAuint32 dataUsed, const XAAndroidBufferItem *pItems, XAuint32 itemsLength
-		);
-	static void StreamChangeCallback(
-			XAStreamInformationItf caller, XAuint32 eventId, XAuint32 streamIndex,
-			void * pEventData, void * pContext
-		);
-	static bool enqueueInitialBuffers(bool discontinuity);
-	static bool createStreamingMediaPlayer();
-	void setPlayingStreamingMediaPlayer();
-
-	bool ended;
-
-	void endCallback(XAPlayItf caller, void* context, XAuint32 playevent);
-     */
 };
 
 #endif
