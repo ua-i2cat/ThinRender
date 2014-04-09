@@ -50,12 +50,12 @@ jmethodID stopVideo = 0;
 void shutdownTextureWindow(){
 	if(javaVM == 0)return;
 	javaVM->AttachCurrentThread(&env, 0);
-	if(stopCamera != 0){
-		env->CallVoidMethod(activityObj, stopCamera);
-	}
-	if(stopVideo != 0){
-		env->CallVoidMethod(activityObj, stopVideo);
-	}
+	//if(stopCamera != 0){
+	//	env->CallVoidMethod(activityObj, stopCamera);
+	//}
+	//if(stopVideo != 0){
+	//	env->CallVoidMethod(activityObj, stopVideo);
+	//}
 	javaVM->DetachCurrentThread();
 	javaVM = 0;
 }
