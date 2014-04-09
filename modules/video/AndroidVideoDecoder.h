@@ -106,7 +106,7 @@ private:
                                      void * pEventData, void * pContext
                                      );
 	static bool enqueueInitialBuffers(bool discontinuity);
-	static bool createStreamingMediaPlayer();
+	bool createStreamingMediaPlayer();
 	void setPlayingStreamingMediaPlayer();
     
     

@@ -65,15 +65,6 @@ extern "C" {
 char AndroidVideoDecoder::dataCache[BUFFER_SIZE * NB_BUFFERS];
 const int AndroidVideoDecoder::kEosBufferCntxt;
 
-std::string AndroidVideoDecoder::sourcePath;
-RectGUI* AndroidVideoDecoder::textureRect;
-GLuint AndroidVideoDecoder::textureID;
-
-float AndroidVideoDecoder::originalWidth;
-float AndroidVideoDecoder::originalHeight;
-float AndroidVideoDecoder::originalLeft;
-float AndroidVideoDecoder::originalTop;
-
 // engine interfaces
 XAObjectItf AndroidVideoDecoder::engineObject = NULL;
 XAEngineItf AndroidVideoDecoder::engineEngine = NULL;
@@ -585,6 +576,9 @@ bool AndroidVideoDecoder::isPlaying(){
 	return (state == XA_PLAYSTATE_PLAYING);
 }
 
+
+void AndroidVideoDecoder::setSource(std::string fileName){}
+void AndroidVideoDecoder::releaseVideo(){}
 
 void AndroidVideoDecoder::setSplash(std::string texturePath){}
 void AndroidVideoDecoder::setSplash(){}
