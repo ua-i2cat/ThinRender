@@ -111,6 +111,12 @@ CMSampleBufferRef lastSampleBufferRef = NULL;
         }
         pthread_mutex_unlock(&mutex);
     }
+
+
+
+
+
+
 void audioCallback(void *                  inUserData,
                    AudioQueueRef           inAQ,
                    AudioQueueBufferRef     inCompleteAQBuffer) {

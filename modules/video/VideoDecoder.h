@@ -48,11 +48,11 @@ public:
     
 	virtual void setSplash(std::string texturePath) = 0;
 	virtual void setSplash() = 0;
-    
-    
+    virtual void updateTexture() = 0;
+
+
     void maximize();
 	void restore();
-	void updateTexture();
     
     void setEnded();
     bool isEnded();

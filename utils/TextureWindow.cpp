@@ -25,6 +25,7 @@
 //TODO: Quarkfly Refactor
 #include "../modules/sensors/LocationManager.h"
 #include "../modules/camera/CameraManager.h"
+#include "../modules/video/VideoDecoder.h"
 
 
 
@@ -168,9 +169,9 @@ Java_net_i2cat_modernismemnactec_TextureSurfaceActivity_setSurface(JNIEnv *env, 
 
 #else
 
-void shutdownTextureWindow(){/*CameraManager::getInstance()->shutdownTextureWindow();*/};
-void closeVideo(){/*CameraManager::getInstance()->closeVideo();*/};
-void updateTextureVideo(){/*CameraManager::getInstance()->updateTextureVideo();*/};
+void shutdownTextureWindow(){/*VideoDecoder::getInstance()->shutdownTextureWindow();*/};
+void closeVideo(){/*VideoDecoder::getInstance()->closeVideo();*/};
+void updateTextureVideo(){/*VideoDecoder::getInstance()->updateTexture();*/};
 
 #endif
 

@@ -66,6 +66,8 @@ public:
     
 	void setSplash(std::string texturePath);
 	void setSplash();
+    void updateTexture();
+
     
 private:
 

@@ -24,7 +24,10 @@
 #define IOS_VIDEO_DECODER_H
 
 #include "VideoDecoder.h"
+#import <AVFoundation/AVFoundation.h>
 
+
+@class IOSVideoDecoderDelegate;
 
 class IOSVideoDecoder:public VideoDecoder {
 public:
@@ -41,12 +44,23 @@ public:
 	bool isStopped();
 	bool isPaused();
 	bool isPlaying();
+    void updateTexture();
+
     
 	void setSplash(std::string texturePath);
 	void setSplash();
     
 private:
+    IOSVideoDecoderDelegate *videoDecoderObject;
 
 };
 
+@interface IOSVideoDecoderDelegate : NSObject
+
+- (id) init:(IOSVideoDecoder *) vm withURL: (NSURL *) url withTextureId:(GLuint)texture;
+- (void) startVideo;
+- (void) stopVideo;
+- (void) readNextMovieFrame;
+
+@end
 #endif

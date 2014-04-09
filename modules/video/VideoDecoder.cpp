@@ -41,9 +41,6 @@ bool VideoDecoder::isEnded(){
 	return ended;
 }
 
-void VideoDecoder::updateTexture(){
-	updateTextureVideo();
-}
 
 
 void VideoDecoder::maximize(){

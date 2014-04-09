@@ -576,6 +576,11 @@ bool AndroidVideoDecoder::isPlaying(){
 	return (state == XA_PLAYSTATE_PLAYING);
 }
 
+void AndroidVideoDecoder::updateTexture(){
+	updateTextureVideo();
+}
+
+
 
 void AndroidVideoDecoder::setSource(std::string fileName){}
 void AndroidVideoDecoder::releaseVideo(){}
