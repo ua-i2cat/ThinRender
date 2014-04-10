@@ -61,6 +61,8 @@ private:
 - (void) startVideo;
 - (void) stopVideo;
 - (void) readNextMovieFrame;
+- (void) readAudio;
+- (void) startPlaying;
 
 @end
 #endif

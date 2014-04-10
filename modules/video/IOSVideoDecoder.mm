@@ -13,10 +13,13 @@
 enum{PAUSED=0, STOPPED, PLAYING};
 
 int videoState;
+bool muted;
 
 IOSVideoDecoder::IOSVideoDecoder(RectGUI* rect, std::string path){
     NSLog(@"IOSAudioPlayer constructor");
     ended = false;
+    muted = false;
+    
 	sourcePath = path;
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
@@ -54,6 +57,8 @@ void IOSVideoDecoder::updateTexture(){
     if (isPlaying())
     {
         [videoDecoderObject readNextMovieFrame];
+        
+        [videoDecoderObject readAudio];
     }
 }
 
@@ -68,6 +73,7 @@ void IOSVideoDecoder::setSource(std::string fileName){}
 void IOSVideoDecoder::releaseVideo(){}
 void IOSVideoDecoder::play(){
     videoState = PLAYING;
+    [videoDecoderObject startPlaying];
 }
 void IOSVideoDecoder::pause()
 {
@@ -80,8 +86,16 @@ void IOSVideoDecoder::stop()
     videoState = STOPPED;
 
 }
-void IOSVideoDecoder::setMute(bool enable){}
-bool IOSVideoDecoder::getMute(){return false;}
+
+void IOSVideoDecoder::setMute(bool enable)
+{
+    muted = enable;
+}
+
+bool IOSVideoDecoder::getMute()
+{
+    return muted;
+}
 
 bool IOSVideoDecoder::isStopped()
 {
@@ -101,6 +115,10 @@ bool IOSVideoDecoder::isPlaying()
 void IOSVideoDecoder::setSplash(std::string texturePath){}
 void IOSVideoDecoder::setSplash(){}
 void IOSVideoDecoder::setEnded(bool end){
+    if(end)
+    {
+        videoState = STOPPED;
+    }
     ended = end;
 }
 
@@ -108,7 +126,7 @@ void IOSVideoDecoder::setEnded(bool end){
 @implementation IOSVideoDecoderDelegate
 
 AVAssetReader * _movieReader;
-AVAssetReader * _audioReader;
+//AVAssetReader * _audioReader;
 
 GLuint textureID;
 IOSVideoDecoder *videoManager;
@@ -129,36 +147,57 @@ AudioQueueRef _playQueue = NULL;
          dispatch_async(dispatch_get_main_queue(),
                         ^{
                             AVAssetTrack * videoTrack = nil;
-                            BOOL p = [asset isPlayable];
-                            NSError *error;
-                            [asset statusOfValueForKey:@"tracks" error:&error];
+                            AVAssetTrack * audioTrack = nil;
                             
-                            //Check for video tracks
-                            NSArray * tracks = [asset tracksWithMediaType:AVMediaTypeVideo];
-                            if ([tracks count] == 1)
-                            {
-                                videoTrack = [tracks objectAtIndex:0];
+                            BOOL playable = [asset isPlayable];
+                            
+                            if (playable){
                                 
                                 NSError * error = nil;
                                 
                                 _movieReader = [[AVAssetReader alloc] initWithAsset:asset error:&error];
                                 
-                                NSString* key = (NSString*)kCVPixelBufferPixelFormatTypeKey;
-                                NSNumber* value = [NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA];
-                                NSDictionary* videoSettings = 
-                                [NSDictionary dictionaryWithObject:value forKey:key]; 
+                                [asset statusOfValueForKey:@"tracks" error:&error];
                                 
-                                [_movieReader addOutput:[AVAssetReaderTrackOutput 
-                                                         assetReaderTrackOutputWithTrack:videoTrack 
-                                                         outputSettings:videoSettings]];
+                                if (error != nil){
+                                    _movieReader = nil;
+                                    logInf("IOSVideoDecoder: Error loading tracks inside assetReader");
+                                }
+                                //Check for video tracks
+                                NSArray * tracks = [asset tracksWithMediaType:AVMediaTypeVideo];
+                                if ([tracks count] == 1)
+                                {
+                                    videoTrack = [tracks objectAtIndex:0];
+                             
+                                    
+                                    NSString* key = (NSString*)kCVPixelBufferPixelFormatTypeKey;
+                                    NSNumber* value = [NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA];
+                                    NSDictionary* videoSettings =
+                                    [NSDictionary dictionaryWithObject:value forKey:key];
+                                    
+                                    [_movieReader addOutput:[AVAssetReaderTrackOutput
+                                                             assetReaderTrackOutputWithTrack:videoTrack
+                                                             outputSettings:videoSettings]];
+                                    
+                                }
+                                // Check for audiotracks
+                                NSArray *audioTracks =[asset tracksWithMediaType:AVMediaTypeAudio];
+                                if ([audioTracks count] == 1)
+                                {
+                                    audioTrack = [audioTracks objectAtIndex:0];
+                                    
+                                    NSMutableDictionary* audioReadSettings = [NSMutableDictionary dictionary];
+                                    [audioReadSettings setValue:[NSNumber numberWithInt:kAudioFormatLinearPCM]
+                                                         forKey:AVFormatIDKey];
+                                    
+                                    [_movieReader addOutput:[AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:audioTrack outputSettings:audioReadSettings]];
+                                    
+                                }
+                                
+                                
                                 [_movieReader startReading];
-
                             }
-                            // Check for audiotracks
-                            NSArray *audioTracks =[asset tracksWithMediaType:AVMediaTypeAudio];
-                            if ([audioTracks count] == 1){
-                                
-                            }
+                            
                             vm->play();
                         });
          }];
@@ -175,6 +214,19 @@ AudioQueueRef _playQueue = NULL;
 - (void) stopVideo{
     [_movieReader cancelReading];
     videoManager->setEnded(true);
+}
+
+- (void) startPlaying{
+    if(_playQueue != NULL){
+        AudioQueueStart(_playQueue, audioTimeStamp);
+    }
+}
+
+AudioTimeStamp* audioTimeStamp;
+
+- (void) pauseVideo{
+    AudioQueueGetCurrentTime(_playQueue, timeLine, audioTimeStamp, NULL);
+    AudioQueuePause(_playQueue);
 }
 
 - (void) readNextMovieFrame
@@ -210,8 +262,11 @@ AudioQueueRef _playQueue = NULL;
             sampleBuffer = nil;
             // Unlock the image buffer
             CVPixelBufferUnlockBaseAddress(imageBuffer,0);
+            //Free video frame
             CVPixelBufferRelease(imageBuffer);
         }
+  
+        
     }
     
     else if (_movieReader.status == AVAssetReaderStatusCompleted) {
@@ -219,4 +274,126 @@ AudioQueueRef _playQueue = NULL;
         videoManager->setEnded(true);
     }
 }
+
+
+
+void audioCallback(void *                  inUserData,
+                   AudioQueueRef           inAQ,
+                   AudioQueueBufferRef     inCompleteAQBuffer)
+{
+
+    AVAssetReaderTrackOutput * audioOutput = [_movieReader.outputs objectAtIndex:1];
+    CMSampleBufferRef audioSampleBufferRef = [audioOutput copyNextSampleBuffer];
+    if (!audioSampleBufferRef){
+
+        logErr("read next audio frame output fail");
+        return;
+    }
+    
+    CMBlockBufferRef blockBufferRef= CMSampleBufferGetDataBuffer(audioSampleBufferRef);
+    
+    AudioBufferList audioBufferList;
+    
+    CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(audioSampleBufferRef, NULL, &audioBufferList, sizeof(audioBufferList), NULL, NULL, 0, &blockBufferRef);
+    
+    if(audioBufferList.mNumberBuffers == 0) logErr("====================== mNumberBuffers = 0");
+    
+    for( int i=0; i< audioBufferList.mNumberBuffers; i++ ){
+        if (audioBufferList.mBuffers[i].mData && inCompleteAQBuffer->mAudioData) {
+            memcpy(inCompleteAQBuffer->mAudioData, audioBufferList.mBuffers[i].mData, audioBufferList.mBuffers[i].mDataByteSize);
+            inCompleteAQBuffer->mAudioDataByteSize = audioBufferList.mBuffers[i].mDataByteSize;
+            AudioQueueEnqueueBuffer(_playQueue, inCompleteAQBuffer, 0, NULL);
+        }else{
+            CMSampleBufferInvalidate(audioSampleBufferRef);
+            //CFRelease(audioSampleBufferRef);
+
+            return;
+        }
+    }
+    //CFRelease(blockBufferRef);
+    CMSampleBufferInvalidate(audioSampleBufferRef);
+    //CFRelease(audioSampleBufferRef);
+
+    return;
+}
+
+
+int counterAudioSamples = 0;
+
+-(void) readAudio
+{
+    if(counterAudioSamples >= maxBuffers) return;
+
+    AVAssetReaderTrackOutput * audioOutput = [_movieReader.outputs objectAtIndex:1];
+    CMSampleBufferRef sampleBuffer = [audioOutput copyNextSampleBuffer];
+    if (sampleBuffer!=NULL)
+    {
+        CMBlockBufferRef blockBuffer;
+        AudioBufferList audioBufferList;
+
+        //Read the audio from the asset
+        blockBuffer = CMSampleBufferGetDataBuffer( sampleBuffer );
+        
+        CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer( sampleBuffer,
+                                                                NULL,
+                                                                &audioBufferList,
+                                                                sizeof(audioBufferList),
+                                                                NULL,
+                                                                NULL,
+                                                                0,
+                                                                &blockBuffer);
+        
+        AudioStreamBasicDescription inAudioStreamBasicDescription = *CMAudioFormatDescriptionGetStreamBasicDescription((CMAudioFormatDescriptionRef)CMSampleBufferGetFormatDescription(sampleBuffer));
+        
+        OSStatus status;
+        if(_playQueue == NULL){
+            status = AudioQueueNewOutput(&inAudioStreamBasicDescription, audioCallback, NULL, NULL, NULL, 0, &_playQueue);
+            if(status != 0) logInf("--------------------AudioQueueNewOutput OSStatus error %i", (int) status);
+            
+            status = AudioQueuePrime(_playQueue, 0, NULL);
+            if(status != 0) logInf("--------------------AudioQueuePrime OSStatus error %i", (int) status);
+            
+            status = AudioQueueCreateTimeline(_playQueue, &timeLine);
+            if(status != 0) logInf("--------------------AudioQueuePrime OSStatus error %i", (int) status);
+        }
+        
+        
+        
+       // NSLog( @"mNumberBuffers: %lu", audioBufferList.mNumberBuffers );
+       // NSLog( @"mNumberChannels: %lu", audioBufferList.mBuffers[ 0 ].mNumberChannels  );
+       // NSLog( @"mDataByteSize: %lu", audioBufferList.mBuffers[ 0 ].mDataByteSize );
+        //SInt16* samples = (SInt16 *) audioBufferList.mBuffers[ 0 ].mData;
+        
+        
+        for( int y=0; y< audioBufferList.mNumberBuffers; y++ ){
+            
+            AudioBuffer audioBuffer = audioBufferList.mBuffers[y];
+            status = AudioQueueAllocateBuffer(_playQueue, audioBuffer.mDataByteSize, &audioQueueBuffer[counterAudioSamples]);
+            
+            if (status == 0 && audioQueueBuffer[counterAudioSamples]->mAudioData) {
+                memcpy(audioQueueBuffer[counterAudioSamples]->mAudioData, audioBuffer.mData, audioBuffer.mDataByteSize);
+                audioQueueBuffer[counterAudioSamples]->mAudioDataByteSize = audioBuffer.mDataByteSize;
+            }else{
+                logInf("--------------------OSStatus error %i", (int) status);
+            }
+            
+        }
+        counterAudioSamples++;
+
+        if(counterAudioSamples == maxBuffers){
+
+        status = AudioQueueStart(_playQueue, NULL);
+        if(status != 0) logInf("--------------------AudioQueueStart OSStatus error %i", (int) status);
+        for(int n = 0; n < maxBuffers; n++){
+            AudioTimeStamp bufferStartTime;
+            AudioQueueGetCurrentTime(_playQueue, NULL, &bufferStartTime, NULL);
+            
+            status = AudioQueueEnqueueBuffer(_playQueue, audioQueueBuffer[n], 0, NULL);
+            if(status != 0) logInf("--------------------AudioQueueEnqueueBuffer OSStatus error %i", (int) status);
+        }
+        }
+    }
+    
+}
+
 @end
