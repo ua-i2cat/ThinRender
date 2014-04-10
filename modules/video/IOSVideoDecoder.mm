@@ -10,6 +10,10 @@
 #include "../../shader/gui/VideoPlaneShader.h"
 #import <AudioToolbox/AudioToolbox.h>
 
+enum{PAUSED=0, STOPPED, PLAYING};
+
+int videoState;
+
 IOSVideoDecoder::IOSVideoDecoder(RectGUI* rect, std::string path){
     NSLog(@"IOSAudioPlayer constructor");
     ended = false;
@@ -47,25 +51,52 @@ IOSVideoDecoder::IOSVideoDecoder(RectGUI* rect, std::string path){
 }
 
 void IOSVideoDecoder::updateTexture(){
-    [videoDecoderObject readNextMovieFrame];
+    if (isPlaying())
+    {
+        [videoDecoderObject readNextMovieFrame];
+    }
 }
 
-IOSVideoDecoder::~IOSVideoDecoder(){instanceVideo = NULL;videoDecoderObject = NULL;};
+IOSVideoDecoder::~IOSVideoDecoder()
+{
+    glDeleteTextures(1, &textureID);
+    instanceVideo = NULL;
+    videoDecoderObject = NULL;
+}
 
 void IOSVideoDecoder::setSource(std::string fileName){}
 void IOSVideoDecoder::releaseVideo(){}
 void IOSVideoDecoder::play(){
-    [videoDecoderObject startVideo];
+    videoState = PLAYING;
 }
-void IOSVideoDecoder::pause(){}
-void IOSVideoDecoder::stop(){
+void IOSVideoDecoder::pause()
+{
+   videoState = PAUSED;
+}
+
+void IOSVideoDecoder::stop()
+{
     [videoDecoderObject stopVideo];
+    videoState = STOPPED;
+
 }
 void IOSVideoDecoder::setMute(bool enable){}
 bool IOSVideoDecoder::getMute(){return false;}
-bool IOSVideoDecoder::isStopped(){return false;}
-bool IOSVideoDecoder::isPaused(){return false;}
-bool IOSVideoDecoder::isPlaying(){return true;}
+
+bool IOSVideoDecoder::isStopped()
+{
+    return videoState == STOPPED;
+}
+
+bool IOSVideoDecoder::isPaused()
+{
+    return videoState == PAUSED;
+}
+
+bool IOSVideoDecoder::isPlaying()
+{
+    return videoState == PLAYING;
+}
 
 void IOSVideoDecoder::setSplash(std::string texturePath){}
 void IOSVideoDecoder::setSplash(){}
@@ -128,6 +159,7 @@ AudioQueueRef _playQueue = NULL;
                             if ([audioTracks count] == 1){
                                 
                             }
+                            vm->play();
                         });
          }];
         videoManager = vm;
@@ -141,6 +173,8 @@ AudioQueueRef _playQueue = NULL;
 }
 
 - (void) stopVideo{
+    [_movieReader cancelReading];
+    videoManager->setEnded(true);
 }
 
 - (void) readNextMovieFrame
@@ -157,8 +191,6 @@ AudioQueueRef _playQueue = NULL;
             CVPixelBufferLockBaseAddress(imageBuffer,0);
             
             // Get information of the image
-            //uint8_t *baseAddress = (uint8_t *)CVPixelBufferGetBaseAddress(imageBuffer);
-            //size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
             size_t width = CVPixelBufferGetWidth(imageBuffer);
             size_t height = CVPixelBufferGetHeight(imageBuffer);
             
@@ -173,10 +205,12 @@ AudioQueueRef _playQueue = NULL;
             // Using BGRA extension to pull in video frame data directly
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(imageBuffer));
             
-            
+            CMSampleBufferInvalidate(sampleBuffer);
 
+            sampleBuffer = nil;
             // Unlock the image buffer
             CVPixelBufferUnlockBaseAddress(imageBuffer,0);
+            CVPixelBufferRelease(imageBuffer);
         }
     }
     
