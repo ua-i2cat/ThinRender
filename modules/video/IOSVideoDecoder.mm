@@ -8,6 +8,7 @@
 
 #include "IOSVideoDecoder.h"
 #include "../../shader/gui/VideoPlaneShader.h"
+#import <AudioToolbox/AudioToolbox.h>
 
 IOSVideoDecoder::IOSVideoDecoder(RectGUI* rect, std::string path){
     NSLog(@"IOSAudioPlayer constructor");
@@ -32,6 +33,7 @@ IOSVideoDecoder::IOSVideoDecoder(RectGUI* rect, std::string path){
 	rect->setTexture(TextureManager::getInstance()->getTexture("blueSquare.png"));
 	rect->setTexture(textureID);
     
+    path = "multimedia/9.mp4";
     
     string filename = GlobalData::getInstance()->iOSPath+"/assets/"+path;
     NSString *videopath = [NSString stringWithCString:filename.c_str()
@@ -42,7 +44,6 @@ IOSVideoDecoder::IOSVideoDecoder(RectGUI* rect, std::string path){
    // BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:videopath];
     
     videoDecoderObject = [[IOSVideoDecoderDelegate alloc] init:this withURL:url withTextureId: textureID];
-    
 }
 
 void IOSVideoDecoder::updateTexture(){
@@ -68,21 +69,40 @@ bool IOSVideoDecoder::isPlaying(){return true;}
 
 void IOSVideoDecoder::setSplash(std::string texturePath){}
 void IOSVideoDecoder::setSplash(){}
+void IOSVideoDecoder::setEnded(bool end){
+    ended = end;
+}
+
 
 @implementation IOSVideoDecoderDelegate
 
-AVAssetReader* _movieReader;
+AVAssetReader * _movieReader;
+AVAssetReader * _audioReader;
+
 GLuint textureID;
+IOSVideoDecoder *videoManager;
+int maxBuffers = 3;
+AudioQueueBufferRef audioQueueBuffer[3];
+int audioBuffer = 0;
+AudioQueueTimelineRef timeLine;
+AudioQueueRef _playQueue = NULL;
+
 
 - (id) init:(IOSVideoDecoder *) vm withURL: (NSURL *) url withTextureId:(GLuint)texture{
     if ((self = [super init])) {
         textureID = texture;
         AVURLAsset * asset = [AVURLAsset URLAssetWithURL:url options:nil];
+        
         [asset loadValuesAsynchronouslyForKeys:[NSArray arrayWithObject:@"tracks"] completionHandler:
          ^{
          dispatch_async(dispatch_get_main_queue(),
                         ^{
                             AVAssetTrack * videoTrack = nil;
+                            BOOL p = [asset isPlayable];
+                            NSError *error;
+                            [asset statusOfValueForKey:@"tracks" error:&error];
+                            
+                            //Check for video tracks
                             NSArray * tracks = [asset tracksWithMediaType:AVMediaTypeVideo];
                             if ([tracks count] == 1)
                             {
@@ -90,10 +110,7 @@ GLuint textureID;
                                 
                                 NSError * error = nil;
                                 
-                                // _movieReader is a member variable
                                 _movieReader = [[AVAssetReader alloc] initWithAsset:asset error:&error];
-                                /*if (error)
-                                    NSLog(error.localizedDescription);*/
                                 
                                 NSString* key = (NSString*)kCVPixelBufferPixelFormatTypeKey;
                                 NSNumber* value = [NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA];
@@ -103,9 +120,17 @@ GLuint textureID;
                                 [_movieReader addOutput:[AVAssetReaderTrackOutput 
                                                          assetReaderTrackOutputWithTrack:videoTrack 
                                                          outputSettings:videoSettings]];
+                                [_movieReader startReading];
+
+                            }
+                            // Check for audiotracks
+                            NSArray *audioTracks =[asset tracksWithMediaType:AVMediaTypeAudio];
+                            if ([audioTracks count] == 1){
+                                
                             }
                         });
          }];
+        videoManager = vm;
     }
     
     return self;
@@ -120,7 +145,7 @@ GLuint textureID;
 
 - (void) readNextMovieFrame
 {
-    if (_movieReader.status == AVAssetReaderStatusReading)
+   if (_movieReader.status == AVAssetReaderStatusReading)
     {
         AVAssetReaderTrackOutput * output = [_movieReader.outputs objectAtIndex:0];
         CMSampleBufferRef sampleBuffer = [output copyNextSampleBuffer];
@@ -148,12 +173,16 @@ GLuint textureID;
             // Using BGRA extension to pull in video frame data directly
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(imageBuffer));
             
+            
 
             // Unlock the image buffer
             CVPixelBufferUnlockBaseAddress(imageBuffer,0);
-            CFRelease(sampleBuffer);
         }
     }
+    
+    else if (_movieReader.status == AVAssetReaderStatusCompleted) {
+        [_movieReader cancelReading];
+        videoManager->setEnded(true);
+    }
 }
-
 @end

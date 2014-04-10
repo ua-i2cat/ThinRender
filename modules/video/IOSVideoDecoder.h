@@ -49,7 +49,7 @@ public:
     
 	void setSplash(std::string texturePath);
 	void setSplash();
-    
+    void setEnded(bool end);
 private:
     IOSVideoDecoderDelegate *videoDecoderObject;
 

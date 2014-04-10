@@ -32,7 +32,7 @@ CameraPreviewPlaneShader::CameraPreviewPlaneShader(){
     #ifdef ANDROID_PLATFORM
 	loadShader("CameraPreviewPlaneShader");
 #else
-    loadShader("VideoIOSShader");
+    loadShader("CameraIOSShader");
 #endif
     color = glm::vec4(1.0f,1.0f,1.0f,1.0f);
 }
