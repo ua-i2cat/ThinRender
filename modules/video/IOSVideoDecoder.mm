@@ -9,6 +9,7 @@
 #include "IOSVideoDecoder.h"
 #include "../../shader/gui/VideoPlaneShader.h"
 #import <AudioToolbox/AudioToolbox.h>
+#include <pthread.h>
 
 enum{PAUSED=0, STOPPED, PLAYING};
 
@@ -72,11 +73,12 @@ IOSVideoDecoder::~IOSVideoDecoder()
 void IOSVideoDecoder::setSource(std::string fileName){}
 void IOSVideoDecoder::releaseVideo(){}
 void IOSVideoDecoder::play(){
-    videoState = PLAYING;
     [videoDecoderObject startPlaying];
+    videoState = PLAYING;
 }
 void IOSVideoDecoder::pause()
 {
+  [videoDecoderObject pauseVideo];
    videoState = PAUSED;
 }
 
@@ -133,12 +135,19 @@ IOSVideoDecoder *videoManager;
 int maxBuffers = 3;
 AudioQueueBufferRef audioQueueBuffer[3];
 int audioBuffer = 0;
+AudioTimeStamp* audioTimeStamp;
 AudioQueueTimelineRef timeLine;
 AudioQueueRef _playQueue = NULL;
+
+static int counterAudioSamples = 0;
+AudioStreamBasicDescription inAudioStreamBasicDescription;
+static BOOL fullBuffer = false;
+
 
 
 - (id) init:(IOSVideoDecoder *) vm withURL: (NSURL *) url withTextureId:(GLuint)texture{
     if ((self = [super init])) {
+
         textureID = texture;
         AVURLAsset * asset = [AVURLAsset URLAssetWithURL:url options:nil];
         
@@ -202,6 +211,10 @@ AudioQueueRef _playQueue = NULL;
                         });
          }];
         videoManager = vm;
+        _playQueue = NULL;
+        counterAudioSamples = 0;
+        fullBuffer = false;
+
     }
     
     return self;
@@ -213,6 +226,11 @@ AudioQueueRef _playQueue = NULL;
 
 - (void) stopVideo{
     [_movieReader cancelReading];
+    AudioQueueStop(_playQueue, YES);
+    //TODO: Perform buffer free
+    AudioQueueDispose(_playQueue, YES);
+    _playQueue = NULL;
+    counterAudioSamples = 0;
     videoManager->setEnded(true);
 }
 
@@ -222,7 +240,6 @@ AudioQueueRef _playQueue = NULL;
     }
 }
 
-AudioTimeStamp* audioTimeStamp;
 
 - (void) pauseVideo{
     AudioQueueGetCurrentTime(_playQueue, timeLine, audioTimeStamp, NULL);
@@ -270,23 +287,21 @@ AudioTimeStamp* audioTimeStamp;
     }
     
     else if (_movieReader.status == AVAssetReaderStatusCompleted) {
-        [_movieReader cancelReading];
-        videoManager->setEnded(true);
+        [self stopVideo];
     }
 }
-
 
 
 void audioCallback(void *                  inUserData,
                    AudioQueueRef           inAQ,
                    AudioQueueBufferRef     inCompleteAQBuffer)
 {
-
     AVAssetReaderTrackOutput * audioOutput = [_movieReader.outputs objectAtIndex:1];
     CMSampleBufferRef audioSampleBufferRef = [audioOutput copyNextSampleBuffer];
     if (!audioSampleBufferRef){
 
         logErr("read next audio frame output fail");
+
         return;
     }
     
@@ -294,106 +309,129 @@ void audioCallback(void *                  inUserData,
     
     AudioBufferList audioBufferList;
     
-    CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(audioSampleBufferRef, NULL, &audioBufferList, sizeof(audioBufferList), NULL, NULL, 0, &blockBufferRef);
+    CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(audioSampleBufferRef,
+                                                            NULL,
+                                                            &audioBufferList,
+                                                            sizeof(audioBufferList),
+                                                            NULL,
+                                                            NULL,
+                                                            0,
+                                                            &blockBufferRef);
     
     if(audioBufferList.mNumberBuffers == 0) logErr("====================== mNumberBuffers = 0");
-    
+    OSStatus status;
     for( int i=0; i< audioBufferList.mNumberBuffers; i++ ){
         if (audioBufferList.mBuffers[i].mData && inCompleteAQBuffer->mAudioData) {
-            memcpy(inCompleteAQBuffer->mAudioData, audioBufferList.mBuffers[i].mData, audioBufferList.mBuffers[i].mDataByteSize);
-            inCompleteAQBuffer->mAudioDataByteSize = audioBufferList.mBuffers[i].mDataByteSize;
-            AudioQueueEnqueueBuffer(_playQueue, inCompleteAQBuffer, 0, NULL);
-        }else{
-            CMSampleBufferInvalidate(audioSampleBufferRef);
-            //CFRelease(audioSampleBufferRef);
+            
+            //Buffer size are variable so this free is to be safe
+            AudioQueueFreeBuffer(_playQueue, inCompleteAQBuffer);
+            AudioBuffer audioBuffer = audioBufferList.mBuffers[i];
 
-            return;
+            status = AudioQueueAllocateBuffer(_playQueue, audioBuffer.mDataByteSize, &audioQueueBuffer[counterAudioSamples]);
+            if (status == 0 && audioQueueBuffer[counterAudioSamples]->mAudioData) {
+                memcpy(audioQueueBuffer[counterAudioSamples]->mAudioData, audioBuffer.mData, audioBuffer.mDataByteSize);
+                audioQueueBuffer[counterAudioSamples]->mAudioDataByteSize = audioBuffer.mDataByteSize;
+                AudioQueueEnqueueBuffer(_playQueue, audioQueueBuffer[counterAudioSamples], 0, NULL);
+
+                counterAudioSamples = (counterAudioSamples +1)%maxBuffers;
+            }
+
+        }
+        else{
+            break;
         }
     }
-    //CFRelease(blockBufferRef);
     CMSampleBufferInvalidate(audioSampleBufferRef);
-    //CFRelease(audioSampleBufferRef);
 
     return;
 }
 
 
-int counterAudioSamples = 0;
+
 
 -(void) readAudio
 {
-    if(counterAudioSamples >= maxBuffers) return;
-
-    AVAssetReaderTrackOutput * audioOutput = [_movieReader.outputs objectAtIndex:1];
-    CMSampleBufferRef sampleBuffer = [audioOutput copyNextSampleBuffer];
-    if (sampleBuffer!=NULL)
-    {
-        CMBlockBufferRef blockBuffer;
-        AudioBufferList audioBufferList;
-
-        //Read the audio from the asset
-        blockBuffer = CMSampleBufferGetDataBuffer( sampleBuffer );
-        
-        CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer( sampleBuffer,
-                                                                NULL,
-                                                                &audioBufferList,
-                                                                sizeof(audioBufferList),
-                                                                NULL,
-                                                                NULL,
-                                                                0,
-                                                                &blockBuffer);
-        
-        AudioStreamBasicDescription inAudioStreamBasicDescription = *CMAudioFormatDescriptionGetStreamBasicDescription((CMAudioFormatDescriptionRef)CMSampleBufferGetFormatDescription(sampleBuffer));
-        
-        OSStatus status;
-        if(_playQueue == NULL){
-            status = AudioQueueNewOutput(&inAudioStreamBasicDescription, audioCallback, NULL, NULL, NULL, 0, &_playQueue);
-            if(status != 0) logInf("--------------------AudioQueueNewOutput OSStatus error %i", (int) status);
+    if(!fullBuffer){
+        AVAssetReaderTrackOutput * audioOutput = [_movieReader.outputs objectAtIndex:1];
+        CMSampleBufferRef sampleBuffer = [audioOutput copyNextSampleBuffer];
+        if (sampleBuffer!= NULL )
+        {
+            CMBlockBufferRef blockBuffer;
+            AudioBufferList audioBufferList;
             
-            status = AudioQueuePrime(_playQueue, 0, NULL);
-            if(status != 0) logInf("--------------------AudioQueuePrime OSStatus error %i", (int) status);
+            //Read the audio from the asset
+            blockBuffer = CMSampleBufferGetDataBuffer( sampleBuffer );
             
-            status = AudioQueueCreateTimeline(_playQueue, &timeLine);
-            if(status != 0) logInf("--------------------AudioQueuePrime OSStatus error %i", (int) status);
-        }
-        
-        
-        
-       // NSLog( @"mNumberBuffers: %lu", audioBufferList.mNumberBuffers );
-       // NSLog( @"mNumberChannels: %lu", audioBufferList.mBuffers[ 0 ].mNumberChannels  );
-       // NSLog( @"mDataByteSize: %lu", audioBufferList.mBuffers[ 0 ].mDataByteSize );
-        //SInt16* samples = (SInt16 *) audioBufferList.mBuffers[ 0 ].mData;
-        
-        
-        for( int y=0; y< audioBufferList.mNumberBuffers; y++ ){
+            CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer( sampleBuffer,
+                                                                    NULL,
+                                                                    &audioBufferList,
+                                                                    sizeof(audioBufferList),
+                                                                    NULL,
+                                                                    NULL,
+                                                                    0,
+                                                                    &blockBuffer);
             
-            AudioBuffer audioBuffer = audioBufferList.mBuffers[y];
-            status = AudioQueueAllocateBuffer(_playQueue, audioBuffer.mDataByteSize, &audioQueueBuffer[counterAudioSamples]);
             
-            if (status == 0 && audioQueueBuffer[counterAudioSamples]->mAudioData) {
-                memcpy(audioQueueBuffer[counterAudioSamples]->mAudioData, audioBuffer.mData, audioBuffer.mDataByteSize);
-                audioQueueBuffer[counterAudioSamples]->mAudioDataByteSize = audioBuffer.mDataByteSize;
-            }else{
-                logInf("--------------------OSStatus error %i", (int) status);
+            
+            OSStatus status;
+            if(_playQueue == NULL){
+                
+                AudioStreamBasicDescription inAudioStreamBasicDescription = *CMAudioFormatDescriptionGetStreamBasicDescription((CMAudioFormatDescriptionRef)CMSampleBufferGetFormatDescription(sampleBuffer));
+                status = AudioQueueNewOutput(&inAudioStreamBasicDescription, audioCallback, NULL, NULL, NULL, 0, &_playQueue);
+                if(status != 0) logInf("--------------------AudioQueueNewOutput OSStatus error %i", (int) status);
+                
+                status = AudioQueuePrime(_playQueue, 0, NULL);
+                if(status != 0) logInf("--------------------AudioQueuePrime OSStatus error %i", (int) status);
+                
+                status = AudioQueueCreateTimeline(_playQueue, &timeLine);
+                if(status != 0) logInf("--------------------AudioQueuePrime OSStatus error %i", (int) status);
             }
             
-        }
-        counterAudioSamples++;
-
-        if(counterAudioSamples == maxBuffers){
-
-        status = AudioQueueStart(_playQueue, NULL);
-        if(status != 0) logInf("--------------------AudioQueueStart OSStatus error %i", (int) status);
-        for(int n = 0; n < maxBuffers; n++){
-            AudioTimeStamp bufferStartTime;
-            AudioQueueGetCurrentTime(_playQueue, NULL, &bufferStartTime, NULL);
             
-            status = AudioQueueEnqueueBuffer(_playQueue, audioQueueBuffer[n], 0, NULL);
-            if(status != 0) logInf("--------------------AudioQueueEnqueueBuffer OSStatus error %i", (int) status);
+            [self fillAudioBufferList: &audioBufferList queue:audioQueueBuffer];
+            
+            
+            //Buffers full now we are going to start the sound and continue reading from the asset in the callback
+            if(counterAudioSamples == maxBuffers){
+                status = AudioQueueStart(_playQueue, NULL);
+                if(status != 0) logInf("--------------------AudioQueueStart OSStatus error %i", (int) status);
+                for(int n = 0; n < maxBuffers; n++){
+                    AudioTimeStamp bufferStartTime;
+                    AudioQueueGetCurrentTime(_playQueue, NULL, &bufferStartTime, NULL);
+                    
+                    status = AudioQueueEnqueueBuffer(_playQueue, audioQueueBuffer[n], 0, NULL);
+                    if(status != 0) logInf("--------------------AudioQueueEnqueueBuffer OSStatus error %i", (int) status);
+                }
+                fullBuffer = true;
+                counterAudioSamples = 0;
+            }
+            
+            CMSampleBufferInvalidate(sampleBuffer);
+
         }
-        }
-    }
-    
+    }    
 }
 
+- (void) fillAudioBufferList: (AudioBufferList *) audioBufferList queue:(AudioQueueBufferRef *) audioQueueBuffer
+
+{
+    OSStatus status;
+
+    for( int y=0; y< audioBufferList->mNumberBuffers; y++ ){
+        
+        AudioBuffer audioBuffer = audioBufferList->mBuffers[y];
+        status = AudioQueueAllocateBuffer(_playQueue, audioBuffer.mDataByteSize, &audioQueueBuffer[counterAudioSamples]);
+        
+        if (status == 0 && audioQueueBuffer[counterAudioSamples]->mAudioData) {
+            memcpy(audioQueueBuffer[counterAudioSamples]->mAudioData, audioBuffer.mData, audioBuffer.mDataByteSize);
+            audioQueueBuffer[counterAudioSamples]->mAudioDataByteSize = audioBuffer.mDataByteSize;
+            
+            counterAudioSamples++;
+            
+        }else{
+            logInf("--------------------OSStatus error %i", (int) status);
+        }
+        
+    }
+}
 @end

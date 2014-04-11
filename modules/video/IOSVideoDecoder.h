@@ -60,6 +60,7 @@ private:
 - (id) init:(IOSVideoDecoder *) vm withURL: (NSURL *) url withTextureId:(GLuint)texture;
 - (void) startVideo;
 - (void) stopVideo;
+- (void) pauseVideo;
 - (void) readNextMovieFrame;
 - (void) readAudio;
 - (void) startPlaying;
