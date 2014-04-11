@@ -91,6 +91,8 @@ void IOSVideoDecoder::stop()
 
 void IOSVideoDecoder::setMute(bool enable)
 {
+    [videoDecoderObject setMute:enable];
+
     muted = enable;
 }
 
@@ -142,6 +144,7 @@ AudioQueueRef _playQueue = NULL;
 static int counterAudioSamples = 0;
 AudioStreamBasicDescription inAudioStreamBasicDescription;
 static BOOL fullBuffer = false;
+float volume;
 
 
 
@@ -409,7 +412,7 @@ void audioCallback(void *                  inUserData,
             CMSampleBufferInvalidate(sampleBuffer);
 
         }
-    }    
+    }
 }
 
 - (void) fillAudioBufferList: (AudioBufferList *) audioBufferList queue:(AudioQueueBufferRef *) audioQueueBuffer
@@ -434,4 +437,22 @@ void audioCallback(void *                  inUserData,
         
     }
 }
+
+
+- (void) setMute:(BOOL) mute {
+    OSStatus status;
+    if (mute == true){
+        status = AudioQueueGetParameter(_playQueue, kAudioQueueParam_Volume, &volume);
+        status = AudioQueueSetParameter(_playQueue, kAudioQueueParam_Volume, 0);
+    }
+    
+    else{
+        status = AudioQueueSetParameter(_playQueue, kAudioQueueParam_Volume, volume);
+
+    }
+    if (status) {
+        logInf("AudioQueueSetParameter returned %d when setting the volume.\n", (int)status);
+    }
+}
+
 @end

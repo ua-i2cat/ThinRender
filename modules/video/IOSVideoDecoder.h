@@ -64,6 +64,7 @@ private:
 - (void) readNextMovieFrame;
 - (void) readAudio;
 - (void) startPlaying;
+- (void) setMute:(BOOL) mute;
 
 @end
 #endif
