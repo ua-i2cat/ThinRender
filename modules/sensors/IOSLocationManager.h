@@ -41,6 +41,8 @@ public:
     void setPosition(double latitude, double longitude);
     double getLatitude();
     double getLongitude();
+    bool isGPSActive();
+
 
 private:    
     IOSLocationManagerDelegate *locationObject;
@@ -54,7 +56,7 @@ private:
 - (void) stopUpdatePosition;
 - (void) locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation;
 - (void) locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error;
-
+- (BOOL) isGPSActive;
 
 @end
 

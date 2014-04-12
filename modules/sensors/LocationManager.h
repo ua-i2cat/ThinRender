@@ -39,8 +39,9 @@ public:
 
     virtual double getLatitude() = 0;
     virtual double getLongitude() = 0;
-      
-        
+    virtual bool isGPSActive() = 0;
+ 
+    
 protected:
  
     static LocationManager* instanceLocation;

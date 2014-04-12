@@ -57,7 +57,9 @@ double IOSLocationManager::getLongitude(){
     return longitude;
 }
 
-
+bool IOSLocationManager::isGPSActive(){
+    return [locationObject isGPSActive];
+}
 
 @implementation IOSLocationManagerDelegate
 
@@ -78,18 +80,18 @@ IOSLocationManager *locationObject;
 
 - (void) startUpdatePosition
 {
-    NSLog(@">Start Update Position");
+    logInf(">Start Update Position");
     [locationManager startUpdatingLocation];
 }
 
 - (void) stopUpdatePosition
 {
-    NSLog(@">Stop Update Position");
+    logInf(">Stop Update Position");
     [locationManager stopUpdatingLocation];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
-    NSLog(@">Did Update Position");
+    logInf(">Did Update Position");
     locationObject->setPosition(newLocation.coordinate.latitude, newLocation.coordinate.longitude);
     
 }
@@ -105,8 +107,12 @@ IOSLocationManager *locationObject;
         NSLog(@"Error locating position");
     }
 }
-
-
+- (BOOL) isGPSActive
+{
+    BOOL b = ([CLLocationManager locationServicesEnabled] &&
+              [CLLocationManager authorizationStatus] != kCLAuthorizationStatusDenied);
+    return b;
+}
 
 //Automatic reference counting mode. Release not needed
 

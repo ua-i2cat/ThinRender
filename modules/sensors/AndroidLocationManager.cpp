@@ -86,3 +86,7 @@ void AndroidLocationManager::shutDownGPS(){
     getLongitudeMethod = 0;
     initGPSMethod = 0;
 }
+//TODO: To implement
+bool AndroidLocationManager::isGPSActive(){
+    return true;
+}

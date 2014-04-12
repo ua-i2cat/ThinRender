@@ -38,7 +38,8 @@ public:
     void shutDownGPS();
     double getLatitude();
     double getLongitude();
-   
+    bool isGPSActive();
+
     
 private:
 
