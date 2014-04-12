@@ -345,7 +345,10 @@ void audioCallback(void *                  inUserData,
         }
     }
     CMSampleBufferInvalidate(audioSampleBufferRef);
-
+    if (blockBufferRef) // Double check that what you are releasing actually exists!
+    {
+        CFRelease(blockBufferRef);
+    }
     return;
 }
 
@@ -363,7 +366,7 @@ void audioCallback(void *                  inUserData,
             AudioBufferList audioBufferList;
             
             //Read the audio from the asset
-            blockBuffer = CMSampleBufferGetDataBuffer( sampleBuffer );
+            blockBuffer = CMSampleBufferGetDataBuffer(sampleBuffer);
             
             CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer( sampleBuffer,
                                                                     NULL,
@@ -394,8 +397,13 @@ void audioCallback(void *                  inUserData,
             [self fillAudioBufferList: &audioBufferList queue:audioQueueBuffer];
             
             
-            //Buffers full now we are going to start the sound and continue reading from the asset in the callback
+            // Buffers full now we are going to start the sound and continue reading from the asset in the callback
             if(counterAudioSamples == maxBuffers){
+                
+                fullBuffer = true;
+                counterAudioSamples = 0;
+                
+                // Let's start playing
                 status = AudioQueueStart(_playQueue, NULL);
                 if(status != 0) logInf("--------------------AudioQueueStart OSStatus error %i", (int) status);
                 for(int n = 0; n < maxBuffers; n++){
@@ -405,11 +413,14 @@ void audioCallback(void *                  inUserData,
                     status = AudioQueueEnqueueBuffer(_playQueue, audioQueueBuffer[n], 0, NULL);
                     if(status != 0) logInf("--------------------AudioQueueEnqueueBuffer OSStatus error %i", (int) status);
                 }
-                fullBuffer = true;
-                counterAudioSamples = 0;
+
             }
             
             CMSampleBufferInvalidate(sampleBuffer);
+            if (blockBuffer) // Double check that what you are releasing actually exists!
+            {
+                CFRelease(blockBuffer);
+            }
 
         }
     }
