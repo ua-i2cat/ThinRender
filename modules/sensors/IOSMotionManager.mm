@@ -74,7 +74,6 @@ CMDeviceMotionHandler dmHandler;
   
             // Checking if some errors occured
             if (error) {
-                NSLog(@"Could not start/continue Device Motion Updates with error:\n%@",error);
                 // Restart the motion manager in case of error
                 [motionManager stopDeviceMotionUpdates];
                 motionManager = nil;
@@ -94,7 +93,7 @@ CMDeviceMotionHandler dmHandler;
 
 - (void) startUpdateMotion
 {
-    NSLog(@">Start Update Motion");
+    logInf(">Start Update Motion");
     
     if (motionManager.deviceMotionAvailable) { //Checks gyroscope AND accelerometer avalalability
         
@@ -106,7 +105,7 @@ CMDeviceMotionHandler dmHandler;
 
 - (void) stopUpdateMotion
 {
-    NSLog(@">Stop Update Position");
+    logInf(">Stop Update Position");
     [motionManager stopDeviceMotionUpdates];
 
 }
