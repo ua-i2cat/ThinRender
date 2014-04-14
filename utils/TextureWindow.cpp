@@ -179,6 +179,7 @@ void initGPS(){LocationManager::getInstance()->initGPS();};
 double getLatitude(){return LocationManager::getInstance()->getLatitude();};
 double getLongitude(){return LocationManager::getInstance()->getLongitude();};
 void shutDownGPS(){ LocationManager::getInstance()->shutDownGPS();};
+bool isGPSActive(){ return LocationManager::getInstance()->isGPSActive();};
 void updateTextureCamera(){CameraManager::getInstance()->updateTextureCamera();};
 bool setCameraTexturePreview(int texture){return CameraManager::getInstance()->setCameraTexturePreview(texture);};
 void closeCamera(){CameraManager::getInstance()->closeCamera();};

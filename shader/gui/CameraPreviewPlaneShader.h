@@ -36,9 +36,6 @@ using namespace std;
 #include "../Shader.h"
 #include "../../utils/Maths.h"
 
-#ifdef IOS_PLATFORM
-#include "../../modules/video/VideoIOSWrapper.h"
-#endif
 class CameraPreviewPlaneShader : public Shader {
 public:
 	CameraPreviewPlaneShader();

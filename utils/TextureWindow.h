@@ -72,4 +72,5 @@
     void shutDownGPS();void updateTextureCamera();
     bool setCameraTexturePreview(int texture);
     void closeCamera();
+    bool isGPSActive();
 #endif
