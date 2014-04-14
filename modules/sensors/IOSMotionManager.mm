@@ -72,6 +72,8 @@ CMDeviceMotionHandler dmHandler;
             glm::quat imuOrientation = (glm::quat(IMU::q0, IMU::q1, IMU::q2, IMU::q3));
             */
             
+            //logInf("Compass: %f %f %f",deviceMotion.magneticField.field.x,deviceMotion.magneticField.field.y,deviceMotion.magneticField.field.z);
+            
             glm::quat imuOrientation = (glm::quat(quaternion.w, quaternion.x,quaternion.y, quaternion.z));
 			
 			Input::getInstance()->deviceOrientation = imuOrientation;
@@ -103,8 +105,7 @@ CMDeviceMotionHandler dmHandler;
     if (motionManager.deviceMotionAvailable) { //Checks gyroscope AND accelerometer avalalability
         
         opqueue = [NSOperationQueue currentQueue];
-        [motionManager startDeviceMotionUpdatesToQueue:opqueue
-                                           withHandler:dmHandler];
+        [motionManager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXTrueNorthZVertical toQueue:opqueue withHandler:dmHandler];
     }
     
 }
