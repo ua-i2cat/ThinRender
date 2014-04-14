@@ -68,12 +68,6 @@ CMDeviceMotionHandler dmHandler;
             CMAttitude * anAttitude = deviceMotion.attitude;
             CMQuaternion quaternion = anAttitude.quaternion;
             
-            /*IMU::MadgwickAHRSupdate(deviceMotion.rotationRate.x, deviceMotion.rotationRate.y, deviceMotion.rotationRate.z, deviceMotion.userAcceleration.x, deviceMotion.userAcceleration.y, deviceMotion.userAcceleration.z, deviceMotion.magneticField.field.x,deviceMotion.magneticField.field.y, deviceMotion.magneticField.field.z);
-            glm::quat imuOrientation = (glm::quat(IMU::q0, IMU::q1, IMU::q2, IMU::q3));
-            */
-            
-            //logInf("Compass: %f %f %f",deviceMotion.magneticField.field.x,deviceMotion.magneticField.field.y,deviceMotion.magneticField.field.z);
-            
             glm::quat imuOrientation = (glm::quat(quaternion.w, quaternion.x,quaternion.y, quaternion.z));
 			
 			Input::getInstance()->deviceOrientation = imuOrientation;

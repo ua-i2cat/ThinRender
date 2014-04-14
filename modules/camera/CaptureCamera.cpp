@@ -41,30 +41,23 @@ CaptureCamera::CaptureCamera(RectGUI* rect){
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	setCameraTexturePreview(textureID);
 
-//    rectp = rect;
-    
-    
     
 	Shader* shader = new CameraPreviewPlaneShader();
 	rect->setShader(shader);
 	rect->setTexture(TextureManager::getInstance()->getTexture("blueSquare.png"));
     rect->setTexture(textureID);
-  //  setCameraTexturePreview(textureID);
 
 }
 
 CaptureCamera::~CaptureCamera(){
 	logInf("Camera capture destructor, deleting textureId");
-	glDeleteTextures(1, &textureID);
-	logInf("Camera capture destructor, deleted textureId");
 	closeCamera();
+    logInf("Camera capture destructor, deleted textureId");
+    glDeleteTextures(1, &textureID);
 	logInf("Camera capture destructor ended");
 }
 
 void CaptureCamera::cameraUpdatePreview(){
-    
 	updateTextureCamera();
-    //textureID = CameraManager::getInstance()->getTextureId();
-    //rectp->setTexture(textureID);
-
+ 
 }
