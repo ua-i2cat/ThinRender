@@ -24,7 +24,6 @@
 #include "IOSCameraManager.h"
 #import <CoreVideo/CVPixelBuffer.h>
 #include "../../controllerEGL/ContextControllerEAGL.h"
-//#import <CoreVideo/CVOpenGLESTextureCache.h>
 
 GLuint textureId;
 
@@ -51,14 +50,6 @@ bool IOSCameraManager::setCameraTexturePreview(int texture){
     return true;
 }
 
-void IOSCameraManager::setTextureId(GLuint tid){
-    textureId = tid;
-}
-
-GLuint IOSCameraManager::getTextureId(){
-    return textureId;
-}
-
 
 IOSCameraManager::~IOSCameraManager(){
     this->closeCamera();
@@ -71,7 +62,6 @@ IOSCameraManager::~IOSCameraManager(){
 @implementation IOSCameraManagerDelegate
 IOSCameraManager *cameraManager;
 CVImageBufferRef pixelBuffer;
-CVOpenGLESTextureCacheRef videoTextureCache2;
 GLuint frameBufferHandle;
 
 
@@ -101,14 +91,6 @@ GLuint frameBufferHandle;
         videoOutput = [[AVCaptureVideoDataOutput alloc] init];
         [videoOutput setAlwaysDiscardsLateVideoFrames:YES];
         
-        
-        CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, ContextControllerEAGL::getInstance()->context, NULL, &videoTextureCache2);
-        if(err){
-            logErr("ERROR CREATING CVOpenGLESTextureCache!!! %d", err);
-        }
-
-        
-        
         // Use RGB frames instead of YUV to ease color processing
         [videoOutput setVideoSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
         
@@ -120,7 +102,7 @@ GLuint frameBufferHandle;
         }
         else
         {
-            NSLog(@"Couldn't add video output");
+            logInf("Couldn't add video output");
         }
         
         cameraManager = cm;
@@ -171,7 +153,6 @@ BOOL nextFrame;
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
     
-    CVReturn err;
     if(!nextFrame)return;
     nextFrame = NO;
 	CVImageBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
@@ -181,11 +162,11 @@ BOOL nextFrame;
     size_t height = CVPixelBufferGetHeight(pixelBuffer);
     
 	glBindTexture(GL_TEXTURE_2D, textureId);
-	/*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// This is necessary for non-power-of-two textures
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);*/
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	
 	// Using BGRA extension to pull in video frame data directly
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(pixelBuffer));

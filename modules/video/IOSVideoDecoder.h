@@ -17,7 +17,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Author:         Marc Fernandez Vanaclocha <marc.fernandez@i2cat.net>
+ *  Author:         Daniel Cabrera Benitez <dcabrera@quarkfly.com>
+ *  Author:         Antonio Quesada Frias <aquesada@quarkfly.com>
  */
 
 #ifndef IOS_VIDEO_DECODER_H

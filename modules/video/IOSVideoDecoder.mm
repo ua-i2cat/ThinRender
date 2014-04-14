@@ -1,10 +1,25 @@
-//
-//  IOSVideoDecoder.cpp
-//  ModernismeMNACTEC
-//
-//  Created by Daniel Cabrera on 09/04/14.
-//  Copyright (c) 2014 i2CAT. All rights reserved.
-//
+/*
+ *  thin render - Mobile render engine based on OpenGL ES 2.0
+ *  Copyright (C) 2013  FundaciÛ i2CAT, Internet i InnovaciÛ digital a Catalunya
+ *
+ *  This file is part of thin render.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Author:         Daniel Cabrera Benitez <dcabrera@quarkfly.com>
+ *  Author:         Antonio Quesada Frias <aquesada@quarkfly.com>
+ */
 
 #include "IOSVideoDecoder.h"
 #include "../../shader/gui/VideoPlaneShader.h"
@@ -41,15 +56,12 @@ IOSVideoDecoder::IOSVideoDecoder(RectGUI* rect, std::string path){
 	rect->setTexture(TextureManager::getInstance()->getTexture("blueSquare.png"));
 	rect->setTexture(textureID);
     
-    path = "multimedia/9.mp4";
+    //path = "multimedia/9.mp4";
     
     string filename = GlobalData::getInstance()->iOSPath+"/assets/"+path;
     NSString *videopath = [NSString stringWithCString:filename.c_str()
                                         encoding:[NSString defaultCStringEncoding]];
     NSURL *url = [NSURL fileURLWithPath:videopath];
-    
-    
-   // BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:videopath];
     
     videoDecoderObject = [[IOSVideoDecoderDelegate alloc] init:this withURL:url withTextureId: textureID];
 }
@@ -130,7 +142,6 @@ void IOSVideoDecoder::setEnded(bool end){
 @implementation IOSVideoDecoderDelegate
 
 AVAssetReader * _movieReader;
-//AVAssetReader * _audioReader;
 
 GLuint textureID;
 IOSVideoDecoder *videoManager;
