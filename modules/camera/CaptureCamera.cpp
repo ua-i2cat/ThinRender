@@ -53,7 +53,7 @@ CaptureCamera::~CaptureCamera(){
 	logInf("Camera capture destructor, deleting textureId");
 	closeCamera();
     logInf("Camera capture destructor, deleted textureId");
-    glDeleteTextures(1, &textureID);
+    //glDeleteTextures(1, &textureID);
 	logInf("Camera capture destructor ended");
 }
 
