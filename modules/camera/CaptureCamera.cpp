@@ -33,6 +33,7 @@
 
 
 CaptureCamera::CaptureCamera(RectGUI* rect){
+    
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureID);
 	glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -53,7 +54,12 @@ CaptureCamera::~CaptureCamera(){
 	logInf("Camera capture destructor, deleting textureId");
 	closeCamera();
     logInf("Camera capture destructor, deleted textureId");
-    //glDeleteTextures(1, &textureID);
+#ifdef ANDROID_PLATFORM
+    /*FIXME: IOS glGenTextures without context initialized always returns 0, 
+            http://www.idevgames.com/forums/thread-4672.html
+     */
+    glDeleteTextures(1, &textureID);
+#endif
 	logInf("Camera capture destructor ended");
 }
 
