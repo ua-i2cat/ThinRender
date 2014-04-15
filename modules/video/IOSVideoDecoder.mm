@@ -56,7 +56,7 @@ IOSVideoDecoder::IOSVideoDecoder(RectGUI* rect, std::string path){
 	rect->setTexture(TextureManager::getInstance()->getTexture("blueSquare.png"));
 	rect->setTexture(textureID);
     
-    //path = "multimedia/9.mp4";
+    path = "multimedia/9.mp4";
     
     string filename = GlobalData::getInstance()->iOSPath+"/assets/"+path;
     NSString *videopath = [NSString stringWithCString:filename.c_str()
@@ -77,7 +77,10 @@ void IOSVideoDecoder::updateTexture(){
 
 IOSVideoDecoder::~IOSVideoDecoder()
 {
-    glDeleteTextures(1, &textureID);
+    /*FIXME: IOS glGenTextures without context initialized always returns 0,
+     http://www.idevgames.com/forums/thread-4672.html
+     */
+    //glDeleteTextures(1, &textureID);
     instanceVideo = NULL;
     videoDecoderObject = NULL;
 }
@@ -241,7 +244,6 @@ float volume;
 - (void) stopVideo{
     [_movieReader cancelReading];
     AudioQueueStop(_playQueue, YES);
-    //TODO: Perform buffer free
     AudioQueueDispose(_playQueue, YES);
     _playQueue = NULL;
     counterAudioSamples = 0;
@@ -315,7 +317,7 @@ void audioCallback(void *                  inUserData,
     if (!audioSampleBufferRef){
 
         logErr("read next audio frame output fail");
-
+        AudioQueueFreeBuffer(_playQueue, inCompleteAQBuffer);
         return;
     }
     
