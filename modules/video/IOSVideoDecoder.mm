@@ -56,7 +56,7 @@ IOSVideoDecoder::IOSVideoDecoder(RectGUI* rect, std::string path){
 	rect->setTexture(TextureManager::getInstance()->getTexture("blueSquare.png"));
 	rect->setTexture(textureID);
     
-    path = "multimedia/9.mp4";
+    //path = "multimedia/9.mp4";
     
     string filename = GlobalData::getInstance()->iOSPath+"/assets/"+path;
     NSString *videopath = [NSString stringWithCString:filename.c_str()
