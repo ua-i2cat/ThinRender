@@ -16,8 +16,8 @@ namespace IMU{
         #define sampleFreq        60.0f                // sample frequency in Hz
         #define betaDef                0.6f                // 2 * proportional gain
 
-        float beta = betaDef;                                                                // 2 * proportional gain (Kp)
-        float q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f;        // quaternion of sensor frame relative to auxiliary frame
+        static float beta = betaDef;                                                                // 2 * proportional gain (Kp)
+        static float q0 = 1.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f;        // quaternion of sensor frame relative to auxiliary frame
 
         //---------------------------------------------------------------------------------------------------
         // Fast inverse square-root
@@ -39,7 +39,7 @@ namespace IMU{
         //---------------------------------------------------------------------------------------------------
         // IMU algorithm update
 
-        void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az) {
+        static void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az) {
                 float recipNorm;
                 float s0, s1, s2, s3;
                 float qDot1, qDot2, qDot3, qDot4;
