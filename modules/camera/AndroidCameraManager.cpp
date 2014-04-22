@@ -24,7 +24,7 @@
 #include "AndroidCameraManager.h"
 
 AndroidCameraManager::AndroidCameraManager(){
-    logInf("AndroidCameraManager::created");
+    logInf("AndroidCameraManager: created");
     methodUpdateCamera = 0;
     stopCamera = 0;
 }
@@ -32,7 +32,7 @@ AndroidCameraManager::AndroidCameraManager(){
 void AndroidCameraManager::closeCamera(){
     GlobalData *ginstance = GlobalData::getInstance();
     if(ginstance->jenv.javaVM == 0)return;
-	logInf("closeCamera");
+	logInf("AndroidCameraManager: closeCamera");
 	(ginstance->jenv.javaVM)->AttachCurrentThread(&(ginstance->jenv.env), 0);
 	(ginstance->jenv.env)->CallVoidMethod(ginstance->jenv.activityObj, stopCamera);
 }
@@ -70,5 +70,5 @@ bool AndroidCameraManager::setCameraTexturePreview(int texture){
 }
 
 AndroidCameraManager::~AndroidCameraManager(){
- 
+    logInf("AndroidCameraManager: destructor");
 }
