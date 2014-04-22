@@ -145,7 +145,7 @@ void Shader::useProgram(){
 }
 
 void Shader::disableTextures(){
-//	glDisable(GL_TEXTURE_2D);
+	//glDisable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 void Shader::loadTexture(Texture* texture){
