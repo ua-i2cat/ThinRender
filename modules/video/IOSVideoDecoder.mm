@@ -162,6 +162,9 @@ float volume;
 int videoChannelID = -1;
 int audioChannelID = -1;
 
+CMTime previousFrameTime;
+CFAbsoluteTime previousActualFrameTime;
+
 
 - (id) init:(IOSVideoDecoder *) vm withURL: (NSURL *) url withTextureId:(GLuint)texture{
     if ((self = [super init])) {
@@ -245,6 +248,9 @@ int audioChannelID = -1;
 
 - (void) startVideo{
     [_movieReader startReading];
+    
+    previousFrameTime = kCMTimeZero;
+    previousActualFrameTime = CFAbsoluteTimeGetCurrent();
 }
 
 - (void) stopVideo{
@@ -278,8 +284,28 @@ int audioChannelID = -1;
     {
         AVAssetReaderTrackOutput * output = [_movieReader.outputs objectAtIndex:videoChannelID];
         CMSampleBufferRef sampleBuffer = [output copyNextSampleBuffer];
+        
         if (sampleBuffer)
         {
+            
+            // Synch the video frame rate
+            CMTime currentSampleTime = CMSampleBufferGetOutputPresentationTimeStamp(sampleBuffer);
+            CMTime differenceFromLastFrame = CMTimeSubtract(currentSampleTime, previousFrameTime);
+            CFAbsoluteTime currentActualTime = CFAbsoluteTimeGetCurrent();
+            
+            CGFloat frameTimeDifference = CMTimeGetSeconds(differenceFromLastFrame);
+            CGFloat actualTimeDifference = currentActualTime - previousActualFrameTime;
+            
+            if (frameTimeDifference > actualTimeDifference)
+            {
+                usleep(1000000.0 * (frameTimeDifference - actualTimeDifference));
+            }
+            
+            previousFrameTime = currentSampleTime;
+            previousActualFrameTime = CFAbsoluteTimeGetCurrent();
+            
+            
+            // Let's process the image
             CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
             
             // Lock the image buffer
@@ -298,7 +324,6 @@ int audioChannelID = -1;
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             
             // Using BGRA extension to pull in video frame data directly
-            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(imageBuffer));
              glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(imageBuffer));
             
             CMSampleBufferInvalidate(sampleBuffer);
