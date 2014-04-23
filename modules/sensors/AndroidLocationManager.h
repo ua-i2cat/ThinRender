@@ -47,6 +47,7 @@ private:
     jmethodID getLatitudeMethod;
     jmethodID getLongitudeMethod;
     jmethodID initGPSMethod;
+    jmethodID isGPSActive;
 
     
 };

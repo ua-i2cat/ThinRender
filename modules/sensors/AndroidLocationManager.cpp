@@ -24,14 +24,14 @@
 
 
 AndroidLocationManager::AndroidLocationManager(){
-        
+
     //gps methods...
     shutdownGPSMethod = 0;
     getLatitudeMethod = 0;
     getLongitudeMethod = 0;
     initGPSMethod = 0;
-    
-    
+    isGPSActiveMethod = 0;
+
 }
 
 AndroidLocationManager::~AndroidLocationManager(){
@@ -88,5 +88,20 @@ void AndroidLocationManager::shutDownGPS(){
 }
 //TODO: To implement
 bool AndroidLocationManager::isGPSActive(){
-    return true;
+    GlobalData *ginstance = GlobalData::getInstance();
+
+    if (ginstance->jenv.javaVM == 0) {
+        return false;
+    }
+
+    if (isGPSActiveMethod == 0) {
+        gintance->jenv.javaVM->AttachCurrentThread(&(ginstance->jenv.env), 0);
+        isGPSActiveMethod = (ginstance->jenv.env)->GetMethodID(ginstance->jenv.activityClass, "isGPSActive", "()V");
+    }
+
+    if ((ginstance->jenv.env)->CallBooleanMethod(ginstance->jenv.activityObj, "isGPSActive", "()V")) {
+        return true;
+    } else {
+        return false;
+    }
 }
