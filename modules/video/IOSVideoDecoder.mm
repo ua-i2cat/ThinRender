@@ -32,7 +32,7 @@ int videoState;
 bool muted;
 
 IOSVideoDecoder::IOSVideoDecoder(RectGUI* rect, std::string path){
-    NSLog(@"IOSAudioPlayer constructor");
+    logInf("IOSVideoDecoder constructor");
     ended = false;
     muted = false;
     
@@ -56,8 +56,6 @@ IOSVideoDecoder::IOSVideoDecoder(RectGUI* rect, std::string path){
 	rect->setTexture(TextureManager::getInstance()->getTexture("blueSquare.png"));
 	rect->setTexture(textureID);
     
-    //path = "multimedia/9.mp4";
-    
     string filename = GlobalData::getInstance()->iOSPath+"/assets/"+path;
     NSString *videopath = [NSString stringWithCString:filename.c_str()
                                         encoding:[NSString defaultCStringEncoding]];
@@ -80,6 +78,8 @@ IOSVideoDecoder::~IOSVideoDecoder()
     /*FIXME: IOS glGenTextures without context initialized always returns 0,
      http://www.idevgames.com/forums/thread-4672.html
      */
+    logInf("IOSVideoDecoder desctructor");
+
     //glDeleteTextures(1, &textureID);
     instanceVideo = NULL;
     videoDecoderObject = NULL;
@@ -101,7 +101,6 @@ void IOSVideoDecoder::stop()
 {
     [videoDecoderObject stopVideo];
     videoState = STOPPED;
-
 }
 
 void IOSVideoDecoder::setMute(bool enable)
@@ -160,6 +159,8 @@ AudioStreamBasicDescription inAudioStreamBasicDescription;
 static BOOL fullBuffer = false;
 float volume;
 
+int videoChannelID = -1;
+int audioChannelID = -1;
 
 
 - (id) init:(IOSVideoDecoder *) vm withURL: (NSURL *) url withTextureId:(GLuint)texture{
@@ -174,6 +175,9 @@ float volume;
                         ^{
                             AVAssetTrack * videoTrack = nil;
                             AVAssetTrack * audioTrack = nil;
+                            int channel = 0;
+                            videoChannelID = -1;
+                            audioChannelID = -1;
                             
                             BOOL playable = [asset isPlayable];
                             
@@ -194,7 +198,7 @@ float volume;
                                 if ([tracks count] == 1)
                                 {
                                     videoTrack = [tracks objectAtIndex:0];
-                             
+                                    
                                     
                                     NSString* key = (NSString*)kCVPixelBufferPixelFormatTypeKey;
                                     NSNumber* value = [NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA];
@@ -204,7 +208,8 @@ float volume;
                                     [_movieReader addOutput:[AVAssetReaderTrackOutput
                                                              assetReaderTrackOutputWithTrack:videoTrack
                                                              outputSettings:videoSettings]];
-                                    
+                                    videoChannelID = channel;
+                                    channel++;
                                 }
                                 // Check for audiotracks
                                 NSArray *audioTracks =[asset tracksWithMediaType:AVMediaTypeAudio];
@@ -217,7 +222,8 @@ float volume;
                                                          forKey:AVFormatIDKey];
                                     
                                     [_movieReader addOutput:[AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:audioTrack outputSettings:audioReadSettings]];
-                                    
+                                    audioChannelID = channel;
+                                    channel++;
                                 }
                                 
                                 
@@ -243,30 +249,34 @@ float volume;
 
 - (void) stopVideo{
     [_movieReader cancelReading];
-    AudioQueueStop(_playQueue, YES);
-    AudioQueueDispose(_playQueue, YES);
+    if (_playQueue != NULL){
+        AudioQueueStop(_playQueue, YES);
+        AudioQueueDispose(_playQueue, YES);
+    }
     _playQueue = NULL;
     counterAudioSamples = 0;
     videoManager->setEnded(true);
 }
 
 - (void) startPlaying{
-    if(_playQueue != NULL){
+    if(_playQueue != NULL && audioChannelID != -1){
         AudioQueueStart(_playQueue, audioTimeStamp);
     }
 }
 
 
 - (void) pauseVideo{
-    AudioQueueGetCurrentTime(_playQueue, timeLine, audioTimeStamp, NULL);
-    AudioQueuePause(_playQueue);
+    if(_playQueue != NULL){
+        AudioQueueGetCurrentTime(_playQueue, timeLine, audioTimeStamp, NULL);
+        AudioQueuePause(_playQueue);
+    }
 }
 
 - (void) readNextMovieFrame
 {
-   if (_movieReader.status == AVAssetReaderStatusReading)
+   if (_movieReader.status == AVAssetReaderStatusReading && videoChannelID !=-1)
     {
-        AVAssetReaderTrackOutput * output = [_movieReader.outputs objectAtIndex:0];
+        AVAssetReaderTrackOutput * output = [_movieReader.outputs objectAtIndex:videoChannelID];
         CMSampleBufferRef sampleBuffer = [output copyNextSampleBuffer];
         if (sampleBuffer)
         {
@@ -288,7 +298,8 @@ float volume;
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             
             // Using BGRA extension to pull in video frame data directly
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(imageBuffer));
+            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(imageBuffer));
+             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, CVPixelBufferGetBaseAddress(imageBuffer));
             
             CMSampleBufferInvalidate(sampleBuffer);
 
@@ -312,7 +323,7 @@ void audioCallback(void *                  inUserData,
                    AudioQueueRef           inAQ,
                    AudioQueueBufferRef     inCompleteAQBuffer)
 {
-    AVAssetReaderTrackOutput * audioOutput = [_movieReader.outputs objectAtIndex:1];
+    AVAssetReaderTrackOutput * audioOutput = [_movieReader.outputs objectAtIndex:audioChannelID];
     CMSampleBufferRef audioSampleBufferRef = [audioOutput copyNextSampleBuffer];
     if (!audioSampleBufferRef){
 
@@ -370,8 +381,8 @@ void audioCallback(void *                  inUserData,
 
 -(void) readAudio
 {
-    if(!fullBuffer){
-        AVAssetReaderTrackOutput * audioOutput = [_movieReader.outputs objectAtIndex:1];
+    if(!fullBuffer && audioChannelID != -1){
+        AVAssetReaderTrackOutput * audioOutput = [_movieReader.outputs objectAtIndex:audioChannelID];
         CMSampleBufferRef sampleBuffer = [audioOutput copyNextSampleBuffer];
         if (sampleBuffer!= NULL )
         {
@@ -465,6 +476,7 @@ void audioCallback(void *                  inUserData,
 
 - (void) setMute:(BOOL) mute {
     OSStatus status;
+    if (_playQueue == NULL) return;
     if (mute == true){
         status = AudioQueueGetParameter(_playQueue, kAudioQueueParam_Volume, &volume);
         status = AudioQueueSetParameter(_playQueue, kAudioQueueParam_Volume, 0);

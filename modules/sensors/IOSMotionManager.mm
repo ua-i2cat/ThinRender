@@ -62,7 +62,7 @@ CMDeviceMotionHandler dmHandler;
 
         motionManager = [[CMMotionManager alloc] init];
         motionManager.deviceMotionUpdateInterval = 1.0/REFRESH_FREQUENCY; 
-        
+        motionManager.showsDeviceMovementDisplay = YES;
         dmHandler = ^(CMDeviceMotion * aMotion, NSError * error) {
             CMDeviceMotion *deviceMotion = motionManager.deviceMotion;
             CMAttitude * anAttitude = deviceMotion.attitude;
@@ -73,7 +73,8 @@ CMDeviceMotionHandler dmHandler;
 			Input::getInstance()->deviceOrientation = imuOrientation;
   
             // Checking if some errors occured
-            if (error) {
+            if (error && error.code != CMErrorDeviceRequiresMovement) {
+                
                 // Restart the motion manager in case of error
                 [motionManager stopDeviceMotionUpdates];
                 motionManager = nil;
@@ -98,7 +99,10 @@ CMDeviceMotionHandler dmHandler;
     if (motionManager.deviceMotionAvailable) { //Checks gyroscope AND accelerometer avalalability
         
         opqueue = [NSOperationQueue currentQueue];
-        [motionManager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXTrueNorthZVertical toQueue:opqueue withHandler:dmHandler];
+        //[motionManager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXTrueNorthZVertical toQueue:opqueue withHandler:dmHandler];
+         [motionManager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXMagneticNorthZVertical toQueue:opqueue withHandler:dmHandler];
+         motionManager.showsDeviceMovementDisplay = YES;
+        
     }
     
 }

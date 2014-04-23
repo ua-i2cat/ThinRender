@@ -28,7 +28,7 @@ VideoPlaneShader::VideoPlaneShader(){
 	hasNormals = false;
 	hasTangents = false;
 	hasBitangents = false;
-	hasUV = true;
+    hasUV = true;
     #ifdef ANDROID_PLATFORM
 	loadShader("VideoPlaneShader");
 #else
