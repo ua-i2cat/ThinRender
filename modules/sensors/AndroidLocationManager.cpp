@@ -86,20 +86,20 @@ void AndroidLocationManager::shutDownGPS(){
     getLongitudeMethod = 0;
     initGPSMethod = 0;
 }
-//TODO: To implement
+
 bool AndroidLocationManager::isGPSActive(){
     GlobalData *ginstance = GlobalData::getInstance();
 
     if (ginstance->jenv.javaVM == 0) {
-        return false;
+        return true; // TODO: return false? true?
     }
 
     if (isGPSActiveMethod == 0) {
-        gintance->jenv.javaVM->AttachCurrentThread(&(ginstance->jenv.env), 0);
-        isGPSActiveMethod = (ginstance->jenv.env)->GetMethodID(ginstance->jenv.activityClass, "isGPSActive", "()V");
+        ginstance->jenv.javaVM->AttachCurrentThread(&(ginstance->jenv.env), 0);
+        isGPSActiveMethod = (ginstance->jenv.env)->GetMethodID(ginstance->jenv.activityClass, "isGPSActive", "()Z");
     }
 
-    if ((ginstance->jenv.env)->CallBooleanMethod(ginstance->jenv.activityObj, "isGPSActive", "()V")) {
+    if ((ginstance->jenv.env)->CallBooleanMethod(ginstance->jenv.activityObj, isGPSActiveMethod)) {
         return true;
     } else {
         return false;

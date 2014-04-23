@@ -99,7 +99,7 @@ CMDeviceMotionHandler dmHandler;
     if (motionManager.deviceMotionAvailable) { //Checks gyroscope AND accelerometer avalalability
         
         opqueue = [NSOperationQueue currentQueue];
-        //[motionManager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXTrueNorthZVertical toQueue:opqueue withHandler:dmHandler];
+        //[motionManager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXTrueNorthZVertical toQueue:opqueue withHandler:dmHandler]; // NOTE: use this for better precision, although it may cause a bug in some devices
          [motionManager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXMagneticNorthZVertical toQueue:opqueue withHandler:dmHandler];
          motionManager.showsDeviceMovementDisplay = YES;
         
