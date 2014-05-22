@@ -510,7 +510,7 @@ AndroidVideoDecoder::AndroidVideoDecoder(RectGUI* rect, std::string path){
 
 
 AndroidVideoDecoder::~AndroidVideoDecoder(){
-	glDeleteTextures(1, &textureID);
+	//glDeleteTextures(1, &textureID);
     
 	// OpenMAX AL destruction
 	(*playerObj)->Destroy(playerObj);

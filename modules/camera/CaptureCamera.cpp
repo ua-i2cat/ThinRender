@@ -58,7 +58,7 @@ CaptureCamera::~CaptureCamera(){
     /*FIXME: IOS glGenTextures without context initialized always returns 0, 
             http://www.idevgames.com/forums/thread-4672.html
      */
-    glDeleteTextures(1, &textureID);
+    //glDeleteTextures(1, &textureID);
 #endif
 	logInf("Camera capture destructor ended");
 }
