@@ -49,6 +49,8 @@ public:
 	vector<glm::vec3> tangents;
 	vector<glm::vec3> bitangents;
 	vector<glm::vec2> textureCoord;
+    vector<glm::vec2> textureCoordSorted;
+    vector<unsigned int> textureCoordOrder;
 	vector<glm::vec3> colors;
 	vector<glm::i32vec3> elements;
 	vector<glm::i32vec2> weightsIndex;//first weight is star and the other one the count

@@ -451,7 +451,7 @@ Mesh* MeshManager::parseOBJ(string filename, char* buffer, int lenght){
 		break;
 	case 'f': // Parse a face
 		i++;
-		getFace(&(auxSubMesh->elements), buffer, &i);
+		getFace2(&(auxSubMesh->elements), &(auxSubMesh->textureCoordOrder), buffer, &i);
 		//skipLine(buffer, &i);
 		break;
 	case '#': // Parse a comment
@@ -546,6 +546,17 @@ void MeshManager::getNextWord(char* buffer, int* i){
 	}*/
 }
 
+void MeshManager::getNextWord2(char* buffer, int* i){
+    //logInf("i value %i",*i);
+	while(isSeparator2(buffer[*i]) && buffer[*i] != '\0'){//changed!
+		(*i)++;
+      //  logInf("getNextWord value %c at position %i", buffer[*i], (*i));
+	}
+/*	while(buffer[*i] == ' '){
+		(*i)++;
+	}*/
+}
+
 void MeshManager::skipLine(char* buffer, int* i){
 	while(buffer[*i] != '\n' && buffer[*i] != '\0'){
 		(*i)++;
@@ -567,6 +578,49 @@ void MeshManager::getFace(std::vector<glm::i32vec3>* vertices, char* buffer, int
 	z = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
 
 	vertices->push_back(glm::i32vec3(x, y, z));
+
+	skipLine(buffer, i);
+}
+
+void MeshManager::getFace2(std::vector<glm::i32vec3>* vertices, std::vector<unsigned int>* textureCoordOrder, char* buffer, int* i){
+    
+	getNextWord2(buffer, i);
+
+    int xVertex, yVertex, zVertex;
+    int xTextureCoord, yTextureCoord, zTextureCoord;
+    int xNormal, yNormal, zNormal;
+
+	copyNextWord2(tempBuffer, BUFFERSIZE, buffer, i);
+	xVertex = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
+
+	copyNextWord2(tempBuffer, BUFFERSIZE, buffer, i);
+	xTextureCoord = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
+
+	copyNextWord2(tempBuffer, BUFFERSIZE, buffer, i);
+	xNormal = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
+
+	copyNextWord2(tempBuffer, BUFFERSIZE, buffer, i);
+	yVertex = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
+
+	copyNextWord2(tempBuffer, BUFFERSIZE, buffer, i);
+	yTextureCoord = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
+
+	copyNextWord2(tempBuffer, BUFFERSIZE, buffer, i);
+	yNormal = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
+
+	copyNextWord2(tempBuffer, BUFFERSIZE, buffer, i);
+	zVertex = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
+
+	copyNextWord2(tempBuffer, BUFFERSIZE, buffer, i);
+	zTextureCoord = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
+
+	copyNextWord2(tempBuffer, BUFFERSIZE, buffer, i);
+	zNormal = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
+
+	vertices->push_back(glm::i32vec3(xVertex, yVertex, zVertex));
+    textureCoordOrder->push_back(xTextureCoord);
+    textureCoordOrder->push_back(yTextureCoord);
+    textureCoordOrder->push_back(zTextureCoord);
 
 	skipLine(buffer, i);
 }
@@ -606,9 +660,15 @@ void MeshManager::getVector2(std::vector<glm::vec2>* vertices, char* buffer, int
 
 
 bool MeshManager::isSeparator(char current){
-	if(current == ' ' || current == '\n' || current == '\r' || current == '\t' || current == '\0')
+    if(current == ' ' || current == '\n' || current == '\r' || current == '\t' || current == '\0')
 		return true;
 	return false;
+}
+
+bool MeshManager::isSeparator2(char current){
+    if(current == ' ' || current == '\n' || current == '\r' || current == '\t' || current == '\0' || current == '/')
+        return true;
+    return false;
 }
 // -------------------------------------------------------------------
 //	Copy the next word in a temporary buffer
@@ -616,6 +676,20 @@ void MeshManager::copyNextWord(char* tempBuffer, size_t length, char* buffer, in
 	size_t index = 0;
 	getNextWord(buffer, i);
 	while (!isSeparator(buffer[*i]))
+	{
+		tempBuffer[index] = buffer[*i];
+		index++;
+		if (index == length-1)
+			break;
+		(*i)++;
+	}
+	tempBuffer[index] = '\0';
+}
+
+void MeshManager::copyNextWord2(char* tempBuffer, size_t length, char* buffer, int* i){
+	size_t index = 0;
+	getNextWord2(buffer, i);
+	while (!isSeparator2(buffer[*i]))
 	{
 		tempBuffer[index] = buffer[*i];
 		index++;

@@ -127,11 +127,15 @@ void SubMesh::render(Shader* shader){
 			);
 	}
 	if(ibo_elements){
+        // logInf("SubMesh::render(): using GL_ELEMENT_ARRAY_BUFFER");
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_elements);
 		int size;
 		glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 		glDrawElements(GL_TRIANGLES, size/sizeof(GLuint), GL_UNSIGNED_INT, 0);
 	}else{
+        // logInf("SubMesh::render(): just passing as GL_TRIANGLES");
+
 		/* Push each element in buffer_vertices to the vertex shader */
 		glDrawArrays(GL_TRIANGLES, 0,vertices.size());
 	}
@@ -159,6 +163,7 @@ void SubMesh::generateVBO(){
 		glDeleteBuffers(1, &vbo_texcoords);
 	if(ibo_elements != 0)
 		glDeleteBuffers(1, &ibo_elements);
+
 	if(vertices.size() != 0){
 		glGenBuffers(1, &vbo_vertices);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
@@ -180,9 +185,21 @@ void SubMesh::generateVBO(){
 		glBufferData(GL_ARRAY_BUFFER, bitangents.size() * sizeof(glm::vec3), &bitangents[0], GL_STATIC_DRAW);
 	}
 	if(textureCoord.size() != 0){
-		glGenBuffers(1, &vbo_texcoords);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_texcoords);
-		glBufferData(GL_ARRAY_BUFFER, textureCoord.size() * sizeof(glm::vec2), &textureCoord[0], GL_STATIC_DRAW);
+        if(textureCoordOrder.size() != 0){
+            for(int i = 0; i < textureCoordOrder.size(); i++){
+                int index = textureCoordOrder.at(i);
+                logInf("textureCoordSorted index: %d", index);
+                textureCoordSorted.push_back(textureCoord.at(index));
+            }
+
+            glGenBuffers(1, &vbo_texcoords);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo_texcoords);
+            glBufferData(GL_ARRAY_BUFFER, textureCoordSorted.size() * sizeof(glm::vec2), &textureCoordSorted[0], GL_STATIC_DRAW);
+        } else {
+            glGenBuffers(1, &vbo_texcoords);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo_texcoords);
+            glBufferData(GL_ARRAY_BUFFER, textureCoord.size() * sizeof(glm::vec2), &textureCoord[0], GL_STATIC_DRAW);
+        }
 	}
 	if(colors.size() != 0){
 		glGenBuffers(1, &vbo_colors);

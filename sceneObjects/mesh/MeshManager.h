@@ -77,12 +77,16 @@ private:
 	static MeshManager* instance;
 
 	void getNextWord(char* buffer, int* i);
+	void getNextWord2(char* buffer, int* i);
 	void skipLine(char* buffer, int* i);
 	void getVector3(std::vector<glm::vec3>* vertices, char* buffer, int* i);
 	void getVector2(std::vector<glm::vec2>* vertices, char* buffer, int* i);
 	bool isSeparator(char current);
+	bool isSeparator2(char current);
 	void copyNextWord(char* tempBuffer, size_t length, char* buffer, int* i);
+	void copyNextWord2(char* tempBuffer, size_t length, char* buffer, int* i);
 	void getFace(std::vector<glm::i32vec3>* vertices, char* buffer, int* i);
+	void getFace2(std::vector<glm::i32vec3>* vertices, std::vector<unsigned int>* textureCoordOrder, char* buffer, int* i);
 
 	void removeQuotes(string* str);
 	void computeQuaternionW(glm::quat* quat);
