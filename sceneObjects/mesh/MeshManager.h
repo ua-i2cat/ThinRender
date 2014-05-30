@@ -74,6 +74,10 @@ private:
 
 	Mesh* parseOBJ(string filename, char* buffer, int lenght);
 
+    /*
+	Mesh* parseTinyOBJ(string filename, char* buffer, int lenght);
+    */
+
 	static MeshManager* instance;
 
 	void getNextWord(char* buffer, int* i);
@@ -86,7 +90,11 @@ private:
 	void copyNextWord(char* tempBuffer, size_t length, char* buffer, int* i);
 	void copyNextWord2(char* tempBuffer, size_t length, char* buffer, int* i);
 	void getFace(std::vector<glm::i32vec3>* vertices, char* buffer, int* i);
-	void getFace2(std::vector<glm::i32vec3>* vertices, std::vector<unsigned int>* textureCoordOrder, char* buffer, int* i);
+	void getFace2(
+            std::vector<unsigned int>* verticesOrder,
+            std::vector<unsigned int>* textureCoordOrder,
+            std::vector<unsigned int>* normalsOrder,
+            char* buffer, int* i);
 
 	void removeQuotes(string* str);
 	void computeQuaternionW(glm::quat* quat);

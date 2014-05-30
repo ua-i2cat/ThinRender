@@ -58,6 +58,14 @@ SubMesh::~SubMesh(){
 	vertices.clear();
 	colors.clear();
 	elements.clear();
+
+    verticesSorted.clear();
+    textureCoordSorted.clear();
+    normalsSorted.clear();
+
+	verticesOrder.clear();
+	textureCoordOrder.clear();
+	normalsOrder.clear();
 }
 void SubMesh::setSubMeshTextureName(const char* textureName){
 	subMeshTextureName = textureName;
@@ -126,13 +134,17 @@ void SubMesh::render(Shader* shader){
 			0						// offset of first element
 			);
 	}
-	if(ibo_elements){
+	//if(ibo_elements){
         // logInf("SubMesh::render(): using GL_ELEMENT_ARRAY_BUFFER");
 
+        /*
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_elements);
 		int size;
 		glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 		glDrawElements(GL_TRIANGLES, size/sizeof(GLuint), GL_UNSIGNED_INT, 0);
+        */
+    if (verticesSorted.size() != 0) {
+		glDrawArrays(GL_TRIANGLES, 0,verticesSorted.size());
 	}else{
         // logInf("SubMesh::render(): just passing as GL_TRIANGLES");
 
@@ -165,14 +177,41 @@ void SubMesh::generateVBO(){
 		glDeleteBuffers(1, &ibo_elements);
 
 	if(vertices.size() != 0){
-		glGenBuffers(1, &vbo_vertices);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+        if (verticesOrder.size() != 0) {
+            for (int i = 0; i < verticesOrder.size(); i++) {
+                unsigned int index = verticesOrder.at(i);
+                verticesSorted.push_back(vertices.at(index));
+            }
+
+            glGenBuffers(1, &vbo_vertices);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
+            glBufferData(
+                    GL_ARRAY_BUFFER, verticesSorted.size() * sizeof(glm::vec3),
+                    &verticesSorted[0], GL_STATIC_DRAW
+                    );
+        } else {
+            glGenBuffers(1, &vbo_vertices);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+        }
 	}
 	if(normals.size() != 0){
-		glGenBuffers(1, &vbo_normals);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
-		glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+        if (normalsOrder.size() != 0) {
+            for (int i = 0; i < normalsOrder.size(); i++) {
+                unsigned int index = normalsOrder.at(i);
+                normalsSorted.push_back(normals.at(index));
+            }
+
+            glGenBuffers(1, &vbo_normals);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
+            glBufferData(
+                    GL_ARRAY_BUFFER, normalsSorted.size() * sizeof(glm::vec3),
+                    &normalsSorted[0], GL_STATIC_DRAW);
+        } else {
+            glGenBuffers(1, &vbo_normals);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
+            glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+        }
 	}
 	if(tangents.size() != 0){
 		glGenBuffers(1, &vbo_tangents);
@@ -187,14 +226,15 @@ void SubMesh::generateVBO(){
 	if(textureCoord.size() != 0){
         if(textureCoordOrder.size() != 0){
             for(int i = 0; i < textureCoordOrder.size(); i++){
-                int index = textureCoordOrder.at(i);
-                logInf("textureCoordSorted index: %d", index);
+                unsigned int index = textureCoordOrder.at(i);
                 textureCoordSorted.push_back(textureCoord.at(index));
             }
 
             glGenBuffers(1, &vbo_texcoords);
             glBindBuffer(GL_ARRAY_BUFFER, vbo_texcoords);
-            glBufferData(GL_ARRAY_BUFFER, textureCoordSorted.size() * sizeof(glm::vec2), &textureCoordSorted[0], GL_STATIC_DRAW);
+            glBufferData(
+                    GL_ARRAY_BUFFER, textureCoordSorted.size() * sizeof(glm::vec2),
+                    &textureCoordSorted[0], GL_STATIC_DRAW);
         } else {
             glGenBuffers(1, &vbo_texcoords);
             glBindBuffer(GL_ARRAY_BUFFER, vbo_texcoords);

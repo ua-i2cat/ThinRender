@@ -451,7 +451,11 @@ Mesh* MeshManager::parseOBJ(string filename, char* buffer, int lenght){
 		break;
 	case 'f': // Parse a face
 		i++;
-		getFace2(&(auxSubMesh->elements), &(auxSubMesh->textureCoordOrder), buffer, &i);
+		getFace2(
+                &(auxSubMesh->verticesOrder),
+                &(auxSubMesh->textureCoordOrder),
+                &(auxSubMesh->normalsOrder),
+                buffer, &i);
 		//skipLine(buffer, &i);
 		break;
 	case '#': // Parse a comment
@@ -582,8 +586,12 @@ void MeshManager::getFace(std::vector<glm::i32vec3>* vertices, char* buffer, int
 	skipLine(buffer, i);
 }
 
-void MeshManager::getFace2(std::vector<glm::i32vec3>* vertices, std::vector<unsigned int>* textureCoordOrder, char* buffer, int* i){
-    
+void MeshManager::getFace2(
+        std::vector<unsigned int>* verticesOrder,
+        std::vector<unsigned int>* textureCoordOrder,
+        std::vector<unsigned int>* normalsOrder,
+        char* buffer, int* i)
+{
 	getNextWord2(buffer, i);
 
     int xVertex, yVertex, zVertex;
@@ -617,10 +625,17 @@ void MeshManager::getFace2(std::vector<glm::i32vec3>* vertices, std::vector<unsi
 	copyNextWord2(tempBuffer, BUFFERSIZE, buffer, i);
 	zNormal = (int) atoi(tempBuffer) - 1 - elementOffsetOBJ;
 
-	vertices->push_back(glm::i32vec3(xVertex, yVertex, zVertex));
+	verticesOrder->push_back(xVertex);
+    verticesOrder->push_back(yVertex);
+    verticesOrder->push_back(zVertex);
+
     textureCoordOrder->push_back(xTextureCoord);
     textureCoordOrder->push_back(yTextureCoord);
     textureCoordOrder->push_back(zTextureCoord);
+
+    normalsOrder->push_back(xNormal);
+    normalsOrder->push_back(yNormal);
+    normalsOrder->push_back(zNormal);
 
 	skipLine(buffer, i);
 }
