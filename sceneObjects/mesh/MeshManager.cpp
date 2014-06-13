@@ -79,6 +79,8 @@ void MeshManager::printMeshData(Mesh* mesh){
 }
 
 Mesh* MeshManager::getMesh(string name){
+    logInf("%s: START", __PRETTY_FUNCTION__);
+
 	std::map<string, Mesh*>::iterator it;
 	it = meshMap.find(name);
 	if(it != meshMap.end()){//mesh previament carregat LEAK!
@@ -94,12 +96,15 @@ Mesh* MeshManager::getMesh(string name){
 	std::size_t foundMD5 = name.find(".md5");
 	std::size_t foundOBJ = name.find(".obj");
 	if (foundOBJ!=std::string::npos){
+        logInf("%s: found OBJ file", __PRETTY_FUNCTION__);
 		meshMap[name] = parseOBJ(name, FileSystem::getInstance()->getFileData(name), FileSystem::getInstance()->getFileSize(name));
 	}
 	else if (foundMD5!=std::string::npos){
+        logInf("%s: found MD5 file", __PRETTY_FUNCTION__);
 		meshMap[name] = parseMD5(name, FileSystem::getInstance()->getFileData(name), FileSystem::getInstance()->getFileSize(name));
 	}
 	else{
+        logInf("%s: no format found file", __PRETTY_FUNCTION__);
 		FileSystem::getInstance()->destroyFileData(name);
 		return 0;
 	}
@@ -107,6 +112,9 @@ Mesh* MeshManager::getMesh(string name){
 
 //	printMeshData(meshMap[name]);
 	meshMap[name]->generateVBO();
+
+    logInf("%s: START", __PRETTY_FUNCTION__);
+
 	return meshMap[name];
 }
 
